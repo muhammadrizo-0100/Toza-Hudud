@@ -1,0 +1,75 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: toza-hudud-postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./backend/.env
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        export POSTGRES_USER="$$DB_USER"
+        export POSTGRES_PASSWORD="$$DB_PASSWORD"
+        export POSTGRES_DB="$$DB_NAME"
+        exec docker-entrypoint.sh postgres
+    volumes:
+      - toza_hudud_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$DB_USER -d $$DB_NAME"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    container_name: toza-hudud-backend
+    restart: "no"
+    env_file:
+      - ./backend/.env
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 4001
+      NEST_PORT: 4001
+      UPLOADS_DIR: /usr/src/app/uploads
+      DB_HOST: postgres
+      DB_PORT: 5432
+    ports:
+      - "4001:4001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend/uploads:/usr/src/app/uploads
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:4001/api/public/health').then((res) => process.exit(res.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+  frontend:
+    build: ./frontend
+    container_name: toza-hudud-frontend
+    restart: "no"
+    ports:
+      - "5173:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  toza_hudud_postgres_data:
