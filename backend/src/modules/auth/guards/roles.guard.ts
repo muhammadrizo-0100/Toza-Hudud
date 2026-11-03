@@ -15,7 +15,7 @@ export class RolesGuard implements CanActivate {
     );
 
     if (!requiredRoles || requiredRoles.length === 0) {
-      return true; // No roles required
+      return true;
     }
 
     const { user } = context.switchToHttp().getRequest<{ user?: JwtPayload }>();
@@ -23,7 +23,7 @@ export class RolesGuard implements CanActivate {
       throw new ForbiddenException('Foydalanuvchi ma’lumotlari topilmadi');
     }
 
-    if (requiredRoles.includes('AnyAuthenticated')) {
+    if (requiredRoles.includes('AnyAuthenticated') || user.role === AdminRole.SUPERADMIN) {
       return true;
     }
 

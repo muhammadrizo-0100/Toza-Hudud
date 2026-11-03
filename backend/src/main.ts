@@ -9,6 +9,8 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+  app.set('trust proxy', 1);
+
   app.setGlobalPrefix('api');
 
   const rawOrigins = process.env.ALLOWED_ORIGINS || '';

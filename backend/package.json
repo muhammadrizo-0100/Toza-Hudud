@@ -8,7 +8,8 @@
     "build": "npm run clean && npx nest build",
     "start": "node dist/main",
     "start:dev": "npx nest start --watch",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "npm run build && node --test dist/modules/auth/guards/*.spec.js"
   },
   "dependencies": {
     "@nestjs/common": "^10.4.15",
