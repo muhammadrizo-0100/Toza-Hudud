@@ -6,13 +6,19 @@ import {
   UseGuards,
   UnauthorizedException
 } from '@nestjs/common';
+import { IsNotEmpty, IsString } from 'class-validator';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { JwtPayload } from './types/jwt-payload.type';
 
 export class LoginDto {
+  @IsString()
+  @IsNotEmpty({ message: 'Username kiritilishi shart' })
   username!: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'Password kiritilishi shart' })
   password!: string;
 }
 

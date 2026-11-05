@@ -40,11 +40,10 @@ async function bootstrap() {
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
   });
 
-  // Global ValidationPipe — safely transform and sanitize without breaking extra frontend fields
+  // Global ValidationPipe — safely transform without stripping undecorated fields
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: false,
+      whitelist: false,
       transform: true,
       transformOptions: { enableImplicitConversion: true }
     })
