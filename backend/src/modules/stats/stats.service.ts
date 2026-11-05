@@ -521,11 +521,22 @@ export class StatsService {
     };
   }
 
-  async getMyAccountStats(user: JwtPayload) {
-    const admin = await this.adminRepo.findOne({
-      where: { id: user.id },
-      relations: ['district']
-    });
+  async getMyAccountStats(user: JwtPayload, targetAdminId?: number, targetDistrictId?: number) {
+    const effectiveAdminId = targetAdminId || (user.id !== 0 ? user.id : undefined);
+    let admin = effectiveAdminId
+      ? await this.adminRepo.findOne({
+          where: { id: effectiveAdminId },
+          relations: ['district']
+        })
+      : null;
+
+    const districtIdForLookup = targetDistrictId ?? (user.districtId || undefined);
+    if (!admin && districtIdForLookup) {
+      admin = await this.adminRepo.findOne({
+        where: { districtId: districtIdForLookup, role: AdminRole.MANAGER },
+        relations: ['district']
+      });
+    }
 
     let worker: WorkerEntity | null = null;
     if (admin?.workerId) {
@@ -535,11 +546,13 @@ export class StatsService {
       });
     }
 
+    const effectiveDistrictId = admin?.districtId || targetDistrictId || user.districtId;
+
     const qb = this.requestRepo.createQueryBuilder('r');
     if (admin?.workerId) {
       qb.where('r.assigned_worker_id = :workerId', { workerId: admin.workerId });
-    } else if (user.districtId) {
-      qb.where('r.district_id = :districtId', { districtId: user.districtId });
+    } else if (effectiveDistrictId) {
+      qb.where('r.district_id = :districtId', { districtId: effectiveDistrictId });
     }
 
     const [
