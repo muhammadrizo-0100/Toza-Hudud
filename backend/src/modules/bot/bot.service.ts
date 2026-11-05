@@ -833,8 +833,9 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
   }
 
   private async sendLocationPrompt(ctx: any, session: UserSession): Promise<void> {
-    const frontendUrl = this.configService.get<string>('FRONTEND_URL', 'http://localhost:5173');
-    const isHttps = typeof frontendUrl === 'string' && frontendUrl.trim().toLowerCase().startsWith('https://');
+    const rawUrl = process.env.FRONTEND_URL || this.configService.get<string>('FRONTEND_URL', 'http://localhost:5173');
+    const frontendUrl = (rawUrl || '').trim().replace(/\/+$/, '');
+    const isHttps = typeof frontendUrl === 'string' && frontendUrl.toLowerCase().startsWith('https://');
     const districtName = session.districtName || '';
     const mahallaName = session.mahallaName || '';
     const miniAppUrl = `${frontendUrl}/location-picker?lat=${session.lat}&lng=${session.lng}&name=${encodeURIComponent(mahallaName)}&district=${encodeURIComponent(districtName)}`;

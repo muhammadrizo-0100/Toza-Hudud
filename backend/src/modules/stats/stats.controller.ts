@@ -10,8 +10,14 @@ export class StatsController {
   constructor(private readonly statsService: StatsService) {}
 
   @Get('my-account')
-  async getMyAccountStats(@CurrentUser() user: JwtPayload) {
-    return this.statsService.getMyAccountStats(user);
+  async getMyAccountStats(
+    @CurrentUser() user: JwtPayload,
+    @Query('adminId') adminId?: string,
+    @Query('districtId') districtId?: string
+  ) {
+    const parsedAdminId = adminId ? Number(adminId) : undefined;
+    const parsedDistrictId = districtId ? Number(districtId) : undefined;
+    return this.statsService.getMyAccountStats(user, parsedAdminId, parsedDistrictId);
   }
 
   @Get('insights')
