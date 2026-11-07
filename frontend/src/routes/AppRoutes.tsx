@@ -13,10 +13,23 @@ import { DistrictsPage } from '../pages/admin/DistrictsPage';
 import { StaffPage } from '../pages/admin/StaffPage';
 import { MyAccountPage } from '../pages/admin/MyAccountPage';
 
-const ProtectedAdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
+interface ProtectedAdminRouteProps {
+  children: React.ReactNode;
+  allowedRoles?: string[];
+  fallbackPath?: string;
+}
+
+const ProtectedAdminRoute: React.FC<ProtectedAdminRouteProps> = ({
+  children,
+  allowedRoles,
+  fallbackPath = '/admin/requests'
+}) => {
+  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+  if (allowedRoles && user && !allowedRoles.includes(user.role)) {
+    return <Navigate to={fallbackPath} replace />;
   }
   return <DashboardLayout>{children}</DashboardLayout>;
 };
@@ -33,7 +46,7 @@ export const AppRoutes: React.FC = () => {
       <Route
         path="/admin"
         element={
-          <ProtectedAdminRoute>
+          <ProtectedAdminRoute allowedRoles={['SuperAdmin', 'Manager']}>
             <SystemPage />
           </ProtectedAdminRoute>
         }
@@ -57,7 +70,7 @@ export const AppRoutes: React.FC = () => {
       <Route
         path="/admin/stats"
         element={
-          <ProtectedAdminRoute>
+          <ProtectedAdminRoute allowedRoles={['SuperAdmin', 'Manager']}>
             <StatsPage />
           </ProtectedAdminRoute>
         }
@@ -65,7 +78,7 @@ export const AppRoutes: React.FC = () => {
       <Route
         path="/admin/districts"
         element={
-          <ProtectedAdminRoute>
+          <ProtectedAdminRoute allowedRoles={['SuperAdmin']}>
             <DistrictsPage />
           </ProtectedAdminRoute>
         }
@@ -73,7 +86,7 @@ export const AppRoutes: React.FC = () => {
       <Route
         path="/admin/staff"
         element={
-          <ProtectedAdminRoute>
+          <ProtectedAdminRoute allowedRoles={['SuperAdmin', 'Manager', 'Dispatcher']}>
             <StaffPage />
           </ProtectedAdminRoute>
         }

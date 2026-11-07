@@ -3,6 +3,7 @@ import { Breadcrumbs, Link, Typography, Stack, Box } from '@mui/material';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import { useNavigate } from 'react-router-dom';
+import { useAppSelector } from '../../store/hooks';
 
 export interface BreadcrumbItem {
   label: string;
@@ -17,6 +18,41 @@ interface AppBreadcrumbsProps {
 
 export const AppBreadcrumbs: React.FC<AppBreadcrumbsProps> = ({ items, showHome = true }) => {
   const navigate = useNavigate();
+  const { user } = useAppSelector((state) => state.auth);
+
+  const isLeadership = user?.role === 'SuperAdmin' || user?.role === 'Manager';
+  const homePath = isLeadership ? '/admin' : '/admin/requests';
+
+  // Dala xodimlari (Inspector, Driver) yoki Dispetcher uchun asosiy bosh sahifa /admin/requests hisoblanadi.
+  // Ular o'zlarining asosiy sahifasida turganida, boshqaruv paneliga olib boruvchi "Bosh sahifa >" ortiqcha havolasi ko'rsatilmaydi.
+  const isWorkerOnHome =
+    !isLeadership &&
+    items.length === 1 &&
+    (items[0].label === 'Murojaatlar' || items[0].label === 'Mening vazifalarim');
+
+  if (isWorkerOnHome) {
+    return (
+      <Box sx={{ mb: 2 }}>
+        <Stack direction="row" spacing={0.5} alignItems="center">
+          <Typography
+            sx={{
+              color: '#0F172A',
+              fontSize: '0.85rem',
+              fontWeight: 700
+            }}
+          >
+            {items[0].label}
+          </Typography>
+        </Stack>
+      </Box>
+    );
+  }
+
+  const homeLabel = isLeadership
+    ? 'Bosh sahifa'
+    : user?.role === 'Inspector' || user?.role === 'Driver'
+      ? 'Mening vazifalarim'
+      : 'Murojaatlar';
 
   return (
     <Box sx={{ mb: 2 }}>
@@ -41,10 +77,10 @@ export const AppBreadcrumbs: React.FC<AppBreadcrumbsProps> = ({ items, showHome 
               fontWeight: 500,
               '&:hover': { color: 'primary.main' }
             }}
-            onClick={() => navigate('/admin')}
+            onClick={() => navigate(homePath)}
           >
             <HomeOutlinedIcon sx={{ mr: 0.5, fontSize: 17 }} />
-            Bosh sahifa
+            {homeLabel}
           </Link>
         )}
 

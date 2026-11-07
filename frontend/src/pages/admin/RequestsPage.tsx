@@ -159,9 +159,16 @@ export const RequestsPage: React.FC = () => {
   const totalPages = pagination?.totalPages ?? 1;
   const limit = pagination?.limit ?? 10;
 
+  const isFieldWorker = user?.role === 'Inspector' || user?.role === 'Driver';
+  const pageBreadcrumbLabel = isFieldWorker
+    ? 'Mening vazifalarim'
+    : user?.role === 'Manager'
+      ? 'Tuman murojaatlari'
+      : 'Murojaatlar';
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, position: 'relative' }}>
-      <AppBreadcrumbs items={[{ label: 'Murojaatlar' }]} />
+      <AppBreadcrumbs items={[{ label: pageBreadcrumbLabel }]} />
 
       {/* Top Filter Bar (BSK Style) */}
       <FilterBar>

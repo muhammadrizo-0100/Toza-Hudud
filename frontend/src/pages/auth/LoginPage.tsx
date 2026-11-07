@@ -52,8 +52,10 @@ export const LoginPage: React.FC = () => {
     try {
       const data = await login({ username: username.trim(), password: password.trim() }).unwrap();
       dispatch(setCredentials(data));
+      const role = data.user?.role;
+      const targetPath = role === 'SuperAdmin' || role === 'Manager' ? '/admin' : '/admin/requests';
       showSuccess(`Xush kelibsiz, ${data.user?.fullName || data.user?.username}!`);
-      navigate('/admin/requests');
+      navigate(targetPath);
     } catch (err: unknown) {
       const errObj = err as { data?: { message?: string } };
       const msg = errObj?.data?.message || 'Login yoki parol noto‘g‘ri.';
