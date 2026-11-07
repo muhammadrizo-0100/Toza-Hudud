@@ -22,7 +22,8 @@ import {
   InputAdornment,
   Pagination,
   Collapse,
-  Button
+  Button,
+  Autocomplete
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
@@ -50,6 +51,47 @@ import AppButton from '../../components/common/AppButton';
 import AppSelectField from '../../components/common/AppSelectField';
 import AppBreadcrumbs from '../../components/common/AppBreadcrumbs';
 import { useToast } from '../../context/ToastContext';
+
+const UZBEKISTAN_DISTRICT_SUGGESTIONS = [
+  'Rishton tumani',
+  'Qo‘qon shahri',
+  'Marg‘ilon shahri',
+  'Farg‘ona shahri',
+  'Oltiariq tumani',
+  'Quva tumani',
+  'Beshariq tumani',
+  'Buvayda tumani',
+  'Dang‘ara tumani',
+  'Bag‘dod tumani',
+  'Uchko‘prik tumani',
+  'Toshloq tumani',
+  'Yozyovon tumani',
+  'So‘x tumani',
+  'Andijon shahri',
+  'Asaka tumani',
+  'Shahrixon tumani',
+  'Xonobod shahri',
+  'Baliqchi tumani',
+  'Paxtaobod tumani',
+  'Marhamat tumani',
+  'Qo‘rg‘ontepa tumani',
+  'Buloqboshi tumani',
+  'Izboskan tumani',
+  'Jalaquduq tumani',
+  'Chirchiq shahri',
+  'Olmaliq shahri',
+  'Angren shahri',
+  'Bekobod tumani',
+  'Bo‘stonliq tumani',
+  'Zangiota tumani',
+  'Qibray tumani',
+  'Parkent tumani',
+  'Samarqand shahri',
+  'Urgut tumani',
+  'Kattaqo‘rg‘on shahri',
+  'Buxoro shahri',
+  'G‘ijduvon tumani'
+];
 
 export const DistrictsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -121,6 +163,16 @@ export const DistrictsPage: React.FC = () => {
   const handleCreateDistrict = async () => {
     const trimmedName = newDistrictName.trim();
     if (!trimmedName) return;
+
+    if (trimmedName.length < 3) {
+      setDistrictError('Tuman nomi kamida 3 ta harfdan iborat bo‘lishi kerak');
+      return;
+    }
+
+    if (/(.)\1{3,}/i.test(trimmedName)) {
+      setDistrictError('Tuman nomi noto‘g‘ri kiritildi. Iltimos, haqiqiy tuman yoki shahar nomini kiriting (Masalan: Rishton tumani, Qo‘qon shahri).');
+      return;
+    }
 
     setDistrictError(null);
     try {
@@ -689,32 +741,43 @@ export const DistrictsPage: React.FC = () => {
               <Typography variant="caption" sx={{ color: '#334155', fontWeight: 600, display: 'block', mb: 0.75, fontSize: '0.85rem' }}>
                 Tuman yoki shahar nomi <span style={{ color: '#EF4444' }}>*</span>
               </Typography>
-              <TextField
-                fullWidth
-                placeholder="Masalan: Rishton tumani, Qo‘qon shahri..."
+              <Autocomplete
+                freeSolo
+                options={UZBEKISTAN_DISTRICT_SUGGESTIONS}
                 value={newDistrictName}
-                onChange={(e) => {
-                  setNewDistrictName(e.target.value);
+                onInputChange={(_e, newInputValue) => {
+                  setNewDistrictName(newInputValue);
                   setDistrictError(null);
                 }}
-                autoFocus
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <MapOutlinedIcon sx={{ fontSize: 20, color: '#94A3B8' }} />
-                    </InputAdornment>
-                  )
-                }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: '10px',
-                    bgcolor: '#FFFFFF',
-                    fontSize: '0.92rem',
-                    '& fieldset': { borderColor: '#CBD5E1' },
-                    '&:hover fieldset': { borderColor: '#94A3B8' },
-                    '&.Mui-focused fieldset': { borderColor: 'primary.main', borderWidth: 2 }
-                  }
-                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    fullWidth
+                    placeholder="Masalan: Rishton tumani, Qo‘qon shahri..."
+                    autoFocus
+                    InputProps={{
+                      ...params.InputProps,
+                      startAdornment: (
+                        <>
+                          <InputAdornment position="start">
+                            <MapOutlinedIcon sx={{ fontSize: 20, color: '#94A3B8' }} />
+                          </InputAdornment>
+                          {params.InputProps.startAdornment}
+                        </>
+                      )
+                    }}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: '10px',
+                        bgcolor: '#FFFFFF',
+                        fontSize: '0.92rem',
+                        '& fieldset': { borderColor: '#CBD5E1' },
+                        '&:hover fieldset': { borderColor: '#94A3B8' },
+                        '&.Mui-focused fieldset': { borderColor: 'primary.main', borderWidth: 2 }
+                      }
+                    }}
+                  />
+                )}
               />
             </Box>
 

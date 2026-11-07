@@ -391,8 +391,13 @@ export class DistrictsService implements OnModuleInit {
 
   async create(dto: CreateDistrictDto): Promise<DistrictEntity> {
     const trimmedName = String(dto.name || '').trim();
-    if (!trimmedName) {
-      throw new BadRequestException('Tuman nomi kiritilishi shart');
+    if (!trimmedName || trimmedName.length < 3) {
+      throw new BadRequestException('Tuman nomi kamida 3 ta harfdan iborat bo‘lishi shart');
+    }
+
+    // Tekshiruv: Ketma-ket 3 tadan ortiq bir xil harf (masalan: "dddd...", "aaaa...") yoki bema'ni matnlar
+    if (/(.)\1{3,}/i.test(trimmedName) || /^[^a-zA-Zа-яА-ЯўқғҳЎҚҒҲ]+$/.test(trimmedName)) {
+      throw new BadRequestException('Tuman nomi noto‘g‘ri kiritildi. Haqiqiy tuman yoki shahar nomini kiriting.');
     }
 
     const rawCode = (dto.code ? String(dto.code).trim() : trimmedName)
@@ -413,8 +418,8 @@ export class DistrictsService implements OnModuleInit {
     }
 
     let polygon: [number, number][] | null = dto.polygon || null;
-    let lat = Number(dto.centerLat) || 41.0000;
-    let lng = Number(dto.centerLng) || 71.6000;
+    let lat = Number(dto.centerLat) || 0;
+    let lng = Number(dto.centerLng) || 0;
 
     // Fetch official district boundary if requested (default: true) and no manual polygon was provided
     if (!polygon && dto.fetchOsmBoundary !== false) {
@@ -423,7 +428,7 @@ export class DistrictsService implements OnModuleInit {
         const url = `https://nominatim.openstreetmap.org/search?q=${query}&format=json&polygon_geojson=1&limit=1`;
         const res = await axios.get(url, {
           headers: { 'User-Agent': 'TozaHududSanitation/1.0 (contact@tozahudud.uz)' },
-          timeout: 4000
+          timeout: 4500
         });
 
         if (res.data && res.data.length > 0) {
@@ -438,10 +443,24 @@ export class DistrictsService implements OnModuleInit {
               polygon = (match.geojson.coordinates[0][0] as [number, number][]).map(([pLng, pLat]) => [pLat, pLng]);
             }
           }
+        } else {
+          // Xaritadan bunday hudud topilmadi (masalan, foydalanuvchi imlosida xato qilgan yoki mavjud bo'lmagan so'z kiritgan)
+          throw new BadRequestException(
+            `"${trimmedName}" nomli tuman yoki shahar O‘zbekiston xaritasidan topilmadi. Iltimos, nomini to‘g‘ri yozganingizga ishonch hosil qiling (Masalan: Rishton tumani, Qo‘qon shahri).`
+          );
         }
-      } catch (err) {
+      } catch (err: any) {
+        if (err instanceof BadRequestException) {
+          throw err;
+        }
         this.logger.warn(`OSM boundary fetch skipped for ${trimmedName}: ${String(err)}`);
       }
+    }
+
+    // Agar koordinatalar topilmagan bo'lsa
+    if (!lat || !lng) {
+      lat = 41.0000;
+      lng = 71.6000;
     }
 
     // If still no polygon, create an 8-sided boundary around the center so the district is never boundary-less on the map
