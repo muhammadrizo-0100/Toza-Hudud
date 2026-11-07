@@ -7,13 +7,15 @@ interface NotificationsState {
   unreadCount: number;
   totalCount: number;
   soundEnabled: boolean;
+  locallyReadIds: string[];
 }
 
 const initialState: NotificationsState = {
   items: [],
   unreadCount: 0,
   totalCount: 0,
-  soundEnabled: true
+  soundEnabled: true,
+  locallyReadIds: []
 };
 
 export const notificationsSlice = createSlice({
@@ -24,41 +26,62 @@ export const notificationsSlice = createSlice({
       state,
       action: PayloadAction<{ items: AppNotificationItem[]; unreadCount: number; totalCount?: number }>
     ) => {
-      state.items = action.payload.items;
-      state.unreadCount = Math.max(0, Number(action.payload.unreadCount) || 0);
-      state.totalCount = Math.max(
-        state.unreadCount,
-        Number(action.payload.totalCount) || action.payload.items.length
-      );
+      // Reconcile server items with local read state to prevent race-condition reversion
+      const readSet = new Set(state.locallyReadIds);
+      const reconciledItems = action.payload.items.map((it) => {
+        if (readSet.has(String(it.id))) {
+          return { ...it, isRead: true };
+        }
+        return it;
+      });
+
+      state.items = reconciledItems;
+      const actualUnread = reconciledItems.filter((it) => !it.isRead).length;
+      state.unreadCount = actualUnread;
+      state.totalCount = Math.max(actualUnread, Number(action.payload.totalCount) || reconciledItems.length);
     },
     addNotification: (state, action: PayloadAction<AppNotificationItem>) => {
-      const existingIndex = state.items.findIndex((it) => String(it.id) === String(action.payload.id));
+      const incomingId = String(action.payload.id);
+      const isLocallyRead = state.locallyReadIds.includes(incomingId);
+      const payload: AppNotificationItem = isLocallyRead ? { ...action.payload, isRead: true } : action.payload;
+
+      const existingIndex = state.items.findIndex((it) => String(it.id) === incomingId);
       if (existingIndex >= 0) {
         const existing = state.items[existingIndex];
-        if (existing.isRead && !action.payload.isRead) {
-          state.unreadCount += 1;
-        } else if (!existing.isRead && action.payload.isRead) {
+        // If already exists and marked read, NEVER flip back to unread!
+        if (existing.isRead) {
+          state.items[existingIndex] = { ...payload, isRead: true };
+          return;
+        }
+
+        // If transitioning from unread to read
+        if (!existing.isRead && payload.isRead) {
           state.unreadCount = Math.max(0, state.unreadCount - 1);
         }
-        state.items[existingIndex] = action.payload;
+        state.items[existingIndex] = payload;
         return;
       }
 
-      state.items.unshift(action.payload);
+      // Brand new incoming notification
+      state.items.unshift(payload);
       if (state.items.length > 50) {
         state.items = state.items.slice(0, 50);
       }
-      if (!action.payload.isRead) {
+
+      if (!payload.isRead) {
         state.unreadCount = Math.max(0, state.unreadCount + 1);
+        if (state.soundEnabled) {
+          playNotificationSound();
+        }
       }
       state.totalCount = Math.max(state.unreadCount, state.totalCount + 1);
-
-      if (state.soundEnabled) {
-        playNotificationSound();
-      }
     },
     markAsRead: (state, action: PayloadAction<string>) => {
-      const item = state.items.find((it) => String(it.id) === String(action.payload));
+      const idStr = String(action.payload);
+      if (!state.locallyReadIds.includes(idStr)) {
+        state.locallyReadIds.push(idStr);
+      }
+      const item = state.items.find((it) => String(it.id) === idStr);
       if (item && !item.isRead) {
         item.isRead = true;
         state.unreadCount = Math.max(0, state.unreadCount - 1);
@@ -66,6 +89,10 @@ export const notificationsSlice = createSlice({
     },
     markAllAsRead: (state) => {
       state.items.forEach((it) => {
+        const idStr = String(it.id);
+        if (!state.locallyReadIds.includes(idStr)) {
+          state.locallyReadIds.push(idStr);
+        }
         it.isRead = true;
       });
       state.unreadCount = 0;

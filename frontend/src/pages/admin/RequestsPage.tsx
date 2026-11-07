@@ -114,7 +114,10 @@ export const RequestsPage: React.FC = () => {
     limit: 10
   }), [statusFilter, wasteTypeFilter, effectiveDistrictId, mahallaFilter, dateFilterParams, page]);
 
-  const { data: requestsData, isLoading, isFetching, refetch } = useGetRequestsQuery(queryParams);
+  const { data: requestsData, isLoading, isFetching, refetch } = useGetRequestsQuery(queryParams, {
+    refetchOnFocus: true,
+    refetchOnReconnect: true
+  });
 
   // Keep last known good data while fetching new filter results
   const prevRequestsRef = useRef<RequestsResponse | null>(null);

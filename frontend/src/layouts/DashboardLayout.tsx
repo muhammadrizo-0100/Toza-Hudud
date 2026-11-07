@@ -53,6 +53,7 @@ import {
 } from '../store/slices/notificationsSlice';
 import { NotificationCenter } from '../components/notifications/NotificationCenter';
 import { useGetNotificationsQuery } from '../api/notificationsApi';
+import { baseApi } from '../api/baseApi';
 import { useToast } from '../context/ToastContext';
 import { AppNotificationItem } from '../types';
 import { getUserRoleBadgeText } from '../utils/roles';
@@ -82,8 +83,11 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
   const { user } = useAppSelector((state) => state.auth);
   const { showInfo } = useToast();
 
+  // Real-time fallback polling: 8 seconds (Telegram/Facebook standard web safety net)
   const { data: notifData } = useGetNotificationsQuery(undefined, {
-    pollingInterval: 30000
+    pollingInterval: 8000,
+    refetchOnFocus: true,
+    refetchOnReconnect: true
   });
 
   useEffect(() => {
@@ -98,22 +102,59 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [notifData, dispatch]);
 
-  // Real-time Socket.IO listener
+  // Window Focus / Visibility change listener: instant catch-up when user tabs back
+  useEffect(() => {
+    const handleCatchUp = () => {
+      if (document.visibilityState === 'visible') {
+        dispatch(baseApi.util.invalidateTags(['NOTIFICATIONS', 'REQUESTS', 'STATS']));
+      }
+    };
+
+    window.addEventListener('focus', handleCatchUp);
+    document.addEventListener('visibilitychange', handleCatchUp);
+    return () => {
+      window.removeEventListener('focus', handleCatchUp);
+      document.removeEventListener('visibilitychange', handleCatchUp);
+    };
+  }, [dispatch]);
+
+  // Real-time Socket.IO listener with auto-reconnection, ping heartbeat, and table auto-refresh
   useEffect(() => {
     if (!user) return;
 
     const socket: Socket = io({
-      transports: ['polling', 'websocket'],
-      withCredentials: true
+      transports: ['websocket', 'polling'],
+      withCredentials: true,
+      reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 4000,
+      timeout: 10000
     });
 
-    socket.on('connect', () => {
+    const doSubscribe = () => {
       socket.emit('subscribe', {
         role: user.role,
         districtId: user.districtId,
         adminId: user.id
       });
+    };
+
+    socket.on('connect', () => {
+      doSubscribe();
     });
+
+    socket.on('reconnect', () => {
+      doSubscribe();
+      dispatch(baseApi.util.invalidateTags(['NOTIFICATIONS', 'REQUESTS', 'STATS']));
+    });
+
+    // Heartbeat ping every 15s to keep websocket tunnel alive
+    const pingInterval = setInterval(() => {
+      if (socket.connected) {
+        socket.emit('ping');
+      }
+    }, 15000);
 
     socket.on('notification.new', (event: AppNotificationItem & { actorAdminId?: number }) => {
       // 1. Never notify the user about their own action
@@ -136,7 +177,26 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
         }
       }
 
+      // Add to Redux store (with deduplication & idempotent read state check)
       dispatch(addNotification(event));
+
+      // Instantly refresh requests table and stats in real-time
+      dispatch(baseApi.util.invalidateTags(['REQUESTS', 'STATS']));
+
+      // Show attractive popup toast
+      showInfo(`🔔 ${event.title}: ${event.message}`, 5000);
+    });
+
+    socket.on('request.assigned', () => {
+      dispatch(baseApi.util.invalidateTags(['REQUESTS', 'STATS']));
+    });
+
+    socket.on('request.updated', () => {
+      dispatch(baseApi.util.invalidateTags(['REQUESTS', 'STATS']));
+    });
+
+    socket.on('request.created', () => {
+      dispatch(baseApi.util.invalidateTags(['REQUESTS', 'STATS']));
     });
 
     socket.on('notification.read', (data: { id: string }) => {
@@ -154,9 +214,10 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
     });
 
     return () => {
+      clearInterval(pingInterval);
       socket.disconnect();
     };
-  }, [user, dispatch]);
+  }, [user, dispatch, showInfo]);
 
   const handleLogout = useCallback(() => {
     setLogoutDialogOpen(true);

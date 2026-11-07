@@ -52,11 +52,36 @@ export class RealtimeService {
     };
 
     this.gateway.server.to('room:superadmin').emit('request.updated', payload);
-    this.gateway.server.to(`room:district_${request.districtId}`).emit('request.updated', payload);
+    if (request.districtId) {
+      this.gateway.server.to(`room:district_${request.districtId}`).emit('request.updated', payload);
+    }
+    if (request.assignedWorker?.adminId) {
+      this.gateway.server.to(`room:admin_${request.assignedWorker.adminId}`).emit('request.updated', payload);
+    }
   }
 
   emitRequestAssigned(request: RequestEntity, worker: WorkerEntity, isReassignment = false): void {
     this.emitRequestUpdated(request);
+
+    const assignedPayload = {
+      id: request.id,
+      districtId: request.districtId,
+      status: request.status,
+      assignedWorkerId: worker.id,
+      workerName: worker.fullName,
+      workerRole: worker.role,
+      isReassignment,
+      updatedAt: request.updatedAt
+    };
+
+    this.gateway.server.to('room:superadmin').emit('request.assigned', assignedPayload);
+    if (request.districtId) {
+      this.gateway.server.to(`room:district_${request.districtId}`).emit('request.assigned', assignedPayload);
+    }
+    if (worker.adminId) {
+      this.gateway.server.to(`room:admin_${worker.adminId}`).emit('request.assigned', assignedPayload);
+    }
+
     for (const listener of this.assignedListeners) {
       try {
         const res = listener({ request, worker, isReassignment });
