@@ -134,6 +134,202 @@ const CHUST_POLYGON: [number, number][] = [
   [40.9850, 71.2050]
 ];
 
+const DEFAULT_NAMANGAN_DISTRICTS: Array<{
+  name: string;
+  code: string;
+  centerLat: number;
+  centerLng: number;
+  polygon: [number, number][];
+}> = [
+  {
+    name: 'Davlatobod tumani',
+    code: 'davlatobod',
+    centerLat: 41.0108,
+    centerLng: 71.5775,
+    polygon: DAVLATOBOD_POLYGON
+  },
+  {
+    name: 'Yangi Namangan Tumani',
+    code: 'yangi_namangan',
+    centerLat: 41.0738,
+    centerLng: 71.6250,
+    polygon: YANGI_NAMANGAN_POLYGON
+  },
+  {
+    name: 'Chust tumani',
+    code: 'chust',
+    centerLat: 41.0089,
+    centerLng: 71.2289,
+    polygon: CHUST_POLYGON
+  },
+  {
+    name: 'Namangan shahri',
+    code: 'namangan_shahar',
+    centerLat: 40.9983,
+    centerLng: 71.6726,
+    polygon: [
+      [40.965, 71.635],
+      [40.995, 71.635],
+      [41.015, 71.650],
+      [41.018, 71.695],
+      [40.995, 71.710],
+      [40.970, 71.690],
+      [40.960, 71.655],
+      [40.965, 71.635]
+    ]
+  },
+  {
+    name: 'Kosonsoy tumani',
+    code: 'kosonsoy',
+    centerLat: 41.2500,
+    centerLng: 71.5500,
+    polygon: [
+      [41.150, 71.450],
+      [41.280, 71.450],
+      [41.350, 71.550],
+      [41.320, 71.680],
+      [41.180, 71.650],
+      [41.130, 71.530],
+      [41.150, 71.450]
+    ]
+  },
+  {
+    name: 'Chortoq tumani',
+    code: 'chortoq',
+    centerLat: 41.0667,
+    centerLng: 71.8167,
+    polygon: [
+      [41.020, 71.720],
+      [41.120, 71.730],
+      [41.180, 71.820],
+      [41.140, 71.930],
+      [41.030, 71.900],
+      [41.010, 71.800],
+      [41.020, 71.720]
+    ]
+  },
+  {
+    name: 'Pop tumani',
+    code: 'pop',
+    centerLat: 41.0167,
+    centerLng: 71.1000,
+    polygon: [
+      [40.850, 70.800],
+      [41.150, 70.800],
+      [41.250, 71.100],
+      [41.150, 71.250],
+      [40.900, 71.250],
+      [40.800, 71.000],
+      [40.850, 70.800]
+    ]
+  },
+  {
+    name: 'To‘raqo‘rg‘on tumani',
+    code: 'toraqorgon',
+    centerLat: 41.0000,
+    centerLng: 71.5167,
+    polygon: [
+      [40.950, 71.420],
+      [41.050, 71.430],
+      [41.070, 71.540],
+      [41.000, 71.580],
+      [40.930, 71.550],
+      [40.920, 71.460],
+      [40.950, 71.420]
+    ]
+  },
+  {
+    name: 'Uchqo‘rg‘on tumani',
+    code: 'uchqorgon',
+    centerLat: 41.1167,
+    centerLng: 72.0833,
+    polygon: [
+      [41.050, 71.980],
+      [41.180, 72.000],
+      [41.200, 72.150],
+      [41.120, 72.200],
+      [41.040, 72.150],
+      [41.030, 72.050],
+      [41.050, 71.980]
+    ]
+  },
+  {
+    name: 'Uychi tumani',
+    code: 'uychi',
+    centerLat: 41.0833,
+    centerLng: 71.9167,
+    polygon: [
+      [41.020, 71.850],
+      [41.120, 71.860],
+      [41.150, 71.980],
+      [41.080, 72.020],
+      [41.000, 71.960],
+      [41.010, 71.880],
+      [41.020, 71.850]
+    ]
+  },
+  {
+    name: 'Mingbuloq tumani',
+    code: 'mingbuloq',
+    centerLat: 40.7167,
+    centerLng: 71.3000,
+    polygon: [
+      [40.600, 71.150],
+      [40.820, 71.150],
+      [40.850, 71.450],
+      [40.750, 71.520],
+      [40.620, 71.400],
+      [40.580, 71.250],
+      [40.600, 71.150]
+    ]
+  },
+  {
+    name: 'Norin tumani',
+    code: 'norin',
+    centerLat: 40.8500,
+    centerLng: 72.0333,
+    polygon: [
+      [40.780, 71.950],
+      [40.900, 71.950],
+      [40.950, 72.100],
+      [40.880, 72.180],
+      [40.780, 72.150],
+      [40.750, 72.020],
+      [40.780, 71.950]
+    ]
+  },
+  {
+    name: 'Yangiqo‘rg‘on tumani',
+    code: 'yangiqorgon',
+    centerLat: 41.1833,
+    centerLng: 71.7333,
+    polygon: [
+      [41.100, 71.650],
+      [41.250, 71.650],
+      [41.320, 71.780],
+      [41.220, 71.900],
+      [41.120, 71.850],
+      [41.080, 71.720],
+      [41.100, 71.650]
+    ]
+  },
+  {
+    name: 'Namangan tumani',
+    code: 'namangan_tuman',
+    centerLat: 40.9500,
+    centerLng: 71.6000,
+    polygon: [
+      [40.880, 71.520],
+      [40.950, 71.530],
+      [40.970, 71.600],
+      [40.950, 71.680],
+      [40.880, 71.680],
+      [40.850, 71.580],
+      [40.880, 71.520]
+    ]
+  }
+];
+
 @Injectable()
 export class DistrictsService implements OnModuleInit {
   private readonly logger = new Logger(DistrictsService.name);
@@ -144,35 +340,15 @@ export class DistrictsService implements OnModuleInit {
   ) {}
 
   async onModuleInit(): Promise<void> {
-    // Demo seed disabled for clean testing from 0
+    const count = await this.districtRepo.count();
+    if (count === 0) {
+      await this.seedDefaultDistricts();
+      this.logger.log('✅ Barcha 14 ta tuman va shahar birlamchi (default) holatda yaratildi');
+    }
   }
 
   async seedDefaultDistricts(): Promise<void> {
-    const defaults = [
-      {
-        name: 'Davlatobod tumani',
-        code: 'davlatobod',
-        centerLat: 41.0108,
-        centerLng: 71.5775,
-        polygon: DAVLATOBOD_POLYGON
-      },
-      {
-        name: 'Yangi Namangan tumani',
-        code: 'yangi_namangan',
-        centerLat: 41.0250,
-        centerLng: 71.6500,
-        polygon: YANGI_NAMANGAN_POLYGON
-      },
-      {
-        name: 'Chust tumani',
-        code: 'chust',
-        centerLat: 41.0089,
-        centerLng: 71.2289,
-        polygon: CHUST_POLYGON
-      }
-    ];
-
-    for (const d of defaults) {
+    for (const d of DEFAULT_NAMANGAN_DISTRICTS) {
       const existing = await this.districtRepo.findOne({ where: { code: d.code } });
       if (!existing) {
         const item = this.districtRepo.create(d);
