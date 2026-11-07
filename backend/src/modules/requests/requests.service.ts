@@ -269,6 +269,9 @@ export class RequestsService {
 
   async verifyWork(requestId: number, actorAdminId?: number): Promise<RequestEntity> {
     const request = await this.findOne(requestId);
+    if (request.status !== RequestStatus.SUBMITTED) {
+      throw new BadRequestException('Faqat xodim tozalash fotohisobotini yuklagan murojaatni qabul qilish mumkin');
+    }
     request.status = RequestStatus.COMPLETED;
     request.completedAt = new Date();
 

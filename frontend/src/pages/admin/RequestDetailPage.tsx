@@ -722,6 +722,20 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
 
               {isInProgress && (
                 <Stack spacing={1.5}>
+                  <Box sx={{ p: 2, bgcolor: '#F0FDF4', border: '1.5px solid #BBF7D0', borderRadius: 2.5 }}>
+                    <Stack direction="row" spacing={1.5} alignItems="flex-start">
+                      <HourglassTopOutlinedIcon sx={{ color: '#16A34A', fontSize: 24, mt: 0.2 }} />
+                      <Box sx={{ flex: 1 }}>
+                        <Typography variant="subtitle2" sx={{ color: '#15803D', fontWeight: 800 }}>
+                          Tozalash jarayoni davom etmoqda
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: '#166534', display: 'block', mt: 0.5, lineHeight: 1.4 }}>
+                          Mas’ul xodim (<b>{request.assignedWorker?.fullName || 'Xodim'}</b>) tozalashni yakunlab, fotosuratli hisobot yuklagach, qabul qilish tugmasi faollashadi.
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  </Box>
+
                   {selectedWorkerId && selectedWorkerId !== String(request.assignedWorkerId) && (
                     <AppButton
                       variant="primary"
@@ -730,19 +744,9 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
                       onClick={handleAssign}
                       sx={{ py: 1.25 }}
                     >
-                      Xodimni qayta biriktirish
+                      Boshqa xodimga qayta biriktirish
                     </AppButton>
                   )}
-
-                  <AppButton
-                    variant="primary"
-                    fullWidth
-                    startIcon={<CheckCircleOutlinedIcon />}
-                    onClick={() => setCompleteModalOpen(true)}
-                    sx={{ py: 1.25 }}
-                  >
-                    Tozalandi deb belgilash
-                  </AppButton>
 
                   <AppButton
                     variant="danger"
