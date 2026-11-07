@@ -32,7 +32,7 @@ import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CloseIcon from '@mui/icons-material/Close';
-import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
+import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined';
 
 import {
   useGetDistrictsQuery,
@@ -65,11 +65,6 @@ export const DistrictsPage: React.FC = () => {
 
   // Form states - District
   const [newDistrictName, setNewDistrictName] = useState('');
-  const [newDistrictCode, setNewDistrictCode] = useState('');
-  const [fetchOsmBoundary, setFetchOsmBoundary] = useState(true);
-  const [showAdvancedDistrict, setShowAdvancedDistrict] = useState(false);
-  const [customCenterLat, setCustomCenterLat] = useState('');
-  const [customCenterLng, setCustomCenterLng] = useState('');
   const [districtError, setDistrictError] = useState<string | null>(null);
 
   // Form states - Mahalla
@@ -119,11 +114,6 @@ export const DistrictsPage: React.FC = () => {
   // Handlers - District
   const handleOpenDistrictDialog = () => {
     setNewDistrictName('');
-    setNewDistrictCode('');
-    setFetchOsmBoundary(true);
-    setShowAdvancedDistrict(false);
-    setCustomCenterLat('');
-    setCustomCenterLng('');
     setDistrictError(null);
     setDistrictDialogOpen(true);
   };
@@ -136,10 +126,7 @@ export const DistrictsPage: React.FC = () => {
     try {
       const res = await createDistrict({
         name: trimmedName,
-        code: newDistrictCode.trim() || undefined,
-        fetchOsmBoundary,
-        centerLat: customCenterLat ? Number(customCenterLat) : undefined,
-        centerLng: customCenterLng ? Number(customCenterLng) : undefined
+        fetchOsmBoundary: true
       }).unwrap();
 
       setDistrictDialogOpen(false);
@@ -150,7 +137,7 @@ export const DistrictsPage: React.FC = () => {
     } catch (err: unknown) {
       const errorMsg =
         (err as { data?: { message?: string } })?.data?.message ||
-        'Tuman qo‘shishda xatolik yuz berdi. Bu nom yoki kod allaqachon mavjud bo‘lishi mumkin.';
+        'Tuman qo‘shishda xatolik yuz berdi. Bu nom allaqachon mavjud bo‘lishi mumkin.';
       setDistrictError(errorMsg);
       showError(errorMsg);
     }
@@ -641,29 +628,50 @@ export const DistrictsPage: React.FC = () => {
         </DataTableCard>
       </Box>
 
-      {/* Add District Dialog - Clean & Minimalist (Image 1 Style) */}
+      {/* Add District Dialog - Modern, Intuitive & 100% Automated */}
       <Dialog
         open={districtDialogOpen}
         onClose={() => setDistrictDialogOpen(false)}
-        maxWidth="xs"
+        maxWidth="sm"
         fullWidth
         PaperProps={{
           sx: {
             borderRadius: '16px',
-            p: 1.5,
+            p: 1,
             boxShadow: '0 20px 40px -10px rgba(15, 23, 42, 0.12)',
             border: '1px solid #E2E8F0'
           }
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 2, pt: 1, pb: 0.5 }}>
-          <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.05rem', color: '#0F172A' }}>
-            Yangi tuman qo‘shish
-          </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 2, pt: 1.5, pb: 0.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+            <Box
+              sx={{
+                width: 38,
+                height: 38,
+                borderRadius: '10px',
+                bgcolor: 'rgba(5, 150, 105, 0.1)',
+                color: '#059669',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <LocationCityOutlinedIcon sx={{ fontSize: 22 }} />
+            </Box>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 700, fontSize: '1.05rem', color: '#0F172A' }}>
+                Yangi tuman qo‘shish
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mt: -0.2 }}>
+                Viloyat tarkibiga yangi ma’muriy hudud kiritish
+              </Typography>
+            </Box>
+          </Box>
           <IconButton
             size="small"
             onClick={() => setDistrictDialogOpen(false)}
-            sx={{ color: '#94A3B8', '&:hover': { color: '#0F172A' } }}
+            sx={{ color: '#94A3B8', '&:hover': { color: '#0F172A', bgcolor: '#F1F5F9' } }}
           >
             <CloseIcon sx={{ fontSize: 18 }} />
           </IconButton>
@@ -678,126 +686,116 @@ export const DistrictsPage: React.FC = () => {
             )}
 
             <Box>
-              <Typography variant="caption" sx={{ color: '#475569', fontWeight: 600, display: 'block', mb: 0.5 }}>
-                Tuman nomi
+              <Typography variant="caption" sx={{ color: '#334155', fontWeight: 600, display: 'block', mb: 0.75, fontSize: '0.85rem' }}>
+                Tuman yoki shahar nomi <span style={{ color: '#EF4444' }}>*</span>
               </Typography>
               <TextField
                 fullWidth
-                size="small"
-                placeholder="Masalan: Pop tumani yoki Uychi tumani"
+                placeholder="Masalan: Rishton tumani, Qo‘qon shahri..."
                 value={newDistrictName}
                 onChange={(e) => {
                   setNewDistrictName(e.target.value);
                   setDistrictError(null);
                 }}
                 autoFocus
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <MapOutlinedIcon sx={{ fontSize: 20, color: '#94A3B8' }} />
+                    </InputAdornment>
+                  )
+                }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: '10px',
                     bgcolor: '#FFFFFF',
-                    '& fieldset': { borderColor: '#E2E8F0' },
-                    '&:hover fieldset': { borderColor: '#CBD5E1' }
+                    fontSize: '0.92rem',
+                    '& fieldset': { borderColor: '#CBD5E1' },
+                    '&:hover fieldset': { borderColor: '#94A3B8' },
+                    '&.Mui-focused fieldset': { borderColor: 'primary.main', borderWidth: 2 }
                   }
                 }}
               />
             </Box>
 
             <Box>
-              <Typography variant="caption" sx={{ color: '#475569', fontWeight: 600, display: 'block', mb: 0.5 }}>
-                Tizim kodi (ixtiyoriy)
+              <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600, display: 'block', mb: 0.75, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Tezkor tanlash (namuna):
               </Typography>
-              <TextField
-                fullWidth
-                size="small"
-                placeholder="Masalan: pop (bo‘sh qolsa avtomatik shakllanadi)"
-                value={newDistrictCode}
-                onChange={(e) => setNewDistrictCode(e.target.value)}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: '10px',
-                    bgcolor: '#FFFFFF',
-                    '& fieldset': { borderColor: '#E2E8F0' },
-                    '&:hover fieldset': { borderColor: '#CBD5E1' }
-                  }
-                }}
-              />
-            </Box>
-
-            {/* Boundary Checkbox */}
-            <Box sx={{ p: 1.5, borderRadius: '10px', bgcolor: '#F8FAFC', border: '1px solid #E2E8F0' }}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={fetchOsmBoundary}
-                    onChange={(e) => setFetchOsmBoundary(e.target.checked)}
-                    color="primary"
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
+                {['Rishton tumani', 'Qo‘qon shahri', 'Marg‘ilon shahri', 'Oltiariq tumani', 'Shahrixon tumani', 'Asaka tumani'].map((name) => (
+                  <Chip
+                    key={name}
+                    label={name}
                     size="small"
+                    onClick={() => {
+                      setNewDistrictName(name);
+                      setDistrictError(null);
+                    }}
+                    clickable
+                    sx={{
+                      borderRadius: '8px',
+                      fontSize: '0.78rem',
+                      fontWeight: 500,
+                      bgcolor: newDistrictName === name ? 'rgba(5, 150, 105, 0.12)' : '#F1F5F9',
+                      color: newDistrictName === name ? '#059669' : '#475569',
+                      border: '1px solid',
+                      borderColor: newDistrictName === name ? '#A7F3D0' : '#E2E8F0',
+                      '&:hover': {
+                        bgcolor: 'rgba(5, 150, 105, 0.08)',
+                        borderColor: '#6EE7B7'
+                      }
+                    }}
                   />
-                }
-                label={
-                  <Typography variant="body2" sx={{ fontWeight: 600, color: '#1E293B', fontSize: '0.85rem' }}>
-                    Xaritadan chegarani avtomatik aniqlash
-                  </Typography>
-                }
-              />
-              <Typography variant="caption" sx={{ color: '#64748B', display: 'block', pl: 3.75, fontSize: '0.75rem' }}>
-                Rasmiy ma’muriy poligon avtomatik yuklanadi va tumanlar xaritada bir-biriga kirmaydi.
-              </Typography>
+                ))}
+              </Box>
             </Box>
 
-            {/* Advanced toggle */}
-            <Box>
-              <Button
-                size="small"
-                startIcon={<TuneOutlinedIcon sx={{ fontSize: 16 }} />}
-                onClick={() => setShowAdvancedDistrict(!showAdvancedDistrict)}
-                sx={{
-                  color: '#64748B',
-                  fontWeight: 600,
-                  fontSize: '0.78rem',
-                  textTransform: 'none',
-                  p: 0,
-                  '&:hover': { bgcolor: 'transparent', color: 'primary.main' }
-                }}
-              >
-                {showAdvancedDistrict ? 'Koordinatalarni yashirish' : 'Qo‘lda koordinata kiritish (Ixtiyoriy)'}
-              </Button>
-
-              <Collapse in={showAdvancedDistrict}>
-                <Box sx={{ mt: 1, p: 1.5, borderRadius: '10px', bgcolor: '#F8FAFC', border: '1px solid #E2E8F0' }}>
-                  <Stack direction="row" spacing={1.5}>
-                    <TextField
-                      label="Kenglik (Lat)"
-                      size="small"
-                      placeholder="41.0108"
-                      value={customCenterLat}
-                      onChange={(e) => setCustomCenterLat(e.target.value)}
-                      fullWidth
-                      sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-                    />
-                    <TextField
-                      label="Uzunlik (Lng)"
-                      size="small"
-                      placeholder="71.5775"
-                      value={customCenterLng}
-                      onChange={(e) => setCustomCenterLng(e.target.value)}
-                      fullWidth
-                      sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-                    />
-                  </Stack>
-                </Box>
-              </Collapse>
+            <Box
+              sx={{
+                p: 1.5,
+                borderRadius: '12px',
+                bgcolor: '#F0FDF4',
+                border: '1px solid #BBF7D0',
+                display: 'flex',
+                gap: 1.25,
+                alignItems: 'flex-start'
+              }}
+            >
+              <AutoAwesomeOutlinedIcon sx={{ fontSize: 20, color: '#059669', mt: 0.2, flexShrink: 0 }} />
+              <Box>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#166534', fontSize: '0.83rem', lineHeight: 1.3 }}>
+                  100% Avtomatlashtirilgan xarita integratsiyasi
+                </Typography>
+                <Typography variant="caption" sx={{ color: '#15803D', display: 'block', mt: 0.4, fontSize: '0.76rem', lineHeight: 1.4 }}>
+                  Koordinatalar (kenglik/uzunlik) yoki chegara kiritishingiz shart emas. Tizim nom bo‘yicha sun’iy yo‘ldosh xaritasi (OpenStreetMap) orqali rasmiy ma’muriy poligonni avtomatik aniqlaydi va xaritaga biriktiradi.
+                </Typography>
+              </Box>
             </Box>
           </Stack>
         </DialogContent>
 
-        <DialogActions sx={{ px: 2, pt: 1, pb: 1.5 }}>
+        <DialogActions sx={{ px: 2, pb: 1.5, pt: 1, gap: 1 }}>
+          <Button
+            onClick={() => setDistrictDialogOpen(false)}
+            disabled={creatingDistrict}
+            sx={{
+              borderRadius: '10px',
+              fontWeight: 600,
+              color: '#64748B',
+              textTransform: 'none',
+              px: 2,
+              '&:hover': { bgcolor: '#F1F5F9' }
+            }}
+          >
+            Bekor qilish
+          </Button>
           <Button
             variant="contained"
-            fullWidth
             onClick={handleCreateDistrict}
             disabled={!newDistrictName.trim() || creatingDistrict}
             sx={{
+              flex: 1,
               height: 42,
               borderRadius: '10px',
               bgcolor: 'primary.main',
@@ -811,7 +809,16 @@ export const DistrictsPage: React.FC = () => {
               }
             }}
           >
-            {creatingDistrict ? <CircularProgress size={20} color="inherit" /> : 'Tumanni saqlash'}
+            {creatingDistrict ? (
+              <Stack direction="row" spacing={1} alignItems="center">
+                <CircularProgress size={18} color="inherit" />
+                <Typography variant="body2" sx={{ fontWeight: 600, color: 'inherit' }}>
+                  Xaritadan aniqlanmoqda...
+                </Typography>
+              </Stack>
+            ) : (
+              'Tumanni qo‘shish'
+            )}
           </Button>
         </DialogActions>
       </Dialog>
