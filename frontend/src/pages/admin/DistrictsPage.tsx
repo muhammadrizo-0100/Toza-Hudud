@@ -22,8 +22,7 @@ import {
   InputAdornment,
   Pagination,
   Collapse,
-  Button,
-  Autocomplete
+  Button
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
@@ -51,47 +50,6 @@ import AppButton from '../../components/common/AppButton';
 import AppSelectField from '../../components/common/AppSelectField';
 import AppBreadcrumbs from '../../components/common/AppBreadcrumbs';
 import { useToast } from '../../context/ToastContext';
-
-const UZBEKISTAN_DISTRICT_SUGGESTIONS = [
-  'Rishton tumani',
-  'Qo‘qon shahri',
-  'Marg‘ilon shahri',
-  'Farg‘ona shahri',
-  'Oltiariq tumani',
-  'Quva tumani',
-  'Beshariq tumani',
-  'Buvayda tumani',
-  'Dang‘ara tumani',
-  'Bag‘dod tumani',
-  'Uchko‘prik tumani',
-  'Toshloq tumani',
-  'Yozyovon tumani',
-  'So‘x tumani',
-  'Andijon shahri',
-  'Asaka tumani',
-  'Shahrixon tumani',
-  'Xonobod shahri',
-  'Baliqchi tumani',
-  'Paxtaobod tumani',
-  'Marhamat tumani',
-  'Qo‘rg‘ontepa tumani',
-  'Buloqboshi tumani',
-  'Izboskan tumani',
-  'Jalaquduq tumani',
-  'Chirchiq shahri',
-  'Olmaliq shahri',
-  'Angren shahri',
-  'Bekobod tumani',
-  'Bo‘stonliq tumani',
-  'Zangiota tumani',
-  'Qibray tumani',
-  'Parkent tumani',
-  'Samarqand shahri',
-  'Urgut tumani',
-  'Kattaqo‘rg‘on shahri',
-  'Buxoro shahri',
-  'G‘ijduvon tumani'
-];
 
 export const DistrictsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -741,77 +699,33 @@ export const DistrictsPage: React.FC = () => {
               <Typography variant="caption" sx={{ color: '#334155', fontWeight: 600, display: 'block', mb: 0.75, fontSize: '0.85rem' }}>
                 Tuman yoki shahar nomi <span style={{ color: '#EF4444' }}>*</span>
               </Typography>
-              <Autocomplete
-                freeSolo
-                options={UZBEKISTAN_DISTRICT_SUGGESTIONS}
+              <TextField
+                fullWidth
+                placeholder="Masalan: Yangi hudud yoki tuman nomi..."
                 value={newDistrictName}
-                onInputChange={(_e, newInputValue) => {
-                  setNewDistrictName(newInputValue);
+                onChange={(e) => {
+                  setNewDistrictName(e.target.value);
                   setDistrictError(null);
                 }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    fullWidth
-                    placeholder="Masalan: Rishton tumani, Qo‘qon shahri..."
-                    autoFocus
-                    InputProps={{
-                      ...params.InputProps,
-                      startAdornment: (
-                        <>
-                          <InputAdornment position="start">
-                            <MapOutlinedIcon sx={{ fontSize: 20, color: '#94A3B8' }} />
-                          </InputAdornment>
-                          {params.InputProps.startAdornment}
-                        </>
-                      )
-                    }}
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        borderRadius: '10px',
-                        bgcolor: '#FFFFFF',
-                        fontSize: '0.92rem',
-                        '& fieldset': { borderColor: '#CBD5E1' },
-                        '&:hover fieldset': { borderColor: '#94A3B8' },
-                        '&.Mui-focused fieldset': { borderColor: 'primary.main', borderWidth: 2 }
-                      }
-                    }}
-                  />
-                )}
+                autoFocus
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <MapOutlinedIcon sx={{ fontSize: 20, color: '#94A3B8' }} />
+                    </InputAdornment>
+                  )
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '10px',
+                    bgcolor: '#FFFFFF',
+                    fontSize: '0.92rem',
+                    '& fieldset': { borderColor: '#CBD5E1' },
+                    '&:hover fieldset': { borderColor: '#94A3B8' },
+                    '&.Mui-focused fieldset': { borderColor: 'primary.main', borderWidth: 2 }
+                  }
+                }}
               />
-            </Box>
-
-            <Box>
-              <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600, display: 'block', mb: 0.75, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                Tezkor tanlash (namuna):
-              </Typography>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
-                {['Rishton tumani', 'Qo‘qon shahri', 'Marg‘ilon shahri', 'Oltiariq tumani', 'Shahrixon tumani', 'Asaka tumani'].map((name) => (
-                  <Chip
-                    key={name}
-                    label={name}
-                    size="small"
-                    onClick={() => {
-                      setNewDistrictName(name);
-                      setDistrictError(null);
-                    }}
-                    clickable
-                    sx={{
-                      borderRadius: '8px',
-                      fontSize: '0.78rem',
-                      fontWeight: 500,
-                      bgcolor: newDistrictName === name ? 'rgba(5, 150, 105, 0.12)' : '#F1F5F9',
-                      color: newDistrictName === name ? '#059669' : '#475569',
-                      border: '1px solid',
-                      borderColor: newDistrictName === name ? '#A7F3D0' : '#E2E8F0',
-                      '&:hover': {
-                        bgcolor: 'rgba(5, 150, 105, 0.08)',
-                        borderColor: '#6EE7B7'
-                      }
-                    }}
-                  />
-                ))}
-              </Box>
             </Box>
 
             <Box
