@@ -13,6 +13,7 @@ import { StatsModule } from './modules/stats/stats.module';
 import { PublicApiModule } from './modules/public-api/public-api.module';
 import { BotModule } from './modules/bot/bot.module';
 import { AdminsModule } from './modules/admins/admins.module';
+import { TunnelModule } from './modules/tunnel/tunnel.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { AdminsModule } from './modules/admins/admins.module';
         '.env'
       ]
     }),
+    TunnelModule,
     DatabaseModule,
     RealtimeModule,
     AuthModule,

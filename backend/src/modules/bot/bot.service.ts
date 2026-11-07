@@ -13,6 +13,7 @@ import { MahallasService } from '../mahallas/mahallas.service';
 import { WorkersService } from '../workers/workers.service';
 import { RealtimeService } from '../../common/realtime/realtime.service';
 import { RequestSource, RequestStatus } from '../../database/entities/request.entity';
+import { TunnelService } from '../tunnel/tunnel.service';
 import { AdminEntity, AdminRole } from '../../database/entities/admin.entity';
 import { WorkerEntity } from '../../database/entities/worker.entity';
 
@@ -67,6 +68,7 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
     private readonly mahallasService: MahallasService,
     private readonly workersService: WorkersService,
     private readonly realtimeService: RealtimeService,
+    private readonly tunnelService: TunnelService,
     @InjectRepository(AdminEntity)
     private readonly adminRepo: Repository<AdminEntity>,
     @InjectRepository(WorkerEntity)
@@ -833,15 +835,16 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
   }
 
   private async sendLocationPrompt(ctx: any, session: UserSession): Promise<void> {
-    const rawUrl = process.env.FRONTEND_URL || this.configService.get<string>('FRONTEND_URL', 'http://localhost:5173');
-    const frontendUrl = (rawUrl || '').trim().replace(/\/+$/, '');
-    const isHttps = typeof frontendUrl === 'string' && frontendUrl.toLowerCase().startsWith('https://');
+    const liveUrl = this.tunnelService.getLiveFrontendUrl();
+    const isHttps = typeof liveUrl === 'string' && liveUrl.toLowerCase().startsWith('https://');
     const districtName = session.districtName || '';
     const mahallaName = session.mahallaName || '';
-    const miniAppUrl = `${frontendUrl}/location-picker?lat=${session.lat}&lng=${session.lng}&name=${encodeURIComponent(mahallaName)}&district=${encodeURIComponent(districtName)}`;
+    const miniAppUrl = isHttps
+      ? `${liveUrl}/location-picker?lat=${session.lat}&lng=${session.lng}&name=${encodeURIComponent(mahallaName)}&district=${encodeURIComponent(districtName)}`
+      : '';
 
     const keyboardRows: any[] = [];
-    if (isHttps) {
+    if (isHttps && miniAppUrl) {
       keyboardRows.push([Markup.button.webApp('🗺 Xaritadan belgilash (Mini App)', miniAppUrl)]);
     }
     keyboardRows.push([Markup.button.locationRequest('📍 GPS Lokatsiyamni yuborish')]);
