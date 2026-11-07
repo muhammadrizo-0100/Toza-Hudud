@@ -3,6 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
   ForbiddenException,
+  ConflictException,
   Logger,
   OnModuleInit
 } from '@nestjs/common';
@@ -165,6 +166,17 @@ export class AdminsService implements OnModuleInit {
       }
       if (dto.role && dto.role !== admin.role) {
         throw new ForbiddenException('Rolni o‘zgartirish huquqi faqat SuperAdminga berilgan');
+      }
+    }
+
+    if (dto.username !== undefined && dto.username.trim()) {
+      const cleanUsername = dto.username.trim().toLowerCase();
+      if (cleanUsername !== admin.username) {
+        const conflict = await this.adminRepo.findOne({ where: { username: cleanUsername } });
+        if (conflict && conflict.id !== admin.id) {
+          throw new ConflictException(`Ushbu foydalanuvchi nomi (${cleanUsername}) allaqachon band qilingan`);
+        }
+        admin.username = cleanUsername;
       }
     }
 

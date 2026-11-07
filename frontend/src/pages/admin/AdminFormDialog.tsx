@@ -155,6 +155,7 @@ export const AdminFormDialog: React.FC<AdminFormDialogProps> = ({
         await updateAdmin({
           id: editAdmin.id,
           body: {
+            username: username.trim().toLowerCase(),
             fullName: fullName.trim(),
             phone: phone.trim() ? cleanUzPhone(phone) : undefined,
             jobTitle: jobTitle.trim() || getDefaultJobTitle(role),
@@ -349,7 +350,6 @@ export const AdminFormDialog: React.FC<AdminFormDialogProps> = ({
               placeholder={getUsernamePlaceholder()}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              disabled={Boolean(editAdmin)}
               fullWidth
               size="small"
               error={Boolean(errors.username)}

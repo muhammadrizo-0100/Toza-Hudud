@@ -12,6 +12,7 @@ export interface CreateAdminRequest {
 }
 
 export interface UpdateAdminRequest {
+  username?: string;
   fullName?: string;
   phone?: string;
   jobTitle?: string;

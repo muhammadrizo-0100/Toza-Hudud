@@ -14,6 +14,12 @@ import { AdminRole } from '../../../database/entities/admin.entity';
 export class UpdateAdminDto {
   @IsOptional()
   @IsString()
+  @MinLength(3)
+  @MaxLength(64)
+  username?: string;
+
+  @IsOptional()
+  @IsString()
   @MinLength(6)
   @MaxLength(128)
   password?: string;
