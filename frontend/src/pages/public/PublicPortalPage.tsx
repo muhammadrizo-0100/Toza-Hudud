@@ -27,6 +27,8 @@ import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
 import MyLocationOutlinedIcon from '@mui/icons-material/MyLocationOutlined';
 import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
+import TelegramIcon from '@mui/icons-material/Telegram';
+import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import { useNavigate } from 'react-router-dom';
 
 import {
@@ -238,144 +240,181 @@ export const PublicPortalPage: React.FC = () => {
       sx={{
         minHeight: '100vh',
         background:
-          'linear-gradient(180deg, rgba(5,150,105,0.06) 0%, rgba(5,150,105,0) 35%), linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%)',
-        pb: 6
+          'radial-gradient(circle at 15% 15%, rgba(5, 150, 105, 0.08) 0%, transparent 45%), radial-gradient(circle at 85% 85%, rgba(34, 158, 217, 0.08) 0%, transparent 45%), linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        py: { xs: 2, md: 2.5 }
       }}
     >
-      <Container maxWidth="md" sx={{ py: { xs: 2.5, md: 3.5 } }}>
+      <Container maxWidth="lg">
         {/* Top Navbar */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: { xs: 3, md: 4 } }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Stack direction="row" spacing={1.5} alignItems="center">
             <Box
               sx={{
-                width: 42,
-                height: 42,
+                width: 40,
+                height: 40,
                 borderRadius: 2.5,
                 bgcolor: '#059669',
                 color: '#FFFFFF',
                 display: 'grid',
                 placeItems: 'center',
-                boxShadow: '0 4px 12px rgba(5, 150, 105, 0.28)'
+                boxShadow: '0 4px 14px rgba(5, 150, 105, 0.28)'
               }}
             >
               <DeleteSweepOutlinedIcon />
             </Box>
             <Box>
-              <Typography variant="h6" fontWeight={800} color="#0F172A" sx={{ lineHeight: 1.2 }}>
+              <Typography variant="h6" fontWeight={800} color="#0F172A" sx={{ lineHeight: 1.15, fontSize: '1.1rem' }}>
                 Toza Hudud
               </Typography>
-              <Typography variant="caption" color="text.secondary" fontWeight={500}>
+              <Typography variant="caption" color="text.secondary" fontWeight={600}>
                 Sanitar tozalash portali
               </Typography>
             </Box>
           </Stack>
 
-          <Button
-            variant="outlined"
-            onClick={() => navigate('/login')}
-            startIcon={<SecurityOutlinedIcon />}
-            sx={{
-              fontWeight: 700,
-              borderRadius: 2.5,
-              borderColor: '#CBD5E1',
-              borderWidth: '1.5px',
-              color: '#0F172A',
-              bgcolor: '#FFFFFF',
-              px: 2,
-              '&:hover': { bgcolor: '#F8FAFC', borderColor: '#94A3B8' }
-            }}
-          >
-            Xodimlar Kabineti
-          </Button>
+          <Stack direction="row" spacing={1.5} alignItems="center">
+            <Button
+              component="a"
+              href="https://t.me/toza_hudud_public_bot"
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="contained"
+              startIcon={<TelegramIcon />}
+              sx={{
+                fontWeight: 700,
+                fontSize: '0.85rem',
+                borderRadius: 2.5,
+                bgcolor: '#229ED9',
+                color: '#FFFFFF',
+                textTransform: 'none',
+                px: 2,
+                py: 0.8,
+                boxShadow: '0 4px 14px rgba(34, 158, 217, 0.28)',
+                '&:hover': { bgcolor: '#1D88BC', boxShadow: '0 6px 18px rgba(34, 158, 217, 0.35)' }
+              }}
+            >
+              Telegram Bot
+            </Button>
+
+            <Button
+              variant="outlined"
+              onClick={() => navigate('/login')}
+              startIcon={<SecurityOutlinedIcon />}
+              sx={{
+                fontWeight: 700,
+                fontSize: '0.85rem',
+                borderRadius: 2.5,
+                borderColor: '#CBD5E1',
+                borderWidth: '1.5px',
+                color: '#0F172A',
+                bgcolor: '#FFFFFF',
+                textTransform: 'none',
+                px: 1.75,
+                py: 0.8,
+                '&:hover': { bgcolor: '#F8FAFC', borderColor: '#94A3B8' }
+              }}
+            >
+              Xodimlar Kabineti
+            </Button>
+          </Stack>
         </Box>
 
-        {/* Hero Section */}
-        <Box sx={{ textAlign: 'center', mb: { xs: 3, md: 4 } }}>
-          <Typography
-            variant="h3"
-            fontWeight={800}
-            color="#0F172A"
+        {/* Compact Header & Tabs Row */}
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', md: 'row' },
+            alignItems: { xs: 'flex-start', md: 'center' },
+            justifyContent: 'space-between',
+            mb: 2,
+            gap: 1.5
+          }}
+        >
+          <Box>
+            <Typography
+              variant="h5"
+              fontWeight={800}
+              color="#0F172A"
+              sx={{
+                fontSize: { xs: '1.35rem', sm: '1.55rem', md: '1.75rem' },
+                letterSpacing: '-0.02em',
+                lineHeight: 1.2
+              }}
+            >
+              Shahrimizni Birgalikda Toza Saqlaymiz!
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25, fontSize: '0.88rem' }}>
+              Chiqindini rasmga olib yuboring — mas’ul sanitar xodimlar tezkor tozalab beradi.
+            </Typography>
+          </Box>
+
+          <Tabs
+            value={tab}
+            onChange={(_, val) => setTab(val)}
             sx={{
-              fontSize: { xs: '1.75rem', sm: '2.25rem', md: '2.5rem' },
-              letterSpacing: '-0.02em',
-              mb: 1
+              bgcolor: '#F1F5F9',
+              p: 0.5,
+              borderRadius: 3,
+              minHeight: 40,
+              '& .MuiTabs-indicator': {
+                bgcolor: '#059669',
+                height: '100%',
+                borderRadius: 2.5,
+                zIndex: 0
+              },
+              '& .MuiTab-root': {
+                fontWeight: 700,
+                textTransform: 'none',
+                fontSize: '0.86rem',
+                color: '#64748B',
+                minHeight: 36,
+                py: 0.5,
+                px: 2,
+                borderRadius: 2.5,
+                zIndex: 1,
+                transition: 'color 0.2s',
+                '&.Mui-selected': {
+                  color: '#FFFFFF'
+                }
+              }
             }}
           >
-            Shahrimizni Birgalikda Toza Saqlaymiz!
-          </Typography>
-          <Typography
-            variant="body1"
-            color="text.secondary"
-            sx={{
-              maxWidth: 620,
-              mx: 'auto',
-              fontSize: { xs: '0.9rem', sm: '1rem' },
-              lineHeight: 1.6
-            }}
-          >
-            Konteynerlar toshib ketganmi yoki noqonuniy chiqindi bormi? Rasmga olib yuboring, tezkor tozalab beramiz.
-          </Typography>
+            <Tab
+              value="submit"
+              icon={<DeleteSweepOutlinedIcon sx={{ fontSize: 18 }} />}
+              iconPosition="start"
+              label="Chiqindi haqida xabar berish"
+            />
+            <Tab
+              value="track"
+              icon={<SearchOutlinedIcon sx={{ fontSize: 18 }} />}
+              iconPosition="start"
+              label="Murojaat holati"
+            />
+          </Tabs>
         </Box>
 
         {/* Main Content Card */}
         <Card
           variant="outlined"
           sx={{
-            maxWidth: 740,
-            mx: 'auto',
             borderRadius: 4,
-            borderColor: '#CBD5E1',
+            borderColor: '#E2E8F0',
             borderWidth: '1.5px',
-            boxShadow: '0 12px 32px rgba(15, 23, 42, 0.06), 0 2px 6px rgba(15, 23, 42, 0.04)',
+            boxShadow: '0 20px 40px -15px rgba(15, 23, 42, 0.08), 0 0 1px rgba(15, 23, 42, 0.1)',
             bgcolor: '#FFFFFF'
           }}
         >
-          <CardContent sx={{ p: { xs: 2.5, sm: 3.5, md: 4 } }}>
-            {/* Tab Selector */}
-            <Tabs
-              value={tab}
-              onChange={(_, val) => setTab(val)}
-              centered
-              sx={{
-                mb: 3,
-                borderBottom: '1px solid #E2E8F0',
-                '& .MuiTabs-indicator': {
-                  bgcolor: '#059669',
-                  height: 3,
-                  borderRadius: '3px 3px 0 0'
-                },
-                '& .MuiTab-root': {
-                  fontWeight: 700,
-                  textTransform: 'none',
-                  fontSize: { xs: '0.9rem', sm: '1rem' },
-                  color: '#64748B',
-                  minHeight: 48,
-                  '&.Mui-selected': {
-                    color: '#059669'
-                  }
-                }
-              }}
-            >
-              <Tab
-                value="submit"
-                icon={<DeleteSweepOutlinedIcon fontSize="small" />}
-                iconPosition="start"
-                label="Chiqindi haqida xabar berish"
-              />
-              <Tab
-                value="track"
-                icon={<SearchOutlinedIcon fontSize="small" />}
-                iconPosition="start"
-                label="Murojaat holatini tekshirish"
-              />
-            </Tabs>
-
+          <CardContent sx={{ p: { xs: 2, sm: 2.5, md: 3 } }}>
             {/* Success Alert */}
             {submittedId && tab === 'submit' && (
               <Alert
                 severity="success"
                 icon={<CheckCircleOutlinedIcon fontSize="inherit" />}
-                sx={{ mb: 3, borderRadius: 2.5, border: '1px solid #86EFAC' }}
+                sx={{ mb: 2.5, borderRadius: 2.5, border: '1px solid #86EFAC' }}
                 action={
                   <Button color="inherit" size="small" onClick={() => setSubmittedId(null)} sx={{ fontWeight: 700 }}>
                     Yangi ariza
@@ -399,200 +438,266 @@ export const PublicPortalPage: React.FC = () => {
               </Alert>
             )}
 
-            {/* SUBMIT FORM */}
+            {/* SUBMIT FORM (2-Column Grid: Visual & Location on Left, Form Data on Right) */}
             {tab === 'submit' && (
               <Box component="form" onSubmit={handleSubmit}>
-                <Stack spacing={2.5}>
-                  {/* Image Upload Box */}
-                  <AppImageUpload
-                    value={file}
-                    onChange={setFile}
-                    label="Chiqindi fotosurati *"
-                    hint="Kameradan suratga oling yoki fayl tanlang (JPG, PNG, WEBP)"
-                    buttonText="Chiqindi suratini yuklang *"
-                  />
+                <Box
+                  sx={{
+                    display: 'grid',
+                    gridTemplateColumns: { xs: '1fr', md: '5fr 7fr' },
+                    gap: { xs: 2.5, md: 3 }
+                  }}
+                >
+                  {/* LEFT COLUMN: Visual Media, Location, and Telegram Bot Banner */}
+                  <Stack spacing={2} justifyContent="space-between">
+                    {/* Image Upload Box */}
+                    <AppImageUpload
+                      value={file}
+                      onChange={setFile}
+                      label="Chiqindi fotosurati *"
+                      hint="Kameradan oling yoki fayl tanlang (JPG, PNG, WEBP)"
+                      buttonText="Chiqindi suratini yuklang *"
+                    />
 
-                  {/* Location Picker Section (Telegram-like logic) */}
-                  <Box
-                    sx={{
-                      p: 2,
-                      borderRadius: 2.5,
-                      border: '1.5px solid',
-                      borderColor: lat && lng ? '#059669' : '#CBD5E1',
-                      bgcolor: lat && lng ? '#F0FDF4' : '#F8FAFC',
-                      transition: 'all 0.2s ease'
-                    }}
-                  >
-                    <Stack direction="row" alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={1} sx={{ mb: 1.25 }}>
-                      <Stack direction="row" alignItems="center" spacing={1}>
-                        <PlaceOutlinedIcon sx={{ color: lat && lng ? '#059669' : '#64748B' }} fontSize="small" />
-                        <Typography variant="subtitle2" fontWeight={700} color="#0F172A">
-                          Chiqindi joylashgan aniq nuqta (Lokatsiya)
-                        </Typography>
+                    {/* Compact Location Picker */}
+                    <Box
+                      sx={{
+                        p: 1.75,
+                        borderRadius: 2.5,
+                        border: '1.5px solid',
+                        borderColor: lat && lng ? '#059669' : '#CBD5E1',
+                        bgcolor: lat && lng ? '#F0FDF4' : '#F8FAFC',
+                        transition: 'all 0.2s ease'
+                      }}
+                    >
+                      <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1} sx={{ mb: 1 }}>
+                        <Stack direction="row" alignItems="center" spacing={1}>
+                          <PlaceOutlinedIcon sx={{ color: lat && lng ? '#059669' : '#64748B', fontSize: 20 }} />
+                          <Typography variant="subtitle2" fontWeight={700} color="#0F172A" sx={{ fontSize: '0.88rem' }}>
+                            Aniq lokatsiya (GPS)
+                          </Typography>
+                        </Stack>
+
+                        {lat && lng && (
+                          <Chip
+                            size="small"
+                            icon={<CheckCircleOutlinedIcon style={{ fontSize: 13 }} />}
+                            label={`${lat.toFixed(4)}, ${lng.toFixed(4)}`}
+                            color="success"
+                            variant="filled"
+                            sx={{ fontWeight: 700, fontSize: '0.72rem', height: 22 }}
+                          />
+                        )}
                       </Stack>
 
-                      {lat && lng && (
-                        <Chip
+                      <Stack direction="row" spacing={1}>
+                        <Button
+                          type="button"
+                          variant="outlined"
                           size="small"
-                          icon={<CheckCircleOutlinedIcon style={{ fontSize: 14 }} />}
-                          label={`GPS: ${lat.toFixed(5)}, ${lng.toFixed(5)}`}
-                          color="success"
-                          variant="filled"
-                          sx={{ fontWeight: 700, fontSize: '0.75rem' }}
-                        />
+                          fullWidth
+                          startIcon={<MapOutlinedIcon sx={{ fontSize: 16 }} />}
+                          onClick={() => setMapPickerOpen(true)}
+                          sx={{
+                            py: 0.75,
+                            fontWeight: 700,
+                            fontSize: '0.8rem',
+                            borderRadius: 2,
+                            borderColor: '#94A3B8',
+                            color: '#0F172A',
+                            bgcolor: '#FFFFFF',
+                            textTransform: 'none',
+                            '&:hover': { bgcolor: '#F1F5F9', borderColor: '#475569' }
+                          }}
+                        >
+                          {lat && lng ? 'Xaritadan qayta tanlash' : 'Xaritadan belgilash'}
+                        </Button>
+
+                        <Button
+                          type="button"
+                          variant="outlined"
+                          size="small"
+                          fullWidth
+                          startIcon={gpsLoading ? <CircularProgress size={14} /> : <MyLocationOutlinedIcon sx={{ fontSize: 16 }} />}
+                          onClick={handleGetGPS}
+                          disabled={gpsLoading}
+                          sx={{
+                            py: 0.75,
+                            fontWeight: 700,
+                            fontSize: '0.8rem',
+                            borderRadius: 2,
+                            borderColor: '#94A3B8',
+                            color: '#0F172A',
+                            bgcolor: '#FFFFFF',
+                            textTransform: 'none',
+                            '&:hover': { bgcolor: '#F1F5F9', borderColor: '#475569' }
+                          }}
+                        >
+                          {gpsLoading ? 'Aniqlanmoqda...' : 'Joriy GPS'}
+                        </Button>
+                      </Stack>
+
+                      {gpsMessage && (
+                        <Typography variant="caption" color="success.main" fontWeight={600} sx={{ mt: 0.75, display: 'block', fontSize: '0.75rem' }}>
+                          {gpsMessage}
+                        </Typography>
                       )}
-                    </Stack>
+                    </Box>
 
-                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.5 }}>
-                      Telegramdagi kabi joriy GPS joylashuvingizni yuboring yoki xarita ustiga bosib belgilang.
-                    </Typography>
-
-                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
-                      <Button
-                        type="button"
-                        variant="outlined"
-                        fullWidth
-                        startIcon={<MapOutlinedIcon fontSize="small" />}
-                        onClick={() => setMapPickerOpen(true)}
-                        sx={{
-                          py: 1,
-                          fontWeight: 700,
-                          borderRadius: 2,
-                          borderColor: '#94A3B8',
-                          color: '#0F172A',
-                          bgcolor: '#FFFFFF',
-                          '&:hover': { bgcolor: '#F1F5F9', borderColor: '#475569' }
-                        }}
-                      >
-                        {lat && lng ? 'Xaritadan qayta tanlash' : 'Xaritadan nuqtani belgilash'}
-                      </Button>
-
-                      <Button
-                        type="button"
-                        variant="outlined"
-                        fullWidth
-                        startIcon={gpsLoading ? <CircularProgress size={16} /> : <MyLocationOutlinedIcon fontSize="small" />}
-                        onClick={handleGetGPS}
-                        disabled={gpsLoading}
-                        sx={{
-                          py: 1,
-                          fontWeight: 700,
-                          borderRadius: 2,
-                          borderColor: '#94A3B8',
-                          color: '#0F172A',
-                          bgcolor: '#FFFFFF',
-                          '&:hover': { bgcolor: '#F1F5F9', borderColor: '#475569' }
-                        }}
-                      >
-                        {gpsLoading ? 'Aniqlanmoqda...' : 'Joriy lokatsiyam (GPS)'}
-                      </Button>
-                    </Stack>
-
-                    {gpsMessage && (
-                      <Typography variant="caption" color="success.main" fontWeight={600} sx={{ mt: 1, display: 'block' }}>
-                        {gpsMessage}
-                      </Typography>
-                    )}
-                  </Box>
-
-                  {/* District & Mahalla Selectors */}
-                  <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
-                    <AppSelectField
-                      label="Tumaningizni tanlang *"
-                      value={districtId}
-                      onChange={(e) => {
-                        setDistrictId(e.target.value as number);
-                        setMahallaId('');
+                    {/* Telegram Bot Quick Banner */}
+                    <Box
+                      component="a"
+                      href="https://t.me/toza_hudud_public_bot"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      sx={{
+                        p: 1.5,
+                        borderRadius: 2.5,
+                        bgcolor: 'rgba(34, 158, 217, 0.08)',
+                        border: '1px solid rgba(34, 158, 217, 0.25)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        textDecoration: 'none',
+                        transition: 'all 0.2s',
+                        '&:hover': {
+                          bgcolor: 'rgba(34, 158, 217, 0.14)',
+                          borderColor: '#229ED9',
+                          transform: 'translateY(-1px)'
+                        }
                       }}
-                      options={[
-                        { value: '', label: '-- Tumanni tanlang --' },
-                        ...(locations?.districts.map((d) => ({ value: d.id, label: d.name })) || [])
-                      ]}
-                    />
+                    >
+                      <Stack direction="row" spacing={1.25} alignItems="center">
+                        <Box
+                          sx={{
+                            width: 36,
+                            height: 36,
+                            borderRadius: '50%',
+                            bgcolor: '#229ED9',
+                            color: '#FFFFFF',
+                            display: 'grid',
+                            placeItems: 'center',
+                            flexShrink: 0
+                          }}
+                        >
+                          <TelegramIcon sx={{ fontSize: 20 }} />
+                        </Box>
+                        <Box>
+                          <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F172A', display: 'block', lineHeight: 1.2, fontSize: '0.82rem' }}>
+                            Telegram Bot orqali murojaat
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: '#0284C7', fontWeight: 600, fontSize: '0.75rem' }}>
+                            @toza_hudud_public_bot bilan 1 daqiqada
+                          </Typography>
+                        </Box>
+                      </Stack>
+                      <OpenInNewOutlinedIcon sx={{ fontSize: 18, color: '#229ED9', flexShrink: 0 }} />
+                    </Box>
+                  </Stack>
 
-                    <AppSelectField
-                      label="Mahallangizni tanlang"
-                      value={mahallaId}
-                      onChange={(e) => setMahallaId(e.target.value as number)}
-                      disabled={!districtId}
-                      options={[
-                        { value: '', label: '-- Mahallani tanlang (ixtiyoriy) --' },
-                        ...(locations?.mahallas.map((m) => ({ value: m.id, label: m.name })) || [])
-                      ]}
-                    />
-                  </Box>
+                  {/* RIGHT COLUMN: Form Inputs & Submit */}
+                  <Stack spacing={1.75}>
+                    {/* District & Mahalla Selectors */}
+                    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.5 }}>
+                      <AppSelectField
+                        label="Tumaningizni tanlang *"
+                        value={districtId}
+                        onChange={(e) => {
+                          setDistrictId(e.target.value as number);
+                          setMahallaId('');
+                        }}
+                        options={[
+                          { value: '', label: '-- Tumanni tanlang --' },
+                          ...(locations?.districts.map((d) => ({ value: d.id, label: d.name })) || [])
+                        ]}
+                      />
 
-                  {/* Phone & Full Name */}
-                  <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
-                    <AppPhoneField
-                      required
-                      label="Telefon raqamingiz *"
-                      value={phone}
-                      onChange={setPhone}
-                      sx={highContrastInputSx}
-                    />
+                      <AppSelectField
+                        label="Mahallangizni tanlang"
+                        value={mahallaId}
+                        onChange={(e) => setMahallaId(e.target.value as number)}
+                        disabled={!districtId}
+                        options={[
+                          { value: '', label: '-- Mahallani tanlang (ixtiyoriy) --' },
+                          ...(locations?.mahallas.map((m) => ({ value: m.id, label: m.name })) || [])
+                        ]}
+                      />
+                    </Box>
 
+                    {/* Phone & Full Name */}
+                    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.5 }}>
+                      <AppPhoneField
+                        required
+                        label="Telefon raqamingiz *"
+                        value={phone}
+                        onChange={setPhone}
+                        sx={highContrastInputSx}
+                      />
+
+                      <TextField
+                        fullWidth
+                        size="small"
+                        label="Ismingiz (ixtiyoriy)"
+                        placeholder="Ismingiz"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        sx={highContrastInputSx}
+                      />
+                    </Box>
+
+                    {/* Address / Landmark */}
                     <TextField
                       fullWidth
                       size="small"
-                      label="Ismingiz (ixtiyoriy)"
-                      placeholder="Ismingiz"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
+                      label="Aniq manzil yoki mo‘ljal"
+                      placeholder="Masalan: 12-maktab orqasidagi chiqindi maydoni"
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
                       sx={highContrastInputSx}
                     />
-                  </Box>
 
-                  {/* Address / Landmark */}
-                  <TextField
-                    fullWidth
-                    size="small"
-                    label="Aniq manzil yoki mo‘ljal"
-                    placeholder="Masalan: 12-maktab orqasidagi chiqindi maydoni"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    sx={highContrastInputSx}
-                  />
+                    {/* Description */}
+                    <TextField
+                      fullWidth
+                      size="small"
+                      multiline
+                      rows={2}
+                      label="Qo‘shimcha izoh (ixtiyoriy)"
+                      placeholder="Konteyner toshib ketgan, katta hajmda maishiy chiqindi yig‘ilib qolgan..."
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      sx={highContrastInputSx}
+                    />
 
-                  {/* Description */}
-                  <TextField
-                    fullWidth
-                    size="small"
-                    multiline
-                    rows={2}
-                    label="Qo‘shimcha izoh (ixtiyoriy)"
-                    placeholder="Konteyner toshib ketgan, katta hajmda maishiy chiqindi yig‘ilib qolgan..."
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    sx={highContrastInputSx}
-                  />
-
-                  {/* Submit Button */}
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    size="large"
-                    disabled={!file || !districtId || !phone.trim() || isSubmitting}
-                    startIcon={isSubmitting ? <CircularProgress size={18} color="inherit" /> : <SendOutlinedIcon />}
-                    sx={{
-                      py: 1.5,
-                      fontWeight: 800,
-                      fontSize: '1rem',
-                      borderRadius: 2.5,
-                      bgcolor: '#059669',
-                      boxShadow: '0 4px 14px rgba(5, 150, 105, 0.35)',
-                      '&:hover': {
-                        bgcolor: '#047857'
-                      },
-                      '&.Mui-disabled': {
-                        bgcolor: '#CBD5E1',
-                        color: '#64748B'
-                      }
-                    }}
-                  >
-                    {isSubmitting ? <CircularProgress size={22} color="inherit" /> : 'Murojaatni Yuborish'}
-                  </Button>
-                </Stack>
+                    {/* Submit Button */}
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      size="large"
+                      disabled={!file || !districtId || !phone.trim() || isSubmitting}
+                      startIcon={isSubmitting ? <CircularProgress size={18} color="inherit" /> : <SendOutlinedIcon />}
+                      sx={{
+                        py: 1.25,
+                        fontWeight: 800,
+                        fontSize: '0.98rem',
+                        borderRadius: 2.5,
+                        bgcolor: '#059669',
+                        boxShadow: '0 4px 14px rgba(5, 150, 105, 0.35)',
+                        textTransform: 'none',
+                        '&:hover': {
+                          bgcolor: '#047857',
+                          boxShadow: '0 6px 18px rgba(5, 150, 105, 0.45)'
+                        },
+                        '&.Mui-disabled': {
+                          bgcolor: '#CBD5E1',
+                          color: '#64748B'
+                        }
+                      }}
+                    >
+                      {isSubmitting ? <CircularProgress size={22} color="inherit" /> : 'Murojaatni Yuborish'}
+                    </Button>
+                  </Stack>
+                </Box>
               </Box>
             )}
 
