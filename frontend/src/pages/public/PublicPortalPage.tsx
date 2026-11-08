@@ -4,7 +4,6 @@ import {
   Box,
   Button,
   Card,
-  CardMedia,
   CircularProgress,
   FormControl,
   InputLabel,
@@ -19,7 +18,6 @@ import {
 import SecurityOutlinedIcon from '@mui/icons-material/SecurityOutlined';
 import NorthEastIcon from '@mui/icons-material/NorthEast';
 import SendOutlinedIcon from '@mui/icons-material/SendOutlined';
-import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
 import MyLocationOutlinedIcon from '@mui/icons-material/MyLocationOutlined';
@@ -34,11 +32,8 @@ import { useNavigate } from 'react-router-dom';
 
 import {
   useGetPublicLocationsQuery,
-  useSubmitPublicRequestMutation,
-  useLazyTrackRequestQuery,
-  TrackedRequest
+  useSubmitPublicRequestMutation
 } from '../../api/publicApi';
-import { StatusBadge } from '../../components/common/StatusBadge';
 import AppPhoneField from '../../components/common/AppPhoneField';
 import { LocationPickerModal } from '../../components/map/LocationPickerModal';
 import { detectDistrictByPoint } from '../../constants/boundaries';
@@ -115,7 +110,6 @@ const WASTE_TYPES = [
 
 export const PublicPortalPage: React.FC = () => {
   const navigate = useNavigate();
-  const [tab, setTab] = useState<'submit' | 'track'>('submit');
 
   // Submit Form States
   const [fullName, setFullName] = useState('');
@@ -128,7 +122,7 @@ export const PublicPortalPage: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  const { showSuccess, showError, showWarning } = useToast();
+  const { showSuccess, showError } = useToast();
 
   // Location / GPS states
   const [lat, setLat] = useState<number | null>(null);
@@ -139,14 +133,9 @@ export const PublicPortalPage: React.FC = () => {
 
   const [submittedId, setSubmittedId] = useState<number | null>(null);
 
-  // Track Form States
-  const [trackQuery, setTrackQuery] = useState('');
-  const [trackedResults, setTrackedResults] = useState<TrackedRequest[]>([]);
-
   // API hooks
   const { data: locations } = useGetPublicLocationsQuery(districtId ? { districtId: Number(districtId) } : undefined);
   const [submitRequest, { isLoading: isSubmitting }] = useSubmitPublicRequestMutation();
-  const [triggerTrack, { isLoading: isTracking, error: trackError }] = useLazyTrackRequestQuery();
 
   // Handle Photo Selection
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -275,31 +264,6 @@ export const PublicPortalPage: React.FC = () => {
     }
   };
 
-  const handleTrack = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const query = trackQuery.trim();
-    if (!query) return;
-
-    try {
-      const isNumericOnly = /^\d+$/.test(query) && query.length < 8;
-      const results = await triggerTrack(
-        isNumericOnly ? { id: query } : { phone: cleanUzPhone(query) || query }
-      ).unwrap();
-
-      const list = Array.isArray(results) ? results : results ? [results] : [];
-      setTrackedResults(list);
-      if (list.length > 0) {
-        showSuccess(`${list.length} ta murojaat topildi!`);
-      } else {
-        showWarning('Kiritilgan ma’lumot bo‘yicha murojaat topilmadi.');
-      }
-    } catch (err: any) {
-      console.error('Track error:', err);
-      setTrackedResults([]);
-      showError('Qidiruvda xatolik yuz berdi.');
-    }
-  };
-
   return (
     <Box
       sx={{
@@ -314,7 +278,7 @@ export const PublicPortalPage: React.FC = () => {
         px: { xs: 2, sm: 3 }
       }}
     >
-      {/* Top Header Link (Only "Rahbar / Xodim ↗", no navbar clutter) */}
+      {/* Top Header Link (Only "Rahbar / Xodim ↗", clean and sleek) */}
       <Box
         sx={{
           width: '100%',
@@ -463,7 +427,7 @@ export const PublicPortalPage: React.FC = () => {
             </Stack>
           </Box>
 
-          {/* TELEGRAM BOT QUICK LINK BANNER (Preserved inside card) */}
+          {/* TELEGRAM BOT QUICK LINK BANNER (Official Telegram Brand Colors) */}
           <Box
             component="a"
             href="https://t.me/toza_hudud_public_bot"
@@ -473,50 +437,51 @@ export const PublicPortalPage: React.FC = () => {
               mt: 3.5,
               p: 2,
               borderRadius: '14px',
-              bgcolor: 'rgba(5, 150, 105, 0.05)',
-              border: '1.5px solid rgba(5, 150, 105, 0.25)',
+              bgcolor: '#F0F9FF',
+              border: '1.5px solid #BAE6FD',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               textDecoration: 'none',
               transition: 'all 0.2s ease',
               '&:hover': {
-                bgcolor: 'rgba(5, 150, 105, 0.1)',
-                borderColor: '#059669',
+                bgcolor: '#E0F2FE',
+                borderColor: '#229ED9',
                 transform: 'translateY(-1px)',
-                boxShadow: '0 4px 14px rgba(5, 150, 105, 0.18)'
+                boxShadow: '0 6px 18px rgba(34, 158, 217, 0.22)'
               }
             }}
           >
             <Stack direction="row" spacing={1.5} alignItems="center">
               <Box
                 sx={{
-                  width: 38,
-                  height: 38,
+                  width: 40,
+                  height: 40,
                   borderRadius: '50%',
-                  bgcolor: '#059669',
+                  bgcolor: '#229ED9',
                   color: '#FFFFFF',
                   display: 'grid',
                   placeItems: 'center',
+                  boxShadow: '0 4px 12px rgba(34, 158, 217, 0.35)',
                   flexShrink: 0
                 }}
               >
-                <TelegramIcon sx={{ fontSize: 20 }} />
+                <TelegramIcon sx={{ fontSize: 22 }} />
               </Box>
               <Box>
-                <Typography sx={{ fontWeight: 800, color: '#0F172A', fontSize: '0.84rem', lineHeight: 1.2 }}>
+                <Typography sx={{ fontWeight: 800, color: '#0F172A', fontSize: '0.86rem', lineHeight: 1.2 }}>
                   Telegram Bot orqali tezkor yuborish
                 </Typography>
-                <Typography sx={{ color: '#047857', fontWeight: 600, fontSize: '0.76rem' }}>
+                <Typography sx={{ color: '#0284C7', fontWeight: 600, fontSize: '0.76rem', mt: 0.25 }}>
                   @toza_hudud_public_bot bilan 1 daqiqada
                 </Typography>
               </Box>
             </Stack>
-            <OpenInNewOutlinedIcon sx={{ fontSize: 18, color: '#059669', flexShrink: 0 }} />
+            <OpenInNewOutlinedIcon sx={{ fontSize: 19, color: '#229ED9', flexShrink: 0 }} />
           </Box>
         </Card>
 
-        {/* RIGHT CARD: Online Application Form (or Track Status) */}
+        {/* RIGHT CARD: Online Application Form (Clean, without tabs or tracking toggle) */}
         <Card
           elevation={0}
           sx={{
@@ -530,60 +495,18 @@ export const PublicPortalPage: React.FC = () => {
             justifyContent: 'space-between'
           }}
         >
-          {/* Header Row: Title & Subtitle + View Switcher */}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2.25 }}>
-            <Box>
-              <Typography sx={{ fontWeight: 800, fontSize: '1.3rem', color: '#0F172A', lineHeight: 1.2 }}>
-                {tab === 'submit' ? 'Murojaat onlayn kiritish' : 'Murojaat holatini tekshirish'}
-              </Typography>
-              <Typography sx={{ color: '#64748B', fontSize: '0.82rem', mt: 0.4, fontWeight: 500 }}>
-                {tab === 'submit' ? 'Tartib bo‘yicha ma\'lumotlarni kiriting' : 'ID raqam yoki telefoningizni kiriting'}
-              </Typography>
-            </Box>
-
-            {/* Minimalist Tab Toggle */}
-            <Box sx={{ display: 'flex', bgcolor: '#F1F5F9', p: 0.5, borderRadius: '10px', border: '1px solid #CBD5E1' }}>
-              <Button
-                size="small"
-                onClick={() => setTab('submit')}
-                sx={{
-                  py: 0.45,
-                  px: 1.4,
-                  borderRadius: '7px',
-                  fontSize: '0.76rem',
-                  fontWeight: 700,
-                  textTransform: 'none',
-                  bgcolor: tab === 'submit' ? '#059669' : 'transparent',
-                  color: tab === 'submit' ? '#FFFFFF' : '#475569',
-                  boxShadow: tab === 'submit' ? '0 2px 6px rgba(5, 150, 105, 0.28)' : 'none',
-                  '&:hover': { bgcolor: tab === 'submit' ? '#047857' : 'rgba(0,0,0,0.04)' }
-                }}
-              >
-                Kiritish
-              </Button>
-              <Button
-                size="small"
-                onClick={() => setTab('track')}
-                sx={{
-                  py: 0.45,
-                  px: 1.4,
-                  borderRadius: '7px',
-                  fontSize: '0.76rem',
-                  fontWeight: 700,
-                  textTransform: 'none',
-                  bgcolor: tab === 'track' ? '#059669' : 'transparent',
-                  color: tab === 'track' ? '#FFFFFF' : '#475569',
-                  boxShadow: tab === 'track' ? '0 2px 6px rgba(5, 150, 105, 0.28)' : 'none',
-                  '&:hover': { bgcolor: tab === 'track' ? '#047857' : 'rgba(0,0,0,0.04)' }
-                }}
-              >
-                Holat
-              </Button>
-            </Box>
+          {/* Header Row: Title & Subtitle (Clean & Direct) */}
+          <Box sx={{ mb: 2.25 }}>
+            <Typography sx={{ fontWeight: 800, fontSize: '1.3rem', color: '#0F172A', lineHeight: 1.2 }}>
+              Murojaat onlayn kiritish
+            </Typography>
+            <Typography sx={{ color: '#64748B', fontSize: '0.82rem', mt: 0.4, fontWeight: 500 }}>
+              Tartib bo‘yicha ma'lumotlarni kiriting
+            </Typography>
           </Box>
 
           {/* Success Alert */}
-          {submittedId && tab === 'submit' && (
+          {submittedId && (
             <Alert
               severity="success"
               icon={<CheckCircleOutlinedIcon fontSize="inherit" />}
@@ -600,420 +523,294 @@ export const PublicPortalPage: React.FC = () => {
             </Alert>
           )}
 
-          {/* TAB 1: SUBMIT FORM (Exact layout & notched floating labels matching sample image) */}
-          {tab === 'submit' && (
-            <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 1.75 }}>
-              {/* Row 1: F.I.Sh (Full width) */}
-              <TextField
+          {/* SUBMIT FORM (Exact layout & notched floating labels matching sample image) */}
+          <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 1.75 }}>
+            {/* Row 1: F.I.Sh (Full width) */}
+            <TextField
+              fullWidth
+              label="F.I.Sh"
+              placeholder="Ism va familiyangiz"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              sx={spaciousInputSx}
+            />
+
+            {/* Row 2: Telefon & Muammo yo‘nalishi */}
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.5 }}>
+              <AppPhoneField
+                required
                 fullWidth
-                label="F.I.Sh"
-                placeholder="Ism va familiyangiz"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
+                label="Telefon"
+                placeholder="Telefon raqam"
+                value={phone}
+                onChange={setPhone}
                 sx={spaciousInputSx}
               />
 
-              {/* Row 2: Telefon & Muammo yo‘nalishi */}
-              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.5 }}>
-                <AppPhoneField
-                  required
-                  fullWidth
-                  label="Telefon"
-                  placeholder="Telefon raqam"
-                  value={phone}
-                  onChange={setPhone}
-                  sx={spaciousInputSx}
-                />
-
-                <FormControl fullWidth sx={spaciousInputSx}>
-                  <InputLabel id="waste-type-label">Muammo yo‘nalishi</InputLabel>
-                  <Select
-                    labelId="waste-type-label"
-                    id="waste-type-select"
-                    value={wasteType}
-                    label="Muammo yo‘nalishi"
-                    onChange={(e) => setWasteType(e.target.value)}
-                    IconComponent={KeyboardArrowDownIcon}
-                  >
-                    {WASTE_TYPES.map((t) => (
-                      <MenuItem key={t.value} value={t.value} sx={{ fontSize: '0.92rem', fontWeight: 500 }}>
-                        {t.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Box>
-
-              {/* Row 3: Tuman & Mahalla */}
-              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.5 }}>
-                <FormControl fullWidth sx={spaciousInputSx}>
-                  <InputLabel id="district-label">Tumaningizni tanlang *</InputLabel>
-                  <Select
-                    labelId="district-label"
-                    id="district-select"
-                    value={districtId}
-                    label="Tumaningizni tanlang *"
-                    onChange={(e) => {
-                      setDistrictId(e.target.value as number);
-                      setMahallaId('');
-                    }}
-                    IconComponent={KeyboardArrowDownIcon}
-                  >
-                    {locations?.districts.map((d) => (
-                      <MenuItem key={d.id} value={d.id} sx={{ fontSize: '0.92rem', fontWeight: 500 }}>
-                        {d.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-
-                <FormControl fullWidth sx={spaciousInputSx} disabled={!districtId}>
-                  <InputLabel id="mahalla-label">Mahalla (ixtiyoriy)</InputLabel>
-                  <Select
-                    labelId="mahalla-label"
-                    id="mahalla-select"
-                    value={mahallaId}
-                    label="Mahalla (ixtiyoriy)"
-                    onChange={(e) => setMahallaId(e.target.value as number)}
-                    IconComponent={KeyboardArrowDownIcon}
-                  >
-                    <MenuItem value="">
-                      <em>Tanlanmagan</em>
+              <FormControl fullWidth sx={spaciousInputSx}>
+                <InputLabel id="waste-type-label">Muammo yo‘nalishi</InputLabel>
+                <Select
+                  labelId="waste-type-label"
+                  id="waste-type-select"
+                  value={wasteType}
+                  label="Muammo yo‘nalishi"
+                  onChange={(e) => setWasteType(e.target.value)}
+                  IconComponent={KeyboardArrowDownIcon}
+                >
+                  {WASTE_TYPES.map((t) => (
+                    <MenuItem key={t.value} value={t.value} sx={{ fontSize: '0.92rem', fontWeight: 500 }}>
+                      {t.label}
                     </MenuItem>
-                    {locations?.mahallas.map((m) => (
-                      <MenuItem key={m.id} value={m.id} sx={{ fontSize: '0.92rem', fontWeight: 500 }}>
-                        {m.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Box>
-
-              {/* Row 4: Aniq manzil / Xonadon & Qo‘shimcha manzil / izoh */}
-              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.5 }}>
-                <TextField
-                  fullWidth
-                  label="Xonadon raqami (ixtiyoriy)"
-                  placeholder="Masalan: 14-uy, 2-xonadon"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  sx={spaciousInputSx}
-                />
-
-                <TextField
-                  fullWidth
-                  multiline
-                  rows={2}
-                  label="Qo‘shimcha manzil / izoh"
-                  placeholder="Mo‘ljal yoki chiqindi haqida ma'lumot"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  sx={spaciousInputSx}
-                />
-              </Box>
-
-              {/* Row 5: Compact Location/GPS Selector */}
-              <Box
-                sx={{
-                  p: 1.25,
-                  borderRadius: '12px',
-                  border: '1.5px dashed #CBD5E1',
-                  bgcolor: lat && lng ? '#F0FDF4' : '#F8FAFC',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: 1
-                }}
-              >
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <Button
-                    type="button"
-                    size="small"
-                    startIcon={<MapOutlinedIcon sx={{ fontSize: 16 }} />}
-                    onClick={() => setMapPickerOpen(true)}
-                    sx={{
-                      py: 0.55,
-                      px: 1.5,
-                      fontWeight: 700,
-                      fontSize: '0.78rem',
-                      borderRadius: '8px',
-                      color: '#0F172A',
-                      bgcolor: '#FFFFFF',
-                      textTransform: 'none',
-                      border: '1.5px solid #CBD5E1',
-                      '&:hover': { bgcolor: '#F0FDF4', borderColor: '#059669', color: '#047857' }
-                    }}
-                  >
-                    {lat && lng ? 'Xaritadan qayta tanlash' : 'Xaritadan nuqtani belgilash'}
-                  </Button>
-
-                  <Button
-                    type="button"
-                    size="small"
-                    startIcon={gpsLoading ? <CircularProgress size={13} color="inherit" /> : <MyLocationOutlinedIcon sx={{ fontSize: 16 }} />}
-                    onClick={handleGetGPS}
-                    disabled={gpsLoading}
-                    sx={{
-                      py: 0.55,
-                      px: 1.3,
-                      fontWeight: 700,
-                      fontSize: '0.78rem',
-                      borderRadius: '8px',
-                      color: '#0F172A',
-                      bgcolor: '#FFFFFF',
-                      textTransform: 'none',
-                      border: '1.5px solid #CBD5E1',
-                      '&:hover': { bgcolor: '#F0FDF4', borderColor: '#059669', color: '#047857' }
-                    }}
-                  >
-                    {gpsLoading ? 'Aniqlanmoqda...' : 'Joriy GPS'}
-                  </Button>
-                </Stack>
-
-                {lat && lng ? (
-                  <Chip
-                    size="small"
-                    icon={<CheckCircleOutlinedIcon style={{ fontSize: 13 }} />}
-                    label={gpsMessage || `${lat.toFixed(4)}, ${lng.toFixed(4)}`}
-                    color="success"
-                    variant="filled"
-                    sx={{ fontWeight: 700, fontSize: '0.74rem', height: 26, bgcolor: '#059669' }}
-                  />
-                ) : (
-                  <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.74rem', display: { xs: 'none', sm: 'block' } }}>
-                    (Lokatsiya ixtiyoriy)
-                  </Typography>
-                )}
-              </Box>
-
-              {/* Row 6: Rasmlar section (matches sample image) */}
-              <Box sx={{ mt: 0.25 }}>
-                <Typography sx={{ fontSize: '0.82rem', fontWeight: 600, color: '#334155', mb: 0.75 }}>
-                  Rasmlar
-                </Typography>
-
-                <Stack direction="row" spacing={1.5} alignItems="center">
-                  <Button
-                    component="label"
-                    variant="outlined"
-                    startIcon={<AddPhotoAlternateOutlinedIcon sx={{ fontSize: 19 }} />}
-                    sx={{
-                      py: 0.85,
-                      px: 2.2,
-                      borderRadius: '10px',
-                      borderColor: file ? '#059669' : '#D1D5DB',
-                      borderWidth: '1.5px',
-                      color: file ? '#047857' : '#0F172A',
-                      bgcolor: file ? '#F0FDF4' : '#FFFFFF',
-                      fontWeight: 700,
-                      fontSize: '0.84rem',
-                      textTransform: 'none',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
-                      '&:hover': { bgcolor: '#F0FDF4', borderColor: '#059669', borderWidth: '1.5px' }
-                    }}
-                  >
-                    {file ? 'Boshqa rasm tanlash' : 'Rasm yuklash'}
-                    <input
-                      type="file"
-                      hidden
-                      accept="image/*"
-                      onChange={handlePhotoSelect}
-                    />
-                  </Button>
-
-                  {file && (
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1,
-                        bgcolor: '#F0FDF4',
-                        pl: 1,
-                        pr: 0.5,
-                        py: 0.45,
-                        borderRadius: '8px',
-                        border: '1.5px solid #86EFAC'
-                      }}
-                    >
-                      {previewUrl && (
-                        <Box
-                          component="img"
-                          src={previewUrl}
-                          alt="preview"
-                          sx={{ width: 24, height: 24, borderRadius: 1, objectFit: 'cover' }}
-                        />
-                      )}
-                      <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, color: '#065F46', maxWidth: 130, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                        {file.name}
-                      </Typography>
-                      <IconButton size="small" onClick={handleRemovePhoto} sx={{ p: 0.2 }}>
-                        <CloseIcon sx={{ fontSize: 14, color: '#065F46' }} />
-                      </IconButton>
-                    </Box>
-                  )}
-                </Stack>
-
-                <Typography sx={{ fontSize: '0.73rem', color: '#64748B', fontWeight: 500, mt: 0.75 }}>
-                  Ruxsat etilgan formatlar: JPG, JPEG, PNG, WEBP. Maksimum: 2 ta fayl, har biri 5 MB gacha.
-                </Typography>
-              </Box>
-
-              {/* Row 7: Submit Button */}
-              <Button
-                type="submit"
-                variant="contained"
-                disabled={!districtId || !phone.trim() || !file || isSubmitting}
-                endIcon={isSubmitting ? null : <SendOutlinedIcon sx={{ fontSize: 17 }} />}
-                sx={{
-                  mt: 0.75,
-                  py: 1.35,
-                  borderRadius: '12px',
-                  bgcolor: '#059669',
-                  boxShadow: '0 4px 16px rgba(5, 150, 105, 0.35)',
-                  fontWeight: 800,
-                  fontSize: '0.95rem',
-                  textTransform: 'none',
-                  color: '#FFFFFF',
-                  minHeight: '48px',
-                  transition: 'all 0.15s ease',
-                  '&:hover': {
-                    bgcolor: '#047857',
-                    boxShadow: '0 6px 20px rgba(5, 150, 105, 0.45)'
-                  },
-                  '&.Mui-disabled': {
-                    bgcolor: '#CBD5E1',
-                    color: '#64748B'
-                  }
-                }}
-              >
-                {isSubmitting ? <CircularProgress size={22} color="inherit" /> : 'Yuborish ➤'}
-              </Button>
+                  ))}
+                </Select>
+              </FormControl>
             </Box>
-          )}
 
-          {/* TAB 2: TRACK STATUS */}
-          {tab === 'track' && (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <Box component="form" onSubmit={handleTrack}>
-                <Stack direction="row" spacing={1}>
-                  <TextField
-                    fullWidth
-                    label="Qidiruv"
-                    placeholder="Murojaat ID raqami (masalan: 104) yoki telefon..."
-                    value={trackQuery}
-                    onChange={(e) => setTrackQuery(e.target.value)}
-                    sx={spaciousInputSx}
-                  />
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    disabled={isTracking || !trackQuery.trim()}
-                    startIcon={isTracking ? null : <SearchOutlinedIcon />}
-                    sx={{
-                      px: 2.5,
-                      py: 1,
-                      borderRadius: '12px',
-                      fontWeight: 700,
-                      bgcolor: '#059669',
-                      textTransform: 'none',
-                      whiteSpace: 'nowrap',
-                      minHeight: '48px',
-                      '&:hover': { bgcolor: '#047857' }
-                    }}
-                  >
-                    {isTracking ? <CircularProgress size={18} color="inherit" /> : 'Qidirish'}
-                  </Button>
-                </Stack>
-              </Box>
+            {/* Row 3: Tuman & Mahalla */}
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.5 }}>
+              <FormControl fullWidth sx={spaciousInputSx}>
+                <InputLabel id="district-label">Tumaningizni tanlang *</InputLabel>
+                <Select
+                  labelId="district-label"
+                  id="district-select"
+                  value={districtId}
+                  label="Tumaningizni tanlang *"
+                  onChange={(e) => {
+                    setDistrictId(e.target.value as number);
+                    setMahallaId('');
+                  }}
+                  IconComponent={KeyboardArrowDownIcon}
+                >
+                  {locations?.districts.map((d) => (
+                    <MenuItem key={d.id} value={d.id} sx={{ fontSize: '0.92rem', fontWeight: 500 }}>
+                      {d.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
 
-              {trackError && (
-                <Alert severity="error" sx={{ py: 0.5, borderRadius: 2 }}>
-                  Qidiruvda xatolik yuz berdi.
-                </Alert>
-              )}
+              <FormControl fullWidth sx={spaciousInputSx} disabled={!districtId}>
+                <InputLabel id="mahalla-label">Mahalla (ixtiyoriy)</InputLabel>
+                <Select
+                  labelId="mahalla-label"
+                  id="mahalla-select"
+                  value={mahallaId}
+                  label="Mahalla (ixtiyoriy)"
+                  onChange={(e) => setMahallaId(e.target.value as number)}
+                  IconComponent={KeyboardArrowDownIcon}
+                >
+                  <MenuItem value="">
+                    <em>Tanlanmagan</em>
+                  </MenuItem>
+                  {locations?.mahallas.map((m) => (
+                    <MenuItem key={m.id} value={m.id} sx={{ fontSize: '0.92rem', fontWeight: 500 }}>
+                      {m.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
 
-              {trackedResults.length === 0 && !isTracking && trackQuery && (
-                <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ py: 3 }}>
-                  Hech qanday murojaat topilmadi.
+            {/* Row 4: Aniq manzil / Xonadon & Qo‘shimcha manzil / izoh */}
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.5 }}>
+              <TextField
+                fullWidth
+                label="Xonadon raqami (ixtiyoriy)"
+                placeholder="Masalan: 14-uy, 2-xonadon"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                sx={spaciousInputSx}
+              />
+
+              <TextField
+                fullWidth
+                multiline
+                rows={2}
+                label="Qo‘shimcha manzil / izoh"
+                placeholder="Mo‘ljal yoki chiqindi haqida ma'lumot"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                sx={spaciousInputSx}
+              />
+            </Box>
+
+            {/* Row 5: Compact Location/GPS Selector */}
+            <Box
+              sx={{
+                p: 1.25,
+                borderRadius: '12px',
+                border: '1.5px dashed #CBD5E1',
+                bgcolor: lat && lng ? '#F0FDF4' : '#F8FAFC',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 1
+              }}
+            >
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Button
+                  type="button"
+                  size="small"
+                  startIcon={<MapOutlinedIcon sx={{ fontSize: 16 }} />}
+                  onClick={() => setMapPickerOpen(true)}
+                  sx={{
+                    py: 0.55,
+                    px: 1.5,
+                    fontWeight: 700,
+                    fontSize: '0.78rem',
+                    borderRadius: '8px',
+                    color: '#0F172A',
+                    bgcolor: '#FFFFFF',
+                    textTransform: 'none',
+                    border: '1.5px solid #CBD5E1',
+                    '&:hover': { bgcolor: '#F0FDF4', borderColor: '#059669', color: '#047857' }
+                  }}
+                >
+                  {lat && lng ? 'Xaritadan qayta tanlash' : 'Xaritadan nuqtani belgilash'}
+                </Button>
+
+                <Button
+                  type="button"
+                  size="small"
+                  startIcon={gpsLoading ? <CircularProgress size={13} color="inherit" /> : <MyLocationOutlinedIcon sx={{ fontSize: 16 }} />}
+                  onClick={handleGetGPS}
+                  disabled={gpsLoading}
+                  sx={{
+                    py: 0.55,
+                    px: 1.3,
+                    fontWeight: 700,
+                    fontSize: '0.78rem',
+                    borderRadius: '8px',
+                    color: '#0F172A',
+                    bgcolor: '#FFFFFF',
+                    textTransform: 'none',
+                    border: '1.5px solid #CBD5E1',
+                    '&:hover': { bgcolor: '#F0FDF4', borderColor: '#059669', color: '#047857' }
+                  }}
+                >
+                  {gpsLoading ? 'Aniqlanmoqda...' : 'Joriy GPS'}
+                </Button>
+              </Stack>
+
+              {lat && lng ? (
+                <Chip
+                  size="small"
+                  icon={<CheckCircleOutlinedIcon style={{ fontSize: 13 }} />}
+                  label={gpsMessage || `${lat.toFixed(4)}, ${lng.toFixed(4)}`}
+                  color="success"
+                  variant="filled"
+                  sx={{ fontWeight: 700, fontSize: '0.74rem', height: 26, bgcolor: '#059669' }}
+                />
+              ) : (
+                <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.74rem', display: { xs: 'none', sm: 'block' } }}>
+                  (Lokatsiya ixtiyoriy)
                 </Typography>
               )}
+            </Box>
 
-              {/* Scrollable list inside the card if multiple results exist */}
-              <Box sx={{ maxHeight: '380px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 1.5, pr: 0.5 }}>
-                {trackedResults.map((item) => (
+            {/* Row 6: Rasmlar section (matches sample image) */}
+            <Box sx={{ mt: 0.25 }}>
+              <Typography sx={{ fontSize: '0.82rem', fontWeight: 600, color: '#334155', mb: 0.75 }}>
+                Rasmlar
+              </Typography>
+
+              <Stack direction="row" spacing={1.5} alignItems="center">
+                <Button
+                  component="label"
+                  variant="outlined"
+                  startIcon={<AddPhotoAlternateOutlinedIcon sx={{ fontSize: 19 }} />}
+                  sx={{
+                    py: 0.85,
+                    px: 2.2,
+                    borderRadius: '10px',
+                    borderColor: file ? '#059669' : '#D1D5DB',
+                    borderWidth: '1.5px',
+                    color: file ? '#047857' : '#0F172A',
+                    bgcolor: file ? '#F0FDF4' : '#FFFFFF',
+                    fontWeight: 700,
+                    fontSize: '0.84rem',
+                    textTransform: 'none',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+                    '&:hover': { bgcolor: '#F0FDF4', borderColor: '#059669', borderWidth: '1.5px' }
+                  }}
+                >
+                  {file ? 'Boshqa rasm tanlash' : 'Rasm yuklash'}
+                  <input
+                    type="file"
+                    hidden
+                    accept="image/*"
+                    onChange={handlePhotoSelect}
+                  />
+                </Button>
+
+                {file && (
                   <Box
-                    key={item.id}
                     sx={{
-                      p: 2,
-                      borderRadius: '14px',
-                      bgcolor: '#F8FAFC',
-                      border: '1.5px solid #CBD5E1'
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      bgcolor: '#F0FDF4',
+                      pl: 1,
+                      pr: 0.5,
+                      py: 0.45,
+                      borderRadius: '8px',
+                      border: '1.5px solid #86EFAC'
                     }}
                   >
-                    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
-                      <Box>
-                        <Typography variant="subtitle2" fontWeight={800} color="#0F172A">
-                          Murojaat #{item.id}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {new Date(item.createdAt).toLocaleString('uz-UZ')}
-                        </Typography>
-                      </Box>
-                      <StatusBadge status={item.status} />
-                    </Stack>
-
-                    <Typography variant="caption" sx={{ color: '#475569', display: 'block', mb: 1, fontWeight: 600 }}>
-                      <strong>Manzil:</strong> {[item.mahallaName, item.address].filter(Boolean).join(', ') || '-'}
+                    {previewUrl && (
+                      <Box
+                        component="img"
+                        src={previewUrl}
+                        alt="preview"
+                        sx={{ width: 24, height: 24, borderRadius: 1, objectFit: 'cover' }}
+                      />
+                    )}
+                    <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, color: '#065F46', maxWidth: 130, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                      {file.name}
                     </Typography>
-
-                    <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5, mt: 1 }}>
-                      <Box>
-                        <Typography variant="caption" fontWeight={700} color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
-                          Dastlabki holat:
-                        </Typography>
-                        <CardMedia
-                          component="img"
-                          image={item.beforePhotoUrl}
-                          alt="Dastlabki"
-                          sx={{ height: 110, borderRadius: 1.5, objectFit: 'cover', border: '1px solid #CBD5E1' }}
-                        />
-                      </Box>
-
-                      {item.afterPhotoUrl ? (
-                        <Box>
-                          <Typography variant="caption" fontWeight={700} color="success.main" sx={{ display: 'block', mb: 0.5 }}>
-                            Tozalangan natija:
-                          </Typography>
-                          <CardMedia
-                            component="img"
-                            image={item.afterPhotoUrl}
-                            alt="Tozalangan"
-                            sx={{ height: 110, borderRadius: 1.5, objectFit: 'cover', border: '1.5px solid #059669' }}
-                          />
-                        </Box>
-                      ) : (
-                        <Box
-                          sx={{
-                            height: 110,
-                            borderRadius: 1.5,
-                            border: '1.5px dashed #CBD5E1',
-                            display: 'grid',
-                            placeItems: 'center',
-                            p: 1,
-                            textAlign: 'center'
-                          }}
-                        >
-                          <Typography variant="caption" color="text.secondary">
-                            Tozalash ishlari hali yakunlanmagan.
-                          </Typography>
-                        </Box>
-                      )}
-                    </Box>
+                    <IconButton size="small" onClick={handleRemovePhoto} sx={{ p: 0.2 }}>
+                      <CloseIcon sx={{ fontSize: 14, color: '#065F46' }} />
+                    </IconButton>
                   </Box>
-                ))}
-              </Box>
+                )}
+              </Stack>
+
+              <Typography sx={{ fontSize: '0.73rem', color: '#64748B', fontWeight: 500, mt: 0.75 }}>
+                Ruxsat etilgan formatlar: JPG, JPEG, PNG, WEBP. Maksimum: 2 ta fayl, har biri 5 MB gacha.
+              </Typography>
             </Box>
-          )}
+
+            {/* Row 7: Submit Button */}
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={!districtId || !phone.trim() || !file || isSubmitting}
+              endIcon={isSubmitting ? null : <SendOutlinedIcon sx={{ fontSize: 17 }} />}
+              sx={{
+                mt: 0.75,
+                py: 1.35,
+                borderRadius: '12px',
+                bgcolor: '#059669',
+                boxShadow: '0 4px 16px rgba(5, 150, 105, 0.35)',
+                fontWeight: 800,
+                fontSize: '0.95rem',
+                textTransform: 'none',
+                color: '#FFFFFF',
+                minHeight: '48px',
+                transition: 'all 0.15s ease',
+                '&:hover': {
+                  bgcolor: '#047857',
+                  boxShadow: '0 6px 20px rgba(5, 150, 105, 0.45)'
+                },
+                '&.Mui-disabled': {
+                  bgcolor: '#CBD5E1',
+                  color: '#64748B'
+                }
+              }}
+            >
+              {isSubmitting ? <CircularProgress size={22} color="inherit" /> : 'Yuborish ➤'}
+            </Button>
+          </Box>
         </Card>
       </Box>
 
