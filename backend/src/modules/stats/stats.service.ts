@@ -174,7 +174,8 @@ export class StatsService {
     const topNeighborhoodsRaw = await this.requestRepo
       .createQueryBuilder('r')
       .leftJoin('r.district', 'd')
-      .select('COALESCE(r.mahalla_name, \'Boshqa\')', 'name')
+      .leftJoin('r.mahalla', 'm')
+      .select("COALESCE(r.mahalla_name, m.name, 'Boshqa')", 'name')
       .addSelect('COALESCE(d.name, \'Nomalum\')', 'districtName')
       .addSelect('COUNT(*)', 'total')
       .addSelect(
@@ -183,10 +184,10 @@ export class StatsService {
       )
       .addSelect("COUNT(CASE WHEN r.status = 'completed' THEN 1 END)", 'completed')
       .where(districtId ? 'r.district_id = :districtId' : '1=1', { districtId })
-      .groupBy('r.mahalla_name')
+      .groupBy("COALESCE(r.mahalla_name, m.name, 'Boshqa')")
       .addGroupBy('d.name')
       .orderBy('total', 'DESC')
-      .limit(6)
+      .limit(50)
       .getRawMany();
 
     const topNeighborhoods = topNeighborhoodsRaw.map((row, idx) => ({
@@ -389,10 +390,11 @@ export class StatsService {
     // Mahalla breakdown (Top 10)
     const mahallaRaw = await this.requestRepo
       .createQueryBuilder('r')
-      .select('COALESCE(r.mahalla_name, \'Boshqa\')', 'name')
+      .leftJoin('r.mahalla', 'm')
+      .select("COALESCE(r.mahalla_name, m.name, 'Boshqa')", 'name')
       .addSelect('COUNT(*)', 'value')
       .where(districtId ? 'r.district_id = :districtId' : '1=1', { districtId })
-      .groupBy('name')
+      .groupBy("COALESCE(r.mahalla_name, m.name, 'Boshqa')")
       .orderBy('value', 'DESC')
       .limit(10)
       .getRawMany();

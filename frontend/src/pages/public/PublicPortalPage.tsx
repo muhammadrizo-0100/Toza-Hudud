@@ -673,7 +673,7 @@ export const PublicPortalPage: React.FC = () => {
                   </Box>
                   <Box sx={{ minWidth: 0 }}>
                     <Typography sx={{ fontWeight: 700, fontSize: '0.86rem', color: '#0F172A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      📍 {gpsMessage || 'Joylashuv belgilandi'}
+                      {gpsMessage || 'Joylashuv belgilandi'}
                     </Typography>
                     <Typography sx={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 500 }}>
                       {lat.toFixed(5)}, {lng.toFixed(5)} • Chiqindi guruhiga aniq yo‘naltiriladi
