@@ -193,8 +193,52 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
       }
     });
 
-    // 2. When a task is verified & completed
-    this.realtimeService.onRequestCompleted(async ({ request }) => {
+    // 2. When a work report is submitted (via web cabinet or bot)
+    this.realtimeService.onRequestSubmitted(async ({ request, worker }) => {
+      // Clear active photo session for this request across any worker sessions
+      for (const [tgId, sess] of this.workerSessions.entries()) {
+        if (sess.activeRequestId === request.id) {
+          this.workerSessions.delete(tgId);
+        }
+      }
+
+      // Notify Worker via workerBot
+      if (this.workerBot) {
+        try {
+          let targetWorker = worker;
+          if (!targetWorker && request.assignedWorkerId) {
+            targetWorker = await this.workerRepo.findOne({ where: { id: request.assignedWorkerId } });
+          }
+
+          if (targetWorker?.telegramId) {
+            const address = [request.mahallaName, request.address].filter(Boolean).join(', ') || 'Manzil ko‘rsatilmagan';
+            const text =
+              `⏳ <b>Topshiriq #${request.id} bo‘yicha hisobot qabul qilindi!</b>\n\n` +
+              `📍 <b>Manzil:</b> ${address}\n` +
+              `⏱ <b>Holati:</b> ⏳ Dispetcher tasdig‘i kutilmoqda\n\n` +
+              `ℹ️ Topshiriq bo‘yicha tozalash hisoboti tizimga muvaffaqiyatli kiritildi. Dispetcher tasdiqlaganidan so‘ng sizga yakuniy xabar yuboriladi.`;
+
+            await this.workerBot.telegram.sendMessage(targetWorker.telegramId, text, {
+              parse_mode: 'HTML',
+              reply_markup: WORKER_KEYBOARD.reply_markup
+            });
+          }
+        } catch (err: any) {
+          this.logger.warn(`Worker hisobot bildirishnomasi yuborilmadi: ${err.message}`);
+        }
+      }
+    });
+
+    // 3. When a task is verified & completed
+    this.realtimeService.onRequestCompleted(async ({ request, worker }) => {
+      // Clear any pending photo sessions
+      for (const [tgId, sess] of this.workerSessions.entries()) {
+        if (sess.activeRequestId === request.id) {
+          this.workerSessions.delete(tgId);
+        }
+      }
+
+      // Notify Citizen via public bot
       if (this.bot && request.citizenTelegramId) {
         try {
           const text =
@@ -208,6 +252,75 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
           });
         } catch (err: any) {
           this.logger.warn(`Fuqaro yakunlash bildirishnomasi yuborilmadi: ${err.message}`);
+        }
+      }
+
+      // Notify Worker via workerBot
+      if (this.workerBot) {
+        try {
+          let targetWorker = worker;
+          if (!targetWorker && request.assignedWorkerId) {
+            targetWorker = await this.workerRepo.findOne({ where: { id: request.assignedWorkerId } });
+          }
+
+          if (targetWorker?.telegramId) {
+            const address = [request.mahallaName, request.address].filter(Boolean).join(', ') || 'Manzil ko‘rsatilmagan';
+            const text =
+              `🎉 <b>Topshiriq #${request.id} dispetcher tomonidan tasdiqlandi!</b>\n\n` +
+              `📍 <b>Manzil:</b> ${address}\n` +
+              `✅ <b>Holati:</b> Bajarildi (Yakunlandi)\n\n` +
+              `Tozalash ishlari to‘liq qabul qilindi. Mehnat va xizmatingiz uchun tashakkur!`;
+
+            await this.workerBot.telegram.sendMessage(targetWorker.telegramId, text, {
+              parse_mode: 'HTML',
+              reply_markup: WORKER_KEYBOARD.reply_markup
+            });
+          }
+        } catch (err: any) {
+          this.logger.warn(`Worker yakunlash bildirishnomasi yuborilmadi: ${err.message}`);
+        }
+      }
+    });
+
+    // 4. When a task is rejected by dispatcher / admin
+    this.realtimeService.onRequestRejected(async ({ request, reason, worker }) => {
+      // Clear any pending photo sessions
+      for (const [tgId, sess] of this.workerSessions.entries()) {
+        if (sess.activeRequestId === request.id) {
+          this.workerSessions.delete(tgId);
+        }
+      }
+
+      // Notify Worker via workerBot
+      if (this.workerBot) {
+        try {
+          let targetWorker = worker;
+          if (!targetWorker && request.assignedWorkerId) {
+            targetWorker = await this.workerRepo.findOne({ where: { id: request.assignedWorkerId } });
+          }
+
+          if (targetWorker?.telegramId) {
+            const address = [request.mahallaName, request.address].filter(Boolean).join(', ') || 'Manzil ko‘rsatilmagan';
+            const text =
+              `⚠️ <b>Topshiriq #${request.id} hisoboti qaytarildi!</b>\n\n` +
+              `📍 <b>Manzil:</b> ${address}\n` +
+              `❌ <b>Rad etish sababi:</b> ${reason || 'Talab darajasida tozalanmagan'}\n\n` +
+              `Iltimos, hudud tozaligini qayta ta'minlab, sifatli fotosuratni qayta yuklang:`;
+
+            const buttons: any[] = [
+              [Markup.button.callback('📸 Qayta hisobot yuklash', `done_${request.id}`)]
+            ];
+            if (request.lat && request.lng) {
+              buttons[0].push(Markup.button.url('📍 Xaritada ko‘rish', `https://maps.google.com/?q=${request.lat},${request.lng}`));
+            }
+
+            await this.workerBot.telegram.sendMessage(targetWorker.telegramId, text, {
+              parse_mode: 'HTML',
+              reply_markup: { inline_keyboard: buttons }
+            });
+          }
+        } catch (err: any) {
+          this.logger.warn(`Worker rad etish bildirishnomasi yuborilmadi: ${err.message}`);
         }
       }
     });
@@ -1280,6 +1393,59 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
       if (!fromId) return;
 
       const reqId = Number(ctx.match[1]);
+      let request;
+      try {
+        request = await this.requestsService.findOne(reqId);
+      } catch (err) {
+        await ctx.answerCbQuery('Topshiriq topilmadi!', { show_alert: true });
+        return;
+      }
+
+      if (!request) {
+        await ctx.answerCbQuery('Topshiriq topilmadi!', { show_alert: true });
+        return;
+      }
+
+      if (request.status === RequestStatus.COMPLETED) {
+        await ctx.answerCbQuery('Bu topshiriq allaqachon dispetcher tomonidan tasdiqlangan va yakunlangan!', { show_alert: true });
+        await ctx.editMessageReplyMarkup({ inline_keyboard: [] }).catch(() => {});
+        await ctx.reply(
+          `✅ <b>Topshiriq #${reqId} allaqachon muvaffaqiyatli yakunlangan.</b>`,
+          {
+            parse_mode: 'HTML',
+            reply_markup: WORKER_KEYBOARD.reply_markup
+          }
+        );
+        return;
+      }
+
+      if (request.status === RequestStatus.SUBMITTED) {
+        await ctx.answerCbQuery('Hisobot fotosurati allaqachon qabul qilingan!', { show_alert: true });
+        await ctx.editMessageReplyMarkup({ inline_keyboard: [] }).catch(() => {});
+        await ctx.reply(
+          `⏳ <b>Topshiriq #${reqId} bo‘yicha hisobot fotosurati allaqachon topshirilgan va dispetcher tasdig‘i kutilmoqda.</b>\n\nQayta hisobot yuborish talab etilmaydi.`,
+          {
+            parse_mode: 'HTML',
+            reply_markup: WORKER_KEYBOARD.reply_markup
+          }
+        );
+        return;
+      }
+
+      if (request.status !== RequestStatus.IN_PROGRESS && request.status !== RequestStatus.REJECTED) {
+        await ctx.answerCbQuery('Topshiriq faol holatda emas!', { show_alert: true });
+        await ctx.editMessageReplyMarkup({ inline_keyboard: [] }).catch(() => {});
+        return;
+      }
+
+      // Verify that user is authorized to submit for this task
+      const { admin, worker } = await this.findWorkerOrAdminByTelegramId(String(fromId));
+      const workerId = worker?.id || admin?.workerId;
+      if (workerId && request.assignedWorkerId && request.assignedWorkerId !== workerId) {
+        await ctx.answerCbQuery('Bu topshiriq sizga biriktirilmagan!', { show_alert: true });
+        return;
+      }
+
       this.workerSessions.set(fromId, { step: 'await_after_photo', activeRequestId: reqId });
 
       await ctx.answerCbQuery();
@@ -1333,6 +1499,45 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
 
       const session = this.workerSessions.get(fromId);
       if (session?.step === 'await_after_photo' && session.activeRequestId) {
+        const reqId = session.activeRequestId;
+
+        // DB Status Guard to prevent race conditions and duplicate submissions
+        let request;
+        try {
+          request = await this.requestsService.findOne(reqId);
+        } catch {
+          this.workerSessions.delete(fromId);
+          await ctx.reply('Topshiriq topilmadi.', { reply_markup: WORKER_KEYBOARD.reply_markup });
+          return;
+        }
+
+        if (request.status === RequestStatus.COMPLETED) {
+          this.workerSessions.delete(fromId);
+          await ctx.reply(
+            `✅ <b>Topshiriq #${reqId} allaqachon dispetcher tomonidan yakunlangan!</b>\nQayta fotosurat yuklash shart emas.`,
+            { parse_mode: 'HTML', reply_markup: WORKER_KEYBOARD.reply_markup }
+          );
+          return;
+        }
+
+        if (request.status === RequestStatus.SUBMITTED) {
+          this.workerSessions.delete(fromId);
+          await ctx.reply(
+            `⏳ <b>Topshiriq #${reqId} bo‘yicha hisobot fotosurati allaqachon qabul qilingan va dispetcher tasdig‘i kutilmoqda.</b>\nQayta fotosurat yuborish talab etilmaydi.`,
+            { parse_mode: 'HTML', reply_markup: WORKER_KEYBOARD.reply_markup }
+          );
+          return;
+        }
+
+        if (request.status !== RequestStatus.IN_PROGRESS && request.status !== RequestStatus.REJECTED) {
+          this.workerSessions.delete(fromId);
+          await ctx.reply(
+            `⚠️ Ushbu topshiriq faol jarayonda emas.`,
+            { reply_markup: WORKER_KEYBOARD.reply_markup }
+          );
+          return;
+        }
+
         const photos = ctx.message.photo;
         const highestRes = photos[photos.length - 1];
 
@@ -1340,8 +1545,7 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
           const fileLink = await ctx.telegram.getFileLink(highestRes.file_id);
           const savedPath = await this.downloadTelegramFile(fileLink.href);
 
-          await this.requestsService.submitWork(session.activeRequestId, savedPath);
-          const reqId = session.activeRequestId;
+          await this.requestsService.submitWork(reqId, savedPath);
           this.workerSessions.delete(fromId);
 
           await ctx.reply(
@@ -1352,9 +1556,10 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
               reply_markup: WORKER_KEYBOARD.reply_markup
             }
           );
-        } catch (err) {
+        } catch (err: any) {
           this.logger.error('Xodim rasmini saqlashda xatolik:', err);
-          await ctx.reply('Rasmni yuklashda xatolik yuz berdi. Iltimos qaytadan yuboring.');
+          const msg = err?.message || 'Rasmni yuklashda xatolik yuz berdi. Iltimos qaytadan yuboring.';
+          await ctx.reply(msg, { reply_markup: WORKER_KEYBOARD.reply_markup });
         }
       }
     });

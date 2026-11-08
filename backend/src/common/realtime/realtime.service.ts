@@ -10,12 +10,26 @@ export interface RequestAssignedEvent {
 
 export interface RequestCompletedEvent {
   request: RequestEntity;
+  worker?: WorkerEntity | null;
+}
+
+export interface RequestSubmittedEvent {
+  request: RequestEntity;
+  worker?: WorkerEntity | null;
+}
+
+export interface RequestRejectedEvent {
+  request: RequestEntity;
+  reason: string;
+  worker?: WorkerEntity | null;
 }
 
 @Injectable()
 export class RealtimeService {
   private readonly assignedListeners: Array<(event: RequestAssignedEvent) => void | Promise<void>> = [];
   private readonly completedListeners: Array<(event: RequestCompletedEvent) => void | Promise<void>> = [];
+  private readonly submittedListeners: Array<(event: RequestSubmittedEvent) => void | Promise<void>> = [];
+  private readonly rejectedListeners: Array<(event: RequestRejectedEvent) => void | Promise<void>> = [];
 
   constructor(private readonly gateway: RealtimeGateway) {}
 
@@ -25,6 +39,14 @@ export class RealtimeService {
 
   onRequestCompleted(listener: (event: RequestCompletedEvent) => void | Promise<void>): void {
     this.completedListeners.push(listener);
+  }
+
+  onRequestSubmitted(listener: (event: RequestSubmittedEvent) => void | Promise<void>): void {
+    this.submittedListeners.push(listener);
+  }
+
+  onRequestRejected(listener: (event: RequestRejectedEvent) => void | Promise<void>): void {
+    this.rejectedListeners.push(listener);
   }
 
   emitRequestCreated(request: RequestEntity): void {
@@ -92,11 +114,87 @@ export class RealtimeService {
     }
   }
 
-  emitRequestCompleted(request: RequestEntity): void {
+  emitRequestSubmitted(request: RequestEntity, worker?: WorkerEntity | null): void {
     this.emitRequestUpdated(request);
+
+    const payload = {
+      id: request.id,
+      districtId: request.districtId,
+      status: request.status,
+      assignedWorkerId: request.assignedWorkerId,
+      updatedAt: request.updatedAt
+    };
+
+    this.gateway.server.to('room:superadmin').emit('request.submitted', payload);
+    if (request.districtId) {
+      this.gateway.server.to(`room:district_${request.districtId}`).emit('request.submitted', payload);
+    }
+    if (worker?.adminId) {
+      this.gateway.server.to(`room:admin_${worker.adminId}`).emit('request.submitted', payload);
+    }
+
+    for (const listener of this.submittedListeners) {
+      try {
+        const res = listener({ request, worker });
+        if (res instanceof Promise) {
+          res.catch(() => {});
+        }
+      } catch (err) {}
+    }
+  }
+
+  emitRequestCompleted(request: RequestEntity, worker?: WorkerEntity | null): void {
+    this.emitRequestUpdated(request);
+
+    const payload = {
+      id: request.id,
+      districtId: request.districtId,
+      status: request.status,
+      assignedWorkerId: request.assignedWorkerId,
+      updatedAt: request.updatedAt
+    };
+
+    this.gateway.server.to('room:superadmin').emit('request.completed', payload);
+    if (request.districtId) {
+      this.gateway.server.to(`room:district_${request.districtId}`).emit('request.completed', payload);
+    }
+    if (worker?.adminId) {
+      this.gateway.server.to(`room:admin_${worker.adminId}`).emit('request.completed', payload);
+    }
+
     for (const listener of this.completedListeners) {
       try {
-        const res = listener({ request });
+        const res = listener({ request, worker });
+        if (res instanceof Promise) {
+          res.catch(() => {});
+        }
+      } catch (err) {}
+    }
+  }
+
+  emitRequestRejected(request: RequestEntity, reason: string, worker?: WorkerEntity | null): void {
+    this.emitRequestUpdated(request);
+
+    const payload = {
+      id: request.id,
+      districtId: request.districtId,
+      status: request.status,
+      assignedWorkerId: request.assignedWorkerId,
+      reason,
+      updatedAt: request.updatedAt
+    };
+
+    this.gateway.server.to('room:superadmin').emit('request.rejected', payload);
+    if (request.districtId) {
+      this.gateway.server.to(`room:district_${request.districtId}`).emit('request.rejected', payload);
+    }
+    if (worker?.adminId) {
+      this.gateway.server.to(`room:admin_${worker.adminId}`).emit('request.rejected', payload);
+    }
+
+    for (const listener of this.rejectedListeners) {
+      try {
+        const res = listener({ request, reason, worker });
         if (res instanceof Promise) {
           res.catch(() => {});
         }

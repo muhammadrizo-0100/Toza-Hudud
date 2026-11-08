@@ -233,17 +233,27 @@ export class RequestsService {
     }
 
     const request = await this.findOne(requestId);
+
+    // Idempotency & state guards: prevent duplicate submissions or submitting completed tasks
+    if (request.status === RequestStatus.COMPLETED) {
+      throw new BadRequestException('Bu topshiriq allaqachon dispetcher tomonidan tasdiqlangan va yakunlangan!');
+    }
+    if (request.status === RequestStatus.SUBMITTED) {
+      throw new BadRequestException('Bu topshiriq bo‘yicha hisobot allaqachon yuklangan va dispetcher tasdig‘i kutilmoqda!');
+    }
+
     request.afterPhotoUrl = afterPhotoUrl;
     request.status = RequestStatus.SUBMITTED;
     request.submittedAt = new Date();
 
     const saved = await this.requestRepo.save(request);
 
-    // Resolve submitting worker adminId to prevent self-notification
+    // Resolve assigned worker
+    let worker: WorkerEntity | null = null;
     let submittingActorId = actorAdminId;
-    if (!submittingActorId && saved.assignedWorkerId) {
-      const worker = await this.workerRepo.findOne({ where: { id: saved.assignedWorkerId } });
-      if (worker?.adminId) {
+    if (saved.assignedWorkerId) {
+      worker = await this.workerRepo.findOne({ where: { id: saved.assignedWorkerId } });
+      if (!submittingActorId && worker?.adminId) {
         submittingActorId = worker.adminId;
       }
     }
@@ -261,7 +271,7 @@ export class RequestsService {
     });
     const savedNotif = await this.notificationRepo.save(notif);
 
-    this.realtimeService.emitRequestUpdated(saved);
+    this.realtimeService.emitRequestSubmitted(saved, worker);
     this.realtimeService.emitNotification(savedNotif, submittingActorId);
 
     return saved;
@@ -278,8 +288,9 @@ export class RequestsService {
     const saved = await this.requestRepo.save(request);
 
     // In-app notification for the worker
+    let worker: WorkerEntity | null = null;
     if (saved.assignedWorkerId) {
-      const worker = await this.workerRepo.findOne({ where: { id: saved.assignedWorkerId } });
+      worker = await this.workerRepo.findOne({ where: { id: saved.assignedWorkerId } });
       if (worker?.adminId) {
         const notif = this.notificationRepo.create({
           districtId: saved.districtId,
@@ -296,7 +307,7 @@ export class RequestsService {
       }
     }
 
-    this.realtimeService.emitRequestCompleted(saved);
+    this.realtimeService.emitRequestCompleted(saved, worker);
 
     return saved;
   }
@@ -312,7 +323,13 @@ export class RequestsService {
     request.rejectionReason = cleanReason;
 
     const saved = await this.requestRepo.save(request);
-    this.realtimeService.emitRequestUpdated(saved);
+
+    let worker: WorkerEntity | null = null;
+    if (saved.assignedWorkerId) {
+      worker = await this.workerRepo.findOne({ where: { id: saved.assignedWorkerId } });
+    }
+
+    this.realtimeService.emitRequestRejected(saved, cleanReason, worker);
 
     // In-app notification for dispetcher/management (recipientAdminId: null means district dispatchers/admins)
     const notif = this.notificationRepo.create({
@@ -329,22 +346,19 @@ export class RequestsService {
     this.realtimeService.emitNotification(savedNotif, actorAdminId);
 
     // Also notify assigned worker if actor is someone else
-    if (saved.assignedWorkerId) {
-      const worker = await this.workerRepo.findOne({ where: { id: saved.assignedWorkerId } });
-      if (worker?.adminId && worker.adminId !== actorAdminId) {
-        const workerNotif = this.notificationRepo.create({
-          districtId: saved.districtId,
-          recipientAdminId: worker.adminId,
-          requestId: saved.id,
-          kind: 'rejected',
-          title: `Murojaat rad etildi #${saved.id}`,
-          message: `Sabab: ${cleanReason}`,
-          status: RequestStatus.REJECTED,
-          isRead: false
-        });
-        const savedWorkerNotif = await this.notificationRepo.save(workerNotif);
-        this.realtimeService.emitNotification(savedWorkerNotif, actorAdminId);
-      }
+    if (worker?.adminId && worker.adminId !== actorAdminId) {
+      const workerNotif = this.notificationRepo.create({
+        districtId: saved.districtId,
+        recipientAdminId: worker.adminId,
+        requestId: saved.id,
+        kind: 'rejected',
+        title: `Murojaat rad etildi #${saved.id}`,
+        message: `Sabab: ${cleanReason}`,
+        status: RequestStatus.REJECTED,
+        isRead: false
+      });
+      const savedWorkerNotif = await this.notificationRepo.save(workerNotif);
+      this.realtimeService.emitNotification(savedWorkerNotif, actorAdminId);
     }
 
     return saved;
