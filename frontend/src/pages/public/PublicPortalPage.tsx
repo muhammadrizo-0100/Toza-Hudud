@@ -12,7 +12,6 @@ import {
   Stack,
   TextField,
   Typography,
-  Chip,
   IconButton
 } from '@mui/material';
 import SecurityOutlinedIcon from '@mui/icons-material/SecurityOutlined';
@@ -40,7 +39,7 @@ import { detectDistrictByPoint } from '../../constants/boundaries';
 import { cleanUzPhone, validateUzPhone } from '../../utils/phone';
 import { useToast } from '../../context/ToastContext';
 
-// Spacious, notched-outline input styling matching Davlatobod / SaaS standard with emerald brand accents
+// Spacious, notched-outline input styling matching Davlatobod / SaaS standard with natural, balanced colors
 const spaciousInputSx = {
   '& .MuiOutlinedInput-root': {
     borderRadius: '12px',
@@ -49,9 +48,9 @@ const spaciousInputSx = {
     fontWeight: 500,
     color: '#0F172A',
     minHeight: '48px',
-    transition: 'all 0.2s ease',
+    transition: 'all 0.18s ease',
     '& fieldset': {
-      borderColor: '#D1D5DB', // Clean, crisp border line
+      borderColor: '#D1D5DB', // Natural clean border (Gray 300)
       borderWidth: '1.5px',
       borderRadius: '12px'
     },
@@ -60,9 +59,9 @@ const spaciousInputSx = {
       borderWidth: '1.5px'
     },
     '&.Mui-focused fieldset': {
-      borderColor: '#059669', // Emerald active border
+      borderColor: '#059669', // Emerald accent only on active focus
       borderWidth: '2px',
-      boxShadow: '0 0 0 3.5px rgba(5, 150, 105, 0.14)'
+      boxShadow: '0 0 0 3px rgba(5, 150, 105, 0.12)'
     }
   },
   '& .MuiInputLabel-root': {
@@ -192,7 +191,7 @@ export const PublicPortalPage: React.FC = () => {
 
         const msg = dName ? `${dName}` : `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
         setGpsMessage(msg);
-        showSuccess(`Joriy GPS lokatsiyangiz aniqlandi: ${msg}`);
+        showSuccess(`Joriy GPS aniqlandi: ${msg}`);
       },
       (err) => {
         setGpsLoading(false);
@@ -204,7 +203,7 @@ export const PublicPortalPage: React.FC = () => {
     );
   };
 
-  // Handle Map Picker Confirm (Clear visual UX feedback)
+  // Handle Map Picker Confirm
   const handleMapConfirm = (selectedLat: number, selectedLng: number, detectedCode: string | null) => {
     setLat(selectedLat);
     setLng(selectedLng);
@@ -220,9 +219,9 @@ export const PublicPortalPage: React.FC = () => {
       }
     }
 
-    const label = foundDistrictName || 'Tanlangan hudud';
+    const label = foundDistrictName || 'Tanlangan nuqta';
     setGpsMessage(label);
-    showSuccess(`Xaritadan joylashuv belgilandi: ${label} (${selectedLat.toFixed(4)}, ${selectedLng.toFixed(4)})`);
+    showSuccess(`Xaritadan belgilandi: ${label} (${selectedLat.toFixed(4)}, ${selectedLng.toFixed(4)})`);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -276,8 +275,7 @@ export const PublicPortalPage: React.FC = () => {
     <Box
       sx={{
         minHeight: '100vh',
-        background:
-          'radial-gradient(circle at 10% 12%, rgba(5, 150, 105, 0.08) 0%, transparent 45%), radial-gradient(circle at 90% 88%, rgba(16, 185, 129, 0.08) 0%, transparent 45%), linear-gradient(135deg, #F0FDF4 0%, #F8FAFC 50%, #ECFDF5 100%)',
+        bgcolor: '#F8FAFC', // Natural, clean slate-50 background (no aggressive green wash)
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
@@ -311,12 +309,11 @@ export const PublicPortalPage: React.FC = () => {
             px: 2,
             py: 0.7,
             borderRadius: '10px',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
             transition: 'all 0.15s ease',
             '&:hover': {
-              bgcolor: '#F0FDF4',
-              borderColor: '#059669',
-              color: '#047857'
+              bgcolor: '#F1F5F9',
+              borderColor: '#94A3B8'
             }
           }}
         >
@@ -324,7 +321,7 @@ export const PublicPortalPage: React.FC = () => {
         </Button>
       </Box>
 
-      {/* Main 2-Card Layout (Toza Hudud Emerald Theme) */}
+      {/* Main 2-Card Layout (Balanced natural design) */}
       <Box
         sx={{
           width: '100%',
@@ -342,8 +339,8 @@ export const PublicPortalPage: React.FC = () => {
             p: { xs: 3, sm: 3.5, md: 4 },
             borderRadius: '20px',
             bgcolor: '#FFFFFF',
-            border: '1.5px solid #E2E8F0',
-            boxShadow: '0 12px 32px -4px rgba(15, 23, 42, 0.05), 0 2px 6px rgba(0, 0, 0, 0.02)',
+            border: '1px solid #E2E8F0',
+            boxShadow: '0 4px 20px -2px rgba(15, 23, 42, 0.05)',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between'
@@ -360,7 +357,7 @@ export const PublicPortalPage: React.FC = () => {
                 color: '#FFFFFF',
                 display: 'grid',
                 placeItems: 'center',
-                boxShadow: '0 8px 22px rgba(5, 150, 105, 0.35)',
+                boxShadow: '0 6px 18px rgba(5, 150, 105, 0.28)',
                 mb: 2.5
               }}
             >
@@ -489,21 +486,21 @@ export const PublicPortalPage: React.FC = () => {
           </Box>
         </Card>
 
-        {/* RIGHT CARD: Online Application Form (Clean, without tabs or tracking toggle) */}
+        {/* RIGHT CARD: Online Application Form (Clean, without tabs or heavy colored blocks) */}
         <Card
           elevation={0}
           sx={{
             p: { xs: 3, sm: 3.5, md: 4 },
             borderRadius: '20px',
             bgcolor: '#FFFFFF',
-            border: '1.5px solid #E2E8F0',
-            boxShadow: '0 12px 32px -4px rgba(15, 23, 42, 0.05), 0 2px 6px rgba(0, 0, 0, 0.02)',
+            border: '1px solid #E2E8F0',
+            boxShadow: '0 4px 20px -2px rgba(15, 23, 42, 0.05)',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between'
           }}
         >
-          {/* Header Row: Title & Subtitle (Clean & Direct) */}
+          {/* Header Row: Title & Subtitle */}
           <Box sx={{ mb: 2.25 }}>
             <Typography sx={{ fontWeight: 800, fontSize: '1.3rem', color: '#0F172A', lineHeight: 1.2 }}>
               Murojaat onlayn kiritish
@@ -518,7 +515,7 @@ export const PublicPortalPage: React.FC = () => {
             <Alert
               severity="success"
               icon={<CheckCircleOutlinedIcon fontSize="inherit" />}
-              sx={{ mb: 2, py: 0.5, borderRadius: '12px', border: '1.5px solid #86EFAC', bgcolor: '#F0FDF4' }}
+              sx={{ mb: 2, py: 0.5, borderRadius: '12px', border: '1px solid #86EFAC', bgcolor: '#F0FDF4' }}
               action={
                 <Button color="inherit" size="small" onClick={() => setSubmittedId(null)} sx={{ fontWeight: 700, fontSize: '0.75rem' }}>
                   Yangi
@@ -531,7 +528,7 @@ export const PublicPortalPage: React.FC = () => {
             </Alert>
           )}
 
-          {/* SUBMIT FORM (Exact layout & notched floating labels matching sample image) */}
+          {/* SUBMIT FORM (Exact layout & notched floating labels) */}
           <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 1.75 }}>
             {/* Row 1: F.I.Sh (Full width) */}
             <TextField
@@ -642,185 +639,162 @@ export const PublicPortalPage: React.FC = () => {
               />
             </Box>
 
-            {/* Row 5: Location Selector / Confirmation Box */}
+            {/* Row 5: Location Selector / Confirmation (Clean, orderly 2-column or confirmed state) */}
             {lat && lng ? (
               <Box
                 sx={{
-                  p: 1.5,
+                  minHeight: '48px',
+                  py: 1,
+                  px: 1.75,
                   borderRadius: '12px',
-                  bgcolor: '#F0FDF4',
-                  border: '1.5px solid #86EFAC',
+                  bgcolor: '#FFFFFF',
+                  border: '1.5px solid #CBD5E1',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   gap: 1.5,
-                  boxShadow: '0 2px 8px rgba(5, 150, 105, 0.08)'
+                  transition: 'all 0.15s ease'
                 }}
               >
-                <Stack direction="row" spacing={1.5} alignItems="center">
+                <Stack direction="row" spacing={1.5} alignItems="center" sx={{ minWidth: 0 }}>
                   <Box
                     sx={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: '10px',
-                      bgcolor: '#059669',
-                      color: '#FFFFFF',
+                      width: 32,
+                      height: 32,
+                      borderRadius: '8px',
+                      bgcolor: 'rgba(5, 150, 105, 0.1)',
+                      color: '#059669',
                       display: 'grid',
                       placeItems: 'center',
-                      flexShrink: 0,
-                      boxShadow: '0 4px 10px rgba(5, 150, 105, 0.25)'
+                      flexShrink: 0
                     }}
                   >
-                    <PlaceOutlinedIcon sx={{ fontSize: 24 }} />
+                    <PlaceOutlinedIcon sx={{ fontSize: 20 }} />
                   </Box>
-                  <Box>
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <Typography sx={{ fontWeight: 800, fontSize: '0.88rem', color: '#065F46' }}>
-                        Joylashuv belgilandi: {gpsMessage || 'Xaritada tanlangan joy'}
-                      </Typography>
-                      <Chip
-                        size="small"
-                        icon={<CheckCircleOutlinedIcon style={{ fontSize: 13, color: '#fff' }} />}
-                        label="Saqlandi"
-                        sx={{ bgcolor: '#059669', color: '#FFFFFF', fontWeight: 700, height: 20, fontSize: '0.68rem' }}
-                      />
-                    </Stack>
-                    <Typography sx={{ fontSize: '0.75rem', color: '#047857', fontWeight: 500, mt: 0.2 }}>
-                      Koordinatalar: {lat.toFixed(5)}, {lng.toFixed(5)} • Chiqindi yig‘ish guruhiga yo‘naltiriladi
+                  <Box sx={{ minWidth: 0 }}>
+                    <Typography sx={{ fontWeight: 700, fontSize: '0.86rem', color: '#0F172A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      📍 {gpsMessage || 'Joylashuv belgilandi'}
+                    </Typography>
+                    <Typography sx={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 500 }}>
+                      {lat.toFixed(5)}, {lng.toFixed(5)} • Chiqindi guruhiga aniq yo‘naltiriladi
                     </Typography>
                   </Box>
                 </Stack>
 
-                <Stack direction="row" spacing={0.75} alignItems="center">
+                <Stack direction="row" spacing={1} alignItems="center" sx={{ flexShrink: 0 }}>
                   <Button
                     size="small"
                     onClick={() => setMapPickerOpen(true)}
                     sx={{
                       textTransform: 'none',
                       fontWeight: 700,
-                      fontSize: '0.78rem',
-                      color: '#065F46',
-                      bgcolor: '#FFFFFF',
-                      border: '1.5px solid #86EFAC',
-                      borderRadius: '8px',
-                      py: 0.45,
-                      px: 1.4,
-                      boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
-                      '&:hover': { bgcolor: '#DCFCE7', borderColor: '#059669' }
+                      fontSize: '0.76rem',
+                      color: '#059669',
+                      bgcolor: '#F8FAFC',
+                      border: '1px solid #CBD5E1',
+                      borderRadius: '7px',
+                      py: 0.4,
+                      px: 1.2,
+                      '&:hover': { bgcolor: '#F1F5F9', borderColor: '#94A3B8' }
                     }}
                   >
                     O‘zgartirish
                   </Button>
                   <IconButton
                     size="small"
-                    title="Lokatsiyani bekor qilish"
+                    title="Bekor qilish"
                     onClick={() => {
                       setLat(null);
                       setLng(null);
                       setGpsMessage(null);
                     }}
-                    sx={{ color: '#065F46', p: 0.5, '&:hover': { bgcolor: '#DCFCE7' } }}
+                    sx={{ color: '#94A3B8', p: 0.4, '&:hover': { color: '#DC2626', bgcolor: '#FEE2E2' } }}
                   >
                     <CloseIcon sx={{ fontSize: 16 }} />
                   </IconButton>
                 </Stack>
               </Box>
             ) : (
-              <Box
-                sx={{
-                  p: 1.25,
-                  borderRadius: '12px',
-                  border: '1.5px dashed #CBD5E1',
-                  bgcolor: '#F8FAFC',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: 1
-                }}
-              >
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <Button
-                    type="button"
-                    size="small"
-                    startIcon={<MapOutlinedIcon sx={{ fontSize: 16 }} />}
-                    onClick={() => setMapPickerOpen(true)}
-                    sx={{
-                      py: 0.55,
-                      px: 1.5,
-                      fontWeight: 700,
-                      fontSize: '0.78rem',
-                      borderRadius: '8px',
-                      color: '#0F172A',
-                      bgcolor: '#FFFFFF',
-                      textTransform: 'none',
-                      border: '1.5px solid #CBD5E1',
-                      '&:hover': { bgcolor: '#F0FDF4', borderColor: '#059669', color: '#047857' }
-                    }}
-                  >
-                    Xaritadan nuqtani belgilash
-                  </Button>
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.5 }}>
+                <Button
+                  type="button"
+                  variant="outlined"
+                  startIcon={<MapOutlinedIcon sx={{ fontSize: 18, color: '#059669' }} />}
+                  onClick={() => setMapPickerOpen(true)}
+                  sx={{
+                    minHeight: '48px',
+                    py: 1,
+                    px: 1.5,
+                    fontWeight: 600,
+                    fontSize: '0.86rem',
+                    borderRadius: '12px',
+                    color: '#1E293B',
+                    bgcolor: '#FFFFFF',
+                    textTransform: 'none',
+                    borderColor: '#D1D5DB',
+                    borderWidth: '1.5px',
+                    '&:hover': { bgcolor: '#F8FAFC', borderColor: '#9CA3AF', borderWidth: '1.5px' }
+                  }}
+                >
+                  Xaritadan nuqtani belgilash
+                </Button>
 
-                  <Button
-                    type="button"
-                    size="small"
-                    startIcon={gpsLoading ? <CircularProgress size={13} color="inherit" /> : <MyLocationOutlinedIcon sx={{ fontSize: 16 }} />}
-                    onClick={handleGetGPS}
-                    disabled={gpsLoading}
-                    sx={{
-                      py: 0.55,
-                      px: 1.3,
-                      fontWeight: 700,
-                      fontSize: '0.78rem',
-                      borderRadius: '8px',
-                      color: '#0F172A',
-                      bgcolor: '#FFFFFF',
-                      textTransform: 'none',
-                      border: '1.5px solid #CBD5E1',
-                      '&:hover': { bgcolor: '#F0FDF4', borderColor: '#059669', color: '#047857' }
-                    }}
-                  >
-                    {gpsLoading ? 'Aniqlanmoqda...' : 'Joriy GPS'}
-                  </Button>
-                </Stack>
-
-                <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.74rem', display: { xs: 'none', sm: 'block' } }}>
-                  (Lokatsiya ixtiyoriy)
-                </Typography>
+                <Button
+                  type="button"
+                  variant="outlined"
+                  startIcon={gpsLoading ? <CircularProgress size={16} color="inherit" /> : <MyLocationOutlinedIcon sx={{ fontSize: 18, color: '#059669' }} />}
+                  onClick={handleGetGPS}
+                  disabled={gpsLoading}
+                  sx={{
+                    minHeight: '48px',
+                    py: 1,
+                    px: 1.5,
+                    fontWeight: 600,
+                    fontSize: '0.86rem',
+                    borderRadius: '12px',
+                    color: '#1E293B',
+                    bgcolor: '#FFFFFF',
+                    textTransform: 'none',
+                    borderColor: '#D1D5DB',
+                    borderWidth: '1.5px',
+                    '&:hover': { bgcolor: '#F8FAFC', borderColor: '#9CA3AF', borderWidth: '1.5px' }
+                  }}
+                >
+                  {gpsLoading ? 'Aniqlanmoqda...' : 'Joriy GPS lokatsiya'}
+                </Button>
               </Box>
             )}
 
-            {/* Row 6: Rasmlar section (Large rectangular 4-burchak preview) */}
+            {/* Row 6: Rasmlar section (Orderly, large rectangular 4-burchak preview) */}
             <Box sx={{ mt: 0.25 }}>
               <Typography sx={{ fontSize: '0.82rem', fontWeight: 600, color: '#334155', mb: 0.75 }}>
-                Chiqindi fotosurati *
+                {file ? 'Yuklangan fotosurat' : 'Rasmlar'}
               </Typography>
 
               {file && previewUrl ? (
-                /* 4-BURCHAK KATTA RASM PREVIEW KARTASI */
+                /* 4-BURCHAK KATTA TOZA RASM PREVIEW */
                 <Box
                   sx={{
                     display: 'flex',
-                    flexDirection: { xs: 'column', sm: 'row' },
-                    alignItems: { xs: 'flex-start', sm: 'center' },
+                    alignItems: 'center',
                     gap: 2,
-                    p: 1.75,
-                    borderRadius: '14px',
-                    border: '1.5px solid #86EFAC',
-                    bgcolor: '#F0FDF4',
-                    boxShadow: '0 2px 8px rgba(5, 150, 105, 0.08)'
+                    p: 1.5,
+                    borderRadius: '12px',
+                    bgcolor: '#FFFFFF',
+                    border: '1.5px solid #CBD5E1',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.03)'
                   }}
                 >
-                  {/* To‘rtburchak katta rasm */}
+                  {/* To‘rtburchak 4-burchak katta rasm */}
                   <Box
                     sx={{
                       position: 'relative',
-                      width: { xs: '100%', sm: 170 },
-                      height: 115,
-                      borderRadius: '10px',
+                      width: 140,
+                      height: 95,
+                      borderRadius: '8px',
                       overflow: 'hidden',
-                      border: '1.5px solid #CBD5E1',
-                      boxShadow: '0 3px 10px rgba(0,0,0,0.08)',
-                      bgcolor: '#FFFFFF',
+                      border: '1px solid #E2E8F0',
+                      bgcolor: '#F1F5F9',
                       flexShrink: 0
                     }}
                   >
@@ -834,29 +808,15 @@ export const PublicPortalPage: React.FC = () => {
                         objectFit: 'cover'
                       }}
                     />
-                    <Chip
-                      size="small"
-                      label="✓ Yuklandi"
-                      sx={{
-                        position: 'absolute',
-                        top: 6,
-                        left: 6,
-                        bgcolor: 'rgba(5, 150, 105, 0.92)',
-                        color: '#FFFFFF',
-                        fontWeight: 700,
-                        fontSize: '0.68rem',
-                        height: 20
-                      }}
-                    />
                   </Box>
 
-                  {/* Fayl tafsilotlari va harakat tugmalari */}
+                  {/* Fayl ma'lumotlari va harakat tugmalari */}
                   <Box sx={{ flex: 1, minWidth: 0 }}>
                     <Typography
                       sx={{
-                        fontWeight: 800,
-                        fontSize: '0.9rem',
-                        color: '#065F46',
+                        fontWeight: 700,
+                        fontSize: '0.88rem',
+                        color: '#0F172A',
                         textOverflow: 'ellipsis',
                         overflow: 'hidden',
                         whiteSpace: 'nowrap'
@@ -864,31 +824,30 @@ export const PublicPortalPage: React.FC = () => {
                     >
                       {file.name}
                     </Typography>
-                    <Typography sx={{ fontSize: '0.76rem', color: '#047857', fontWeight: 500, mt: 0.3 }}>
-                      Hajmi: {(file.size / (1024 * 1024)).toFixed(2)} MB • Format: {file.type || 'Rasm fayli'}
+                    <Typography sx={{ fontSize: '0.74rem', color: '#64748B', mt: 0.25 }}>
+                      {(file.size / (1024 * 1024)).toFixed(2)} MB • {file.type || 'Rasm'}
                     </Typography>
 
-                    <Stack direction="row" spacing={1.25} sx={{ mt: 1.5 }}>
+                    <Stack direction="row" spacing={1.25} sx={{ mt: 1.25 }}>
                       <Button
                         component="label"
                         size="small"
                         variant="outlined"
-                        startIcon={<AddPhotoAlternateOutlinedIcon sx={{ fontSize: 16 }} />}
+                        startIcon={<AddPhotoAlternateOutlinedIcon sx={{ fontSize: 15 }} />}
                         sx={{
                           textTransform: 'none',
-                          fontWeight: 700,
-                          fontSize: '0.78rem',
-                          color: '#047857',
-                          borderColor: '#86EFAC',
-                          bgcolor: '#FFFFFF',
-                          borderRadius: '8px',
-                          py: 0.5,
-                          px: 1.5,
-                          boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
-                          '&:hover': { bgcolor: '#DCFCE7', borderColor: '#059669' }
+                          fontWeight: 600,
+                          fontSize: '0.76rem',
+                          color: '#334155',
+                          borderColor: '#CBD5E1',
+                          bgcolor: '#F8FAFC',
+                          borderRadius: '7px',
+                          py: 0.35,
+                          px: 1.2,
+                          '&:hover': { bgcolor: '#F1F5F9', borderColor: '#94A3AF' }
                         }}
                       >
-                        Boshqa rasm tanlash
+                        Boshqa rasm
                         <input type="file" hidden accept="image/*" onChange={handlePhotoSelect} />
                       </Button>
 
@@ -896,17 +855,19 @@ export const PublicPortalPage: React.FC = () => {
                         size="small"
                         variant="outlined"
                         color="error"
-                        startIcon={<CloseIcon sx={{ fontSize: 16 }} />}
+                        startIcon={<CloseIcon sx={{ fontSize: 15 }} />}
                         onClick={handleRemovePhoto}
                         sx={{
                           textTransform: 'none',
-                          fontWeight: 700,
-                          fontSize: '0.78rem',
-                          borderRadius: '8px',
-                          py: 0.5,
-                          px: 1.25,
+                          fontWeight: 600,
+                          fontSize: '0.76rem',
+                          borderRadius: '7px',
+                          py: 0.35,
+                          px: 1.2,
+                          borderColor: '#FECACA',
+                          color: '#DC2626',
                           bgcolor: '#FFFFFF',
-                          '&:hover': { bgcolor: '#FEE2E2' }
+                          '&:hover': { bgcolor: '#FEE2E2', borderColor: '#DC2626' }
                         }}
                       >
                         O‘chirish
@@ -919,20 +880,19 @@ export const PublicPortalPage: React.FC = () => {
                   <Button
                     component="label"
                     variant="outlined"
-                    startIcon={<AddPhotoAlternateOutlinedIcon sx={{ fontSize: 19 }} />}
+                    startIcon={<AddPhotoAlternateOutlinedIcon sx={{ fontSize: 18, color: '#64748B' }} />}
                     sx={{
-                      py: 0.85,
+                      py: 1,
                       px: 2.2,
                       borderRadius: '10px',
                       borderColor: '#D1D5DB',
                       borderWidth: '1.5px',
-                      color: '#0F172A',
+                      color: '#1E293B',
                       bgcolor: '#FFFFFF',
-                      fontWeight: 700,
-                      fontSize: '0.84rem',
+                      fontWeight: 600,
+                      fontSize: '0.85rem',
                       textTransform: 'none',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
-                      '&:hover': { bgcolor: '#F0FDF4', borderColor: '#059669', borderWidth: '1.5px' }
+                      '&:hover': { bgcolor: '#F8FAFC', borderColor: '#9CA3AF', borderWidth: '1.5px' }
                     }}
                   >
                     Rasm yuklash
