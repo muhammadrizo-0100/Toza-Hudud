@@ -75,6 +75,13 @@ export class JwtAuthGuard implements CanActivate {
       );
     }
 
+    const method = (request.method || 'GET').toUpperCase();
+    if (method !== 'GET' && method !== 'HEAD' && method !== 'OPTIONS') {
+      throw new ForbiddenException(
+        `Dashboard xizmati faqat ma‘lumotlarni o‘qish (READ-ONLY) huquqiga ega. ${method} amali taqiqlangan.`
+      );
+    }
+
     request.user = {
       id: 0,
       username: 'dashboard_service',

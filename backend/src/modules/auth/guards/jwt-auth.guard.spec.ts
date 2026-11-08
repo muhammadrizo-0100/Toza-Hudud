@@ -53,6 +53,25 @@ describe('JwtAuthGuard (Service Key & JWT)', () => {
     assert.strictEqual(req.user?.username, 'dashboard_service');
   });
 
+  it('should reject mutating methods (POST, PUT, DELETE, PATCH) with service key', () => {
+    const guard = createGuard({
+      DASHBOARD_SERVICE_KEY: serviceKey,
+      DASHBOARD_ALLOWED_IPS: '127.0.0.1'
+    });
+
+    for (const method of ['POST', 'PUT', 'DELETE', 'PATCH']) {
+      const req: Partial<Request> & { user?: JwtPayload } = {
+        headers: { 'x-service-key': serviceKey },
+        ip: '127.0.0.1',
+        method
+      };
+
+      assert.throws(() => {
+        guard.canActivate(createMockContext(req));
+      }, ForbiddenException);
+    }
+  });
+
   it('should throw ForbiddenException if service key is valid but IP is not allowed', () => {
     const guard = createGuard({
       DASHBOARD_SERVICE_KEY: serviceKey,
