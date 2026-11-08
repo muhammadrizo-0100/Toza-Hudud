@@ -26,6 +26,8 @@ import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import DeleteSweepOutlinedIcon from '@mui/icons-material/DeleteSweepOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 
@@ -42,37 +44,62 @@ import { detectDistrictByPoint } from '../../constants/boundaries';
 import { cleanUzPhone, validateUzPhone } from '../../utils/phone';
 import { useToast } from '../../context/ToastContext';
 
-// Clean, crisp input styling matching Davlatobod/SaaS aesthetics
+// High-contrast, crisp, distinct input styling with emerald brand accents
 const formInputSx = {
+  bgcolor: '#FFFFFF',
   '& .MuiOutlinedInput-root': {
     borderRadius: 2.2,
     bgcolor: '#FFFFFF',
-    fontSize: '0.86rem',
-    transition: 'all 0.15s ease',
+    fontSize: '0.88rem',
+    fontWeight: 600,
+    color: '#0F172A',
+    transition: 'all 0.18s ease',
     '& fieldset': {
-      borderColor: '#E2E8F0',
-      borderWidth: '1.2px'
+      borderColor: '#94A3B8', // Clear, visible border (Slate 400)
+      borderWidth: '1.5px'
     },
     '&:hover fieldset': {
-      borderColor: '#94A3B8'
+      borderColor: '#475569', // Darker on hover
+      borderWidth: '1.5px'
     },
     '&.Mui-focused fieldset': {
-      borderColor: '#2563EB',
-      borderWidth: '1.5px',
-      boxShadow: '0 0 0 3px rgba(37, 99, 235, 0.1)'
+      borderColor: '#059669', // Brand emerald
+      borderWidth: '2px',
+      boxShadow: '0 0 0 3.5px rgba(5, 150, 105, 0.18)'
     }
   },
   '& .MuiInputBase-input': {
-    py: 1.1,
-    px: 1.4,
+    py: 1.15,
+    px: 1.5,
     color: '#0F172A',
-    fontSize: '0.86rem',
-    fontWeight: 500,
+    fontSize: '0.88rem',
+    fontWeight: 600,
     '&::placeholder': {
-      color: '#94A3B8',
-      opacity: 1
+      color: '#64748B',
+      opacity: 1,
+      fontWeight: 500
     }
+  },
+  '& .MuiSelect-select': {
+    py: 1.15,
+    px: 1.5,
+    color: '#0F172A',
+    fontSize: '0.88rem',
+    fontWeight: 600,
+    display: 'flex',
+    alignItems: 'center'
+  },
+  '& .MuiSvgIcon-root': {
+    color: '#059669' // Crisp emerald arrow icon
   }
+};
+
+const labelSx = {
+  fontSize: '0.78rem',
+  fontWeight: 700,
+  color: '#1E293B',
+  mb: 0.45,
+  display: 'block'
 };
 
 const WASTE_TYPES = [
@@ -273,7 +300,8 @@ export const PublicPortalPage: React.FC = () => {
     <Box
       sx={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #EEF4FB 0%, #F8FAFD 50%, #EDF3FB 100%)',
+        background:
+          'radial-gradient(circle at 10% 12%, rgba(5, 150, 105, 0.08) 0%, transparent 45%), radial-gradient(circle at 90% 88%, rgba(16, 185, 129, 0.08) 0%, transparent 45%), linear-gradient(135deg, #F0FDF4 0%, #F8FAFC 50%, #ECFDF5 100%)',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
@@ -295,20 +323,24 @@ export const PublicPortalPage: React.FC = () => {
       >
         <Button
           onClick={() => navigate('/login')}
-          startIcon={<SecurityOutlinedIcon sx={{ fontSize: 17, color: '#2563EB' }} />}
-          endIcon={<NorthEastIcon sx={{ fontSize: 14, color: '#2563EB' }} />}
+          startIcon={<SecurityOutlinedIcon sx={{ fontSize: 17, color: '#059669' }} />}
+          endIcon={<NorthEastIcon sx={{ fontSize: 14, color: '#059669' }} />}
           sx={{
             textTransform: 'none',
             fontWeight: 700,
             fontSize: '0.85rem',
             color: '#1E293B',
-            px: 1.5,
-            py: 0.5,
-            borderRadius: 2,
+            border: '1.5px solid #CBD5E1',
+            bgcolor: '#FFFFFF',
+            px: 1.75,
+            py: 0.6,
+            borderRadius: 2.2,
+            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
             transition: 'all 0.15s ease',
             '&:hover': {
-              bgcolor: 'rgba(37, 99, 235, 0.08)',
-              color: '#2563EB'
+              bgcolor: '#F0FDF4',
+              borderColor: '#059669',
+              color: '#047857'
             }
           }}
         >
@@ -316,7 +348,7 @@ export const PublicPortalPage: React.FC = () => {
         </Button>
       </Box>
 
-      {/* Main 2-Card Layout (Matched exactly to Davlatobod portal image) */}
+      {/* Main 2-Card Layout (Toza Hudud Emerald Theme) */}
       <Box
         sx={{
           width: '100%',
@@ -334,7 +366,7 @@ export const PublicPortalPage: React.FC = () => {
             p: { xs: 3, sm: 3.5, md: 4 },
             borderRadius: 4,
             bgcolor: '#FFFFFF',
-            border: '1px solid #E2E8F0',
+            border: '1.5px solid #E2E8F0',
             boxShadow: '0 12px 32px -4px rgba(15, 23, 42, 0.05), 0 2px 6px rgba(0, 0, 0, 0.02)',
             display: 'flex',
             flexDirection: 'column',
@@ -342,30 +374,30 @@ export const PublicPortalPage: React.FC = () => {
           }}
         >
           <Box>
-            {/* Circular Blue Shield Icon Badge */}
+            {/* Circular Emerald Badge */}
             <Box
               sx={{
-                width: 44,
-                height: 44,
+                width: 46,
+                height: 46,
                 borderRadius: '50%',
-                bgcolor: '#2563EB',
+                bgcolor: '#059669',
                 color: '#FFFFFF',
                 display: 'grid',
                 placeItems: 'center',
-                boxShadow: '0 6px 16px rgba(37, 99, 235, 0.28)',
+                boxShadow: '0 8px 22px rgba(5, 150, 105, 0.35)',
                 mb: 2.5
               }}
             >
-              <SecurityOutlinedIcon sx={{ fontSize: 22 }} />
+              <DeleteSweepOutlinedIcon sx={{ fontSize: 24 }} />
             </Box>
 
             {/* Sub-label tag */}
             <Typography
               sx={{
-                fontSize: '0.72rem',
+                fontSize: '0.74rem',
                 fontWeight: 800,
-                letterSpacing: '0.1em',
-                color: '#2563EB',
+                letterSpacing: '0.12em',
+                color: '#059669',
                 textTransform: 'uppercase',
                 mb: 1.5
               }}
@@ -390,8 +422,8 @@ export const PublicPortalPage: React.FC = () => {
             {/* Description Paragraph */}
             <Typography
               sx={{
-                color: '#64748B',
-                fontSize: '0.85rem',
+                color: '#475569',
+                fontSize: '0.86rem',
                 lineHeight: 1.6,
                 mb: 2.5
               }}
@@ -400,13 +432,13 @@ export const PublicPortalPage: React.FC = () => {
             </Typography>
 
             {/* Dashed Separator */}
-            <Box sx={{ borderTop: '1px dashed #E2E8F0', my: 2 }} />
+            <Box sx={{ borderTop: '1px dashed #CBD5E1', my: 2 }} />
 
             {/* "Nimalarni tayyorlang" section */}
             <Typography
               sx={{
                 fontWeight: 800,
-                fontSize: '0.86rem',
+                fontSize: '0.88rem',
                 color: '#0F172A',
                 mb: 1.25
               }}
@@ -414,15 +446,15 @@ export const PublicPortalPage: React.FC = () => {
               Nimalarni tayyorlang
             </Typography>
 
-            <Stack spacing={1} sx={{ color: '#475569', fontSize: '0.82rem', lineHeight: 1.5 }}>
+            <Stack spacing={1} sx={{ color: '#334155', fontSize: '0.83rem', lineHeight: 1.55 }}>
               <Typography sx={{ fontSize: 'inherit', color: 'inherit' }}>
-                To‘liq ism, telefon raqam, manzil va muammo tavsifi kerak bo‘ladi.
+                • To‘liq ism, telefon raqam, manzil va muammo tavsifi kerak bo‘ladi.
               </Typography>
               <Typography sx={{ fontSize: 'inherit', color: 'inherit' }}>
-                Zarur bo‘lsa chiqindi joyi fotosuratini biriktirishingiz mumkin.
+                • Zarur bo‘lsa chiqindi joyi fotosuratini biriktirishingiz mumkin.
               </Typography>
               <Typography sx={{ fontSize: 'inherit', color: 'inherit' }}>
-                Murojaat yuborilgach tizim sizga raqam beradi.
+                • Murojaat yuborilgach tizim sizga rasmiy raqam beradi.
               </Typography>
             </Stack>
           </Box>
@@ -437,28 +469,28 @@ export const PublicPortalPage: React.FC = () => {
               mt: 3,
               p: 1.75,
               borderRadius: 3,
-              bgcolor: '#F0F9FF',
-              border: '1px solid #BAE6FD',
+              bgcolor: 'rgba(5, 150, 105, 0.05)',
+              border: '1.5px solid rgba(5, 150, 105, 0.25)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               textDecoration: 'none',
               transition: 'all 0.2s ease',
               '&:hover': {
-                bgcolor: '#E0F2FE',
-                borderColor: '#0284C7',
+                bgcolor: 'rgba(5, 150, 105, 0.1)',
+                borderColor: '#059669',
                 transform: 'translateY(-1px)',
-                boxShadow: '0 4px 12px rgba(2, 132, 199, 0.12)'
+                boxShadow: '0 4px 14px rgba(5, 150, 105, 0.18)'
               }
             }}
           >
             <Stack direction="row" spacing={1.5} alignItems="center">
               <Box
                 sx={{
-                  width: 36,
-                  height: 36,
+                  width: 38,
+                  height: 38,
                   borderRadius: '50%',
-                  bgcolor: '#229ED9',
+                  bgcolor: '#059669',
                   color: '#FFFFFF',
                   display: 'grid',
                   placeItems: 'center',
@@ -468,15 +500,15 @@ export const PublicPortalPage: React.FC = () => {
                 <TelegramIcon sx={{ fontSize: 20 }} />
               </Box>
               <Box>
-                <Typography sx={{ fontWeight: 800, color: '#0F172A', fontSize: '0.82rem', lineHeight: 1.2 }}>
+                <Typography sx={{ fontWeight: 800, color: '#0F172A', fontSize: '0.83rem', lineHeight: 1.2 }}>
                   Telegram Bot orqali tezkor yuborish
                 </Typography>
-                <Typography sx={{ color: '#0284C7', fontWeight: 600, fontSize: '0.74rem' }}>
+                <Typography sx={{ color: '#047857', fontWeight: 600, fontSize: '0.75rem' }}>
                   @toza_hudud_public_bot bilan 1 daqiqada
                 </Typography>
               </Box>
             </Stack>
-            <OpenInNewOutlinedIcon sx={{ fontSize: 18, color: '#0284C7', flexShrink: 0 }} />
+            <OpenInNewOutlinedIcon sx={{ fontSize: 18, color: '#059669', flexShrink: 0 }} />
           </Box>
         </Card>
 
@@ -487,7 +519,7 @@ export const PublicPortalPage: React.FC = () => {
             p: { xs: 3, sm: 3.5, md: 4 },
             borderRadius: 4,
             bgcolor: '#FFFFFF',
-            border: '1px solid #E2E8F0',
+            border: '1.5px solid #E2E8F0',
             boxShadow: '0 12px 32px -4px rgba(15, 23, 42, 0.05), 0 2px 6px rgba(0, 0, 0, 0.02)',
             display: 'flex',
             flexDirection: 'column',
@@ -500,27 +532,27 @@ export const PublicPortalPage: React.FC = () => {
               <Typography sx={{ fontWeight: 800, fontSize: '1.25rem', color: '#0F172A', lineHeight: 1.2 }}>
                 {tab === 'submit' ? 'Murojaat onlayn kiritish' : 'Murojaat holatini tekshirish'}
               </Typography>
-              <Typography sx={{ color: '#94A3B8', fontSize: '0.8rem', mt: 0.35 }}>
+              <Typography sx={{ color: '#64748B', fontSize: '0.8rem', mt: 0.35, fontWeight: 500 }}>
                 {tab === 'submit' ? 'Tartib bo‘yicha ma\'lumotlarni kiriting' : 'ID raqam yoki telefoningizni kiriting'}
               </Typography>
             </Box>
 
             {/* Minimalist Tab Toggle */}
-            <Box sx={{ display: 'flex', bgcolor: '#F1F5F9', p: 0.5, borderRadius: 2 }}>
+            <Box sx={{ display: 'flex', bgcolor: '#F1F5F9', p: 0.5, borderRadius: 2, border: '1px solid #CBD5E1' }}>
               <Button
                 size="small"
                 onClick={() => setTab('submit')}
                 sx={{
-                  py: 0.4,
-                  px: 1.25,
+                  py: 0.45,
+                  px: 1.35,
                   borderRadius: 1.6,
-                  fontSize: '0.75rem',
+                  fontSize: '0.76rem',
                   fontWeight: 700,
                   textTransform: 'none',
-                  bgcolor: tab === 'submit' ? '#FFFFFF' : 'transparent',
-                  color: tab === 'submit' ? '#2563EB' : '#64748B',
-                  boxShadow: tab === 'submit' ? '0 1px 4px rgba(0,0,0,0.06)' : 'none',
-                  '&:hover': { bgcolor: tab === 'submit' ? '#FFFFFF' : 'rgba(0,0,0,0.04)' }
+                  bgcolor: tab === 'submit' ? '#059669' : 'transparent',
+                  color: tab === 'submit' ? '#FFFFFF' : '#475569',
+                  boxShadow: tab === 'submit' ? '0 2px 6px rgba(5, 150, 105, 0.28)' : 'none',
+                  '&:hover': { bgcolor: tab === 'submit' ? '#047857' : 'rgba(0,0,0,0.04)' }
                 }}
               >
                 Kiritish
@@ -529,16 +561,16 @@ export const PublicPortalPage: React.FC = () => {
                 size="small"
                 onClick={() => setTab('track')}
                 sx={{
-                  py: 0.4,
-                  px: 1.25,
+                  py: 0.45,
+                  px: 1.35,
                   borderRadius: 1.6,
-                  fontSize: '0.75rem',
+                  fontSize: '0.76rem',
                   fontWeight: 700,
                   textTransform: 'none',
-                  bgcolor: tab === 'track' ? '#FFFFFF' : 'transparent',
-                  color: tab === 'track' ? '#2563EB' : '#64748B',
-                  boxShadow: tab === 'track' ? '0 1px 4px rgba(0,0,0,0.06)' : 'none',
-                  '&:hover': { bgcolor: tab === 'track' ? '#FFFFFF' : 'rgba(0,0,0,0.04)' }
+                  bgcolor: tab === 'track' ? '#059669' : 'transparent',
+                  color: tab === 'track' ? '#FFFFFF' : '#475569',
+                  boxShadow: tab === 'track' ? '0 2px 6px rgba(5, 150, 105, 0.28)' : 'none',
+                  '&:hover': { bgcolor: tab === 'track' ? '#047857' : 'rgba(0,0,0,0.04)' }
                 }}
               >
                 Holat
@@ -551,132 +583,151 @@ export const PublicPortalPage: React.FC = () => {
             <Alert
               severity="success"
               icon={<CheckCircleOutlinedIcon fontSize="inherit" />}
-              sx={{ mb: 2, py: 0.5, borderRadius: 2.2, border: '1px solid #86EFAC' }}
+              sx={{ mb: 2, py: 0.5, borderRadius: 2.2, border: '1.5px solid #86EFAC', bgcolor: '#F0FDF4' }}
               action={
                 <Button color="inherit" size="small" onClick={() => setSubmittedId(null)} sx={{ fontWeight: 700, fontSize: '0.75rem' }}>
                   Yangi
                 </Button>
               }
             >
-              <Typography variant="caption" sx={{ fontWeight: 800, display: 'block', fontSize: '0.8rem' }}>
-                Murojaatingiz qabul qilindi! Raqam: #{submittedId}
+              <Typography variant="caption" sx={{ fontWeight: 800, display: 'block', fontSize: '0.82rem', color: '#065F46' }}>
+                Murojaatingiz muvaffaqiyatli qabul qilindi! Raqam: #{submittedId}
               </Typography>
             </Alert>
           )}
 
           {/* TAB 1: SUBMIT FORM */}
           {tab === 'submit' && (
-            <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 1.4 }}>
+            <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 1.35 }}>
               {/* Row 1: F.I.Sh */}
-              <TextField
-                fullWidth
-                size="small"
-                placeholder="F.I.Sh"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                sx={formInputSx}
-              />
+              <Box>
+                <Typography sx={labelSx}>F.I.Sh (Ism va familiyangiz)</Typography>
+                <TextField
+                  fullWidth
+                  size="small"
+                  placeholder="Masalan: Abdullayev Otabek"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  sx={formInputSx}
+                />
+              </Box>
 
               {/* Row 2: Telefon & Muammo yo‘nalishi */}
               <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.25 }}>
-                <AppPhoneField
-                  required
-                  label=""
-                  placeholder="Telefon raqam"
-                  value={phone}
-                  onChange={setPhone}
-                  sx={formInputSx}
-                />
+                <Box>
+                  <Typography sx={labelSx}>Telefon raqamingiz *</Typography>
+                  <AppPhoneField
+                    required
+                    label=""
+                    placeholder="Telefon raqam"
+                    value={phone}
+                    onChange={setPhone}
+                    sx={formInputSx}
+                  />
+                </Box>
 
-                <FormControl fullWidth size="small" sx={formInputSx}>
-                  <Select
-                    value={wasteType}
-                    onChange={(e) => setWasteType(e.target.value)}
-                    displayEmpty
-                    renderValue={(val) => {
-                      const found = WASTE_TYPES.find((w) => w.value === val);
-                      return found ? found.label : <span style={{ color: '#94A3B8' }}>Muammo yo‘nalishi</span>;
-                    }}
-                  >
-                    {WASTE_TYPES.map((t) => (
-                      <MenuItem key={t.value} value={t.value} sx={{ fontSize: '0.86rem' }}>
-                        {t.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                <Box>
+                  <Typography sx={labelSx}>Muammo yo‘nalishi *</Typography>
+                  <FormControl fullWidth size="small" sx={formInputSx}>
+                    <Select
+                      value={wasteType}
+                      onChange={(e) => setWasteType(e.target.value)}
+                      IconComponent={KeyboardArrowDownIcon}
+                    >
+                      {WASTE_TYPES.map((t) => (
+                        <MenuItem key={t.value} value={t.value} sx={{ fontSize: '0.88rem', fontWeight: 600 }}>
+                          {t.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Box>
               </Box>
 
               {/* Row 3: Tuman & Mahalla */}
               <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.25 }}>
-                <FormControl fullWidth size="small" sx={formInputSx}>
-                  <Select
-                    value={districtId}
-                    onChange={(e) => {
-                      setDistrictId(e.target.value as number);
-                      setMahallaId('');
-                    }}
-                    displayEmpty
-                    renderValue={(val) => {
-                      if (!val) return <span style={{ color: '#94A3B8' }}>Tumaningizni tanlang *</span>;
-                      const found = locations?.districts.find((d) => d.id === val);
-                      return found ? found.name : String(val);
-                    }}
-                  >
-                    <MenuItem value="" disabled sx={{ fontSize: '0.86rem' }}>
-                      -- Tumaningizni tanlang --
-                    </MenuItem>
-                    {locations?.districts.map((d) => (
-                      <MenuItem key={d.id} value={d.id} sx={{ fontSize: '0.86rem' }}>
-                        {d.name}
+                <Box>
+                  <Typography sx={labelSx}>Tumaningizni tanlang *</Typography>
+                  <FormControl fullWidth size="small" sx={formInputSx}>
+                    <Select
+                      value={districtId}
+                      onChange={(e) => {
+                        setDistrictId(e.target.value as number);
+                        setMahallaId('');
+                      }}
+                      displayEmpty
+                      IconComponent={KeyboardArrowDownIcon}
+                      renderValue={(val) => {
+                        if (!val) return <span style={{ color: '#64748B', fontWeight: 500 }}>-- Tumanni tanlang * --</span>;
+                        const found = locations?.districts.find((d) => d.id === val);
+                        return found ? found.name : String(val);
+                      }}
+                    >
+                      <MenuItem value="" disabled sx={{ fontSize: '0.88rem' }}>
+                        -- Tumanni tanlang --
                       </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                      {locations?.districts.map((d) => (
+                        <MenuItem key={d.id} value={d.id} sx={{ fontSize: '0.88rem', fontWeight: 600 }}>
+                          {d.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Box>
 
-                <FormControl fullWidth size="small" sx={formInputSx}>
-                  <Select
-                    value={mahallaId}
-                    onChange={(e) => setMahallaId(e.target.value as number)}
-                    disabled={!districtId}
-                    displayEmpty
-                    renderValue={(val) => {
-                      if (!val) return <span style={{ color: '#94A3B8' }}>Mahalla (ixtiyoriy)</span>;
-                      const found = locations?.mahallas.find((m) => m.id === val);
-                      return found ? found.name : String(val);
-                    }}
-                  >
-                    <MenuItem value="" sx={{ fontSize: '0.86rem' }}>
-                      -- Mahallani tanlang --
-                    </MenuItem>
-                    {locations?.mahallas.map((m) => (
-                      <MenuItem key={m.id} value={m.id} sx={{ fontSize: '0.86rem' }}>
-                        {m.name}
+                <Box>
+                  <Typography sx={labelSx}>Mahallangizni tanlang</Typography>
+                  <FormControl fullWidth size="small" sx={formInputSx}>
+                    <Select
+                      value={mahallaId}
+                      onChange={(e) => setMahallaId(e.target.value as number)}
+                      disabled={!districtId}
+                      displayEmpty
+                      IconComponent={KeyboardArrowDownIcon}
+                      renderValue={(val) => {
+                        if (!val) return <span style={{ color: '#64748B', fontWeight: 500 }}>Mahalla (ixtiyoriy)</span>;
+                        const found = locations?.mahallas.find((m) => m.id === val);
+                        return found ? found.name : String(val);
+                      }}
+                    >
+                      <MenuItem value="" sx={{ fontSize: '0.88rem' }}>
+                        -- Mahallani tanlang (ixtiyoriy) --
                       </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                      {locations?.mahallas.map((m) => (
+                        <MenuItem key={m.id} value={m.id} sx={{ fontSize: '0.88rem', fontWeight: 600 }}>
+                          {m.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Box>
               </Box>
 
               {/* Row 4: Aniq manzil & Izoh */}
               <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.25 }}>
-                <TextField
-                  fullWidth
-                  size="small"
-                  placeholder="Aniq manzil yoki mo‘ljal"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  sx={formInputSx}
-                />
+                <Box>
+                  <Typography sx={labelSx}>Aniq manzil yoki mo‘ljal</Typography>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    placeholder="Masalan: 12-maktab yonidagi maydoncha"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    sx={formInputSx}
+                  />
+                </Box>
 
-                <TextField
-                  fullWidth
-                  size="small"
-                  placeholder="Qo‘shimcha izoh / xonadon"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  sx={formInputSx}
-                />
+                <Box>
+                  <Typography sx={labelSx}>Qo‘shimcha izoh (ixtiyoriy)</Typography>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    placeholder="Chiqindi hajmi yoki qo‘shimcha ma'lumot"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    sx={formInputSx}
+                  />
+                </Box>
               </Box>
 
               {/* Row 5: Compact Location/GPS Selector */}
@@ -684,7 +735,7 @@ export const PublicPortalPage: React.FC = () => {
                 sx={{
                   p: 1.2,
                   borderRadius: 2.2,
-                  border: '1px dashed #CBD5E1',
+                  border: '1.5px dashed #94A3B8',
                   bgcolor: lat && lng ? '#F0FDF4' : '#F8FAFC',
                   display: 'flex',
                   alignItems: 'center',
@@ -699,17 +750,17 @@ export const PublicPortalPage: React.FC = () => {
                     startIcon={<MapOutlinedIcon sx={{ fontSize: 16 }} />}
                     onClick={() => setMapPickerOpen(true)}
                     sx={{
-                      py: 0.4,
+                      py: 0.5,
                       px: 1.4,
                       fontWeight: 700,
                       fontSize: '0.78rem',
-                      borderRadius: 1.6,
-                      borderColor: '#CBD5E1',
-                      color: '#1E293B',
+                      borderRadius: 1.8,
+                      borderColor: '#94A3B8',
+                      color: '#0F172A',
                       bgcolor: '#FFFFFF',
                       textTransform: 'none',
-                      border: '1px solid #CBD5E1',
-                      '&:hover': { bgcolor: '#F1F5F9' }
+                      border: '1.5px solid #94A3B8',
+                      '&:hover': { bgcolor: '#F0FDF4', borderColor: '#059669', color: '#047857' }
                     }}
                   >
                     {lat && lng ? 'Xaritadan qayta tanlash' : 'Xaritadan nuqtani belgilash'}
@@ -718,20 +769,20 @@ export const PublicPortalPage: React.FC = () => {
                   <Button
                     type="button"
                     size="small"
-                    startIcon={gpsLoading ? <CircularProgress size={13} /> : <MyLocationOutlinedIcon sx={{ fontSize: 16 }} />}
+                    startIcon={gpsLoading ? <CircularProgress size={13} color="inherit" /> : <MyLocationOutlinedIcon sx={{ fontSize: 16 }} />}
                     onClick={handleGetGPS}
                     disabled={gpsLoading}
                     sx={{
-                      py: 0.4,
+                      py: 0.5,
                       px: 1.2,
                       fontWeight: 700,
                       fontSize: '0.78rem',
-                      borderRadius: 1.6,
-                      color: '#1E293B',
+                      borderRadius: 1.8,
+                      color: '#0F172A',
                       bgcolor: '#FFFFFF',
                       textTransform: 'none',
-                      border: '1px solid #CBD5E1',
-                      '&:hover': { bgcolor: '#F1F5F9' }
+                      border: '1.5px solid #94A3B8',
+                      '&:hover': { bgcolor: '#F0FDF4', borderColor: '#059669', color: '#047857' }
                     }}
                   >
                     {gpsLoading ? 'Aniqlanmoqda...' : 'Joriy GPS'}
@@ -745,18 +796,18 @@ export const PublicPortalPage: React.FC = () => {
                     label={gpsMessage || `${lat.toFixed(4)}, ${lng.toFixed(4)}`}
                     color="success"
                     variant="filled"
-                    sx={{ fontWeight: 700, fontSize: '0.72rem', height: 24 }}
+                    sx={{ fontWeight: 700, fontSize: '0.72rem', height: 24, bgcolor: '#059669' }}
                   />
                 ) : (
-                  <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.72rem', display: { xs: 'none', sm: 'block' } }}>
+                  <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.72rem', display: { xs: 'none', sm: 'block' } }}>
                     (Lokatsiya ixtiyoriy)
                   </Typography>
                 )}
               </Box>
 
               {/* Row 6: Rasmlar section (matches Davlatobod portal style) */}
-              <Box sx={{ mt: 0.5 }}>
-                <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155', mb: 0.5 }}>
+              <Box sx={{ mt: 0.35 }}>
+                <Typography sx={labelSx}>
                   Rasmlar
                 </Typography>
 
@@ -767,15 +818,17 @@ export const PublicPortalPage: React.FC = () => {
                     startIcon={<AddPhotoAlternateOutlinedIcon sx={{ fontSize: 18 }} />}
                     sx={{
                       py: 0.75,
-                      px: 1.75,
+                      px: 2,
                       borderRadius: 2,
-                      borderColor: '#CBD5E1',
-                      color: '#1E293B',
-                      bgcolor: '#FFFFFF',
+                      borderColor: file ? '#059669' : '#94A3B8',
+                      borderWidth: '1.5px',
+                      color: file ? '#047857' : '#0F172A',
+                      bgcolor: file ? '#F0FDF4' : '#FFFFFF',
                       fontWeight: 700,
-                      fontSize: '0.8rem',
+                      fontSize: '0.82rem',
                       textTransform: 'none',
-                      '&:hover': { bgcolor: '#F8FAFC', borderColor: '#94A3B8' }
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                      '&:hover': { bgcolor: '#F0FDF4', borderColor: '#059669', borderWidth: '1.5px' }
                     }}
                   >
                     {file ? 'Boshqa rasm tanlash' : 'Rasm yuklash'}
@@ -793,12 +846,12 @@ export const PublicPortalPage: React.FC = () => {
                         display: 'flex',
                         alignItems: 'center',
                         gap: 1,
-                        bgcolor: '#F1F5F9',
+                        bgcolor: '#F0FDF4',
                         pl: 1,
                         pr: 0.5,
-                        py: 0.4,
+                        py: 0.45,
                         borderRadius: 2,
-                        border: '1px solid #CBD5E1'
+                        border: '1.5px solid #86EFAC'
                       }}
                     >
                       {previewUrl && (
@@ -809,17 +862,17 @@ export const PublicPortalPage: React.FC = () => {
                           sx={{ width: 24, height: 24, borderRadius: 1, objectFit: 'cover' }}
                         />
                       )}
-                      <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#0F172A', maxWidth: 120, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                      <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, color: '#065F46', maxWidth: 130, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
                         {file.name}
                       </Typography>
                       <IconButton size="small" onClick={handleRemovePhoto} sx={{ p: 0.2 }}>
-                        <CloseIcon sx={{ fontSize: 14 }} />
+                        <CloseIcon sx={{ fontSize: 14, color: '#065F46' }} />
                       </IconButton>
                     </Box>
                   )}
                 </Stack>
 
-                <Typography sx={{ fontSize: '0.7rem', color: '#94A3B8', mt: 0.6 }}>
+                <Typography sx={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 500, mt: 0.6 }}>
                   Ruxsat etilgan formatlar: JPG, JPEG, PNG, WEBP. Maksimum: 5 MB gacha.
                 </Typography>
               </Box>
@@ -831,19 +884,19 @@ export const PublicPortalPage: React.FC = () => {
                 disabled={!districtId || !phone.trim() || !file || isSubmitting}
                 endIcon={isSubmitting ? null : <SendOutlinedIcon sx={{ fontSize: 17 }} />}
                 sx={{
-                  mt: 1,
+                  mt: 0.8,
                   py: 1.25,
                   borderRadius: 2.2,
-                  bgcolor: '#2563EB',
-                  boxShadow: '0 4px 14px rgba(37, 99, 235, 0.35)',
+                  bgcolor: '#059669',
+                  boxShadow: '0 4px 16px rgba(5, 150, 105, 0.35)',
                   fontWeight: 800,
-                  fontSize: '0.92rem',
+                  fontSize: '0.94rem',
                   textTransform: 'none',
                   color: '#FFFFFF',
                   transition: 'all 0.15s ease',
                   '&:hover': {
-                    bgcolor: '#1D4ED8',
-                    boxShadow: '0 6px 18px rgba(37, 99, 235, 0.45)'
+                    bgcolor: '#047857',
+                    boxShadow: '0 6px 20px rgba(5, 150, 105, 0.45)'
                   },
                   '&.Mui-disabled': {
                     bgcolor: '#CBD5E1',
@@ -879,10 +932,10 @@ export const PublicPortalPage: React.FC = () => {
                       py: 1,
                       borderRadius: 2.2,
                       fontWeight: 700,
-                      bgcolor: '#2563EB',
+                      bgcolor: '#059669',
                       textTransform: 'none',
                       whiteSpace: 'nowrap',
-                      '&:hover': { bgcolor: '#1D4ED8' }
+                      '&:hover': { bgcolor: '#047857' }
                     }}
                   >
                     {isTracking ? <CircularProgress size={18} color="inherit" /> : 'Qidirish'}
@@ -911,7 +964,7 @@ export const PublicPortalPage: React.FC = () => {
                       p: 2,
                       borderRadius: 2.5,
                       bgcolor: '#F8FAFC',
-                      border: '1px solid #E2E8F0'
+                      border: '1.5px solid #CBD5E1'
                     }}
                   >
                     <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
@@ -926,7 +979,7 @@ export const PublicPortalPage: React.FC = () => {
                       <StatusBadge status={item.status} />
                     </Stack>
 
-                    <Typography variant="caption" sx={{ color: '#475569', display: 'block', mb: 1 }}>
+                    <Typography variant="caption" sx={{ color: '#475569', display: 'block', mb: 1, fontWeight: 600 }}>
                       <strong>Manzil:</strong> {[item.mahallaName, item.address].filter(Boolean).join(', ') || '-'}
                     </Typography>
 
@@ -960,7 +1013,7 @@ export const PublicPortalPage: React.FC = () => {
                           sx={{
                             height: 110,
                             borderRadius: 1.5,
-                            border: '1px dashed #CBD5E1',
+                            border: '1.5px dashed #CBD5E1',
                             display: 'grid',
                             placeItems: 'center',
                             p: 1,
