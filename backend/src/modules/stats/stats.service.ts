@@ -341,7 +341,7 @@ export class StatsService {
       });
     }
 
-    const dailyRaw = await this.requestRepo
+    const dailyQb = this.requestRepo
       .createQueryBuilder('r')
       .select("TO_CHAR(r.created_at, 'YYYY-MM-DD')", 'date')
       .addSelect('COUNT(*)', 'total')
@@ -353,10 +353,21 @@ export class StatsService {
         "COUNT(CASE WHEN r.status IN ('new', 'in_progress', 'submitted') THEN 1 END)",
         'active'
       )
-      .where(districtId ? 'r.district_id = :districtId' : '1=1', { districtId })
-      .andWhere("r.created_at >= :sinceDate", {
+      .where(districtId ? 'r.district_id = :districtId' : '1=1', { districtId });
+
+    if (startDate) {
+      dailyQb.andWhere('r.created_at >= :startDate', { startDate: new Date(startDate) });
+    } else {
+      dailyQb.andWhere("r.created_at >= :sinceDate", {
         sinceDate: new Date(now.getTime() - daysCount * 24 * 60 * 60 * 1000)
-      })
+      });
+    }
+
+    if (endDate) {
+      dailyQb.andWhere('r.created_at <= :endDate', { endDate: new Date(endDate) });
+    }
+
+    const dailyRaw = await dailyQb
       .groupBy("TO_CHAR(r.created_at, 'YYYY-MM-DD')")
       .orderBy('date', 'ASC')
       .getRawMany();
@@ -388,12 +399,21 @@ export class StatsService {
     });
 
     // Mahalla breakdown (Top 10)
-    const mahallaRaw = await this.requestRepo
+    const mahallaQb = this.requestRepo
       .createQueryBuilder('r')
       .leftJoin('r.mahalla', 'm')
       .select("COALESCE(r.mahalla_name, m.name, 'Boshqa')", 'name')
       .addSelect('COUNT(*)', 'value')
-      .where(districtId ? 'r.district_id = :districtId' : '1=1', { districtId })
+      .where(districtId ? 'r.district_id = :districtId' : '1=1', { districtId });
+
+    if (startDate) {
+      mahallaQb.andWhere('r.created_at >= :startDate', { startDate: new Date(startDate) });
+    }
+    if (endDate) {
+      mahallaQb.andWhere('r.created_at <= :endDate', { endDate: new Date(endDate) });
+    }
+
+    const mahallaRaw = await mahallaQb
       .groupBy("COALESCE(r.mahalla_name, m.name, 'Boshqa')")
       .orderBy('value', 'DESC')
       .limit(10)
@@ -405,11 +425,20 @@ export class StatsService {
     }));
 
     // Category breakdown with real database types & calculated percentages
-    const wasteRaw = await this.requestRepo
+    const wasteQb = this.requestRepo
       .createQueryBuilder('r')
       .select("COALESCE(r.waste_type, 'maishiy')", 'wasteType')
       .addSelect('COUNT(*)', 'cnt')
-      .where(districtId ? 'r.district_id = :districtId' : '1=1', { districtId })
+      .where(districtId ? 'r.district_id = :districtId' : '1=1', { districtId });
+
+    if (startDate) {
+      wasteQb.andWhere('r.created_at >= :startDate', { startDate: new Date(startDate) });
+    }
+    if (endDate) {
+      wasteQb.andWhere('r.created_at <= :endDate', { endDate: new Date(endDate) });
+    }
+
+    const wasteRaw = await wasteQb
       .groupBy("COALESCE(r.waste_type, 'maishiy')")
       .getRawMany();
 
