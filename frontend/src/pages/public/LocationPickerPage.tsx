@@ -130,8 +130,8 @@ export const LocationPickerPage: React.FC = () => {
     if (tg && typeof tg.sendData === 'function') {
       tg.sendData(JSON.stringify(payload));
     } else {
-      alert(
-        `Lokatsiya belgilandi:\n• Lat: ${payload.lat}\n• Lng: ${payload.lng}\n• Mo‘ljal: ${payload.address || 'Kiritilmagan'}`
+      setNoticeMessage(
+        `Lokatsiya belgilandi: [${payload.lat}, ${payload.lng}] ${payload.address ? `(${payload.address})` : ''}`
       );
       setIsSubmitting(false);
     }

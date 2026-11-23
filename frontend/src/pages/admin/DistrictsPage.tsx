@@ -14,6 +14,7 @@ import { DistrictsListTable } from './districts/DistrictsListTable';
 import { MahallasListTable } from './districts/MahallasListTable';
 import { DistrictAddDialog } from './districts/DistrictAddDialog';
 import { MahallaAddDialog } from './districts/MahallaAddDialog';
+import AppConfirmDialog from '../../components/common/AppConfirmDialog';
 
 export const DistrictsPage: React.FC = () => {
   const { showSuccess, showError } = useToast();
@@ -23,8 +24,11 @@ export const DistrictsPage: React.FC = () => {
   const [districtDialogOpen, setDistrictDialogOpen] = useState(false);
   const [mahallaDialogOpen, setMahallaDialogOpen] = useState(false);
 
+  const [districtToDelete, setDistrictToDelete] = useState<District | null>(null);
+  const [mahallaToDelete, setMahallaToDelete] = useState<Mahalla | null>(null);
+
   const { data: rawDistricts = [], isLoading: loadingDistricts } = useGetDistrictsQuery();
-  const [deleteDistrict] = useDeleteDistrictMutation();
+  const [deleteDistrict, { isLoading: deletingDistrict }] = useDeleteDistrictMutation();
 
   const districts = useMemo(() => {
     return [...rawDistricts].sort((a, b) => a.id - b.id);
@@ -36,30 +40,30 @@ export const DistrictsPage: React.FC = () => {
   const { data: rawMahallas = [], isLoading: loadingMahallas } = useGetMahallasQuery(
     activeDistrictId ? { districtId: activeDistrictId } : undefined
   );
-  const [deleteMahalla] = useDeleteMahallaMutation();
+  const [deleteMahalla, { isLoading: deletingMahalla }] = useDeleteMahallaMutation();
 
-  const handleDeleteDistrict = async (d: District) => {
-    if (window.confirm(`"${d.name}" tumanini o‘chirishni tasdiqlaysizmi?`)) {
-      try {
-        await deleteDistrict(d.id).unwrap();
-        showSuccess(`"${d.name}" tumani muvaffaqiyatli o‘chirildi`);
-        if (selectedDistrictId === d.id) setSelectedDistrictId(null);
-      } catch (err: unknown) {
-        const msg = (err as { data?: { message?: string } })?.data?.message || 'Tumanni o‘chirishda xatolik yuz berdi';
-        showError(msg);
-      }
+  const handleConfirmDeleteDistrict = async () => {
+    if (!districtToDelete) return;
+    try {
+      await deleteDistrict(districtToDelete.id).unwrap();
+      showSuccess(`"${districtToDelete.name}" tumani muvaffaqiyatli o‘chirildi`);
+      if (selectedDistrictId === districtToDelete.id) setSelectedDistrictId(null);
+      setDistrictToDelete(null);
+    } catch (err: unknown) {
+      const msg = (err as { data?: { message?: string } })?.data?.message || 'Tumanni o‘chirishda xatolik yuz berdi';
+      showError(msg);
     }
   };
 
-  const handleDeleteMahalla = async (m: Mahalla) => {
-    if (window.confirm(`"${m.name}" mahallasini o‘chirishni tasdiqlaysizmi?`)) {
-      try {
-        await deleteMahalla(m.id).unwrap();
-        showSuccess(`"${m.name}" mahallasi muvaffaqiyatli o‘chirildi`);
-      } catch (err: unknown) {
-        const msg = (err as { data?: { message?: string } })?.data?.message || 'Mahallani o‘chirishda xatolik yuz berdi';
-        showError(msg);
-      }
+  const handleConfirmDeleteMahalla = async () => {
+    if (!mahallaToDelete) return;
+    try {
+      await deleteMahalla(mahallaToDelete.id).unwrap();
+      showSuccess(`"${mahallaToDelete.name}" mahallasi muvaffaqiyatli o‘chirildi`);
+      setMahallaToDelete(null);
+    } catch (err: unknown) {
+      const msg = (err as { data?: { message?: string } })?.data?.message || 'Mahallani o‘chirishda xatolik yuz berdi';
+      showError(msg);
     }
   };
 
@@ -99,7 +103,7 @@ export const DistrictsPage: React.FC = () => {
           loading={loadingDistricts}
           activeDistrictId={activeDistrictId}
           onSelectDistrict={(id) => setSelectedDistrictId(id)}
-          onDeleteDistrict={handleDeleteDistrict}
+          onDeleteDistrict={(d) => setDistrictToDelete(d)}
         />
 
         <MahallasListTable
@@ -110,9 +114,31 @@ export const DistrictsPage: React.FC = () => {
           loading={loadingMahallas}
           onSelectDistrict={(id) => setSelectedDistrictId(id)}
           onOpenAddMahalla={() => setMahallaDialogOpen(true)}
-          onDeleteMahalla={handleDeleteMahalla}
+          onDeleteMahalla={(m) => setMahallaToDelete(m)}
         />
       </Box>
+
+      <AppConfirmDialog
+        open={Boolean(districtToDelete)}
+        title="Tumanni o‘chirish"
+        message={`Haqiqatan ham "${districtToDelete?.name}" tumanini o‘chirishni tasdiqlaysizmi? Unga biriktirilgan barcha mahallalar ham o‘chiriladi.`}
+        confirmLabel="O‘chirish"
+        severity="danger"
+        loading={deletingDistrict}
+        onConfirm={handleConfirmDeleteDistrict}
+        onClose={() => setDistrictToDelete(null)}
+      />
+
+      <AppConfirmDialog
+        open={Boolean(mahallaToDelete)}
+        title="Mahallani o‘chirish"
+        message={`Haqiqatan ham "${mahallaToDelete?.name}" mahallasini o‘chirishni tasdiqlaysizmi?`}
+        confirmLabel="O‘chirish"
+        severity="danger"
+        loading={deletingMahalla}
+        onConfirm={handleConfirmDeleteMahalla}
+        onClose={() => setMahallaToDelete(null)}
+      />
 
       <DistrictAddDialog
         open={districtDialogOpen}

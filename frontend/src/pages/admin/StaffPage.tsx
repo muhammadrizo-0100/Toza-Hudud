@@ -50,6 +50,7 @@ import AppButton from '../../components/common/AppButton';
 import { AdminFormDialog } from './AdminFormDialog';
 import { AdminDeleteDialog } from './AdminDeleteDialog';
 import { AdminsStatsCards } from './AdminsStatsCards';
+import AppConfirmDialog from '../../components/common/AppConfirmDialog';
 import AppBreadcrumbs from '../../components/common/AppBreadcrumbs';
 import AppSelectField from '../../components/common/AppSelectField';
 import AppPhoneField from '../../components/common/AppPhoneField';
@@ -174,6 +175,7 @@ export const StaffPage: React.FC = () => {
   // Admin delete state
   const [deleteAdminOpen, setDeleteAdminOpen] = useState(false);
   const [adminToDelete, setAdminToDelete] = useState<AdminUser | null>(null);
+  const [workerToDelete, setWorkerToDelete] = useState<{ id: number; fullName: string } | null>(null);
 
   // Worker form state
   const [workerDialogOpen, setWorkerDialogOpen] = useState(false);
@@ -201,7 +203,7 @@ export const StaffPage: React.FC = () => {
   // Mutations
   const [deleteAdmin, { isLoading: isDeletingAdmin }] = useDeleteAdminMutation();
   const [createWorker, { isLoading: creatingWorker }] = useCreateWorkerMutation();
-  const [deleteWorker] = useDeleteWorkerMutation();
+  const [deleteWorker, { isLoading: isDeletingWorker }] = useDeleteWorkerMutation();
 
   // Filtered & Paginated Admins
   const filteredAdmins = useMemo(() => {
@@ -1003,17 +1005,7 @@ export const StaffPage: React.FC = () => {
                         <IconButton
                           size="small"
                           sx={{ color: '#94A3B8', '&:hover': { color: '#DC2626', bgcolor: '#FEF2F2' } }}
-                          onClick={async () => {
-                            if (window.confirm(`${w.fullName} xodimini o‘chirishni tasdiqlaysizmi?`)) {
-                              try {
-                                await deleteWorker(w.id).unwrap();
-                                showSuccess(`Xodim (${w.fullName}) muvaffaqiyatli o‘chirildi`);
-                                refetchWorkers();
-                              } catch (err: any) {
-                                showError(err?.data?.message || 'O‘chirishda xatolik yuz berdi');
-                              }
-                            }
-                          }}
+                          onClick={() => setWorkerToDelete({ id: w.id, fullName: w.fullName })}
                         >
                           <DeleteOutlineOutlinedIcon sx={{ fontSize: 17 }} />
                         </IconButton>
@@ -1089,6 +1081,29 @@ export const StaffPage: React.FC = () => {
         loading={isDeletingAdmin}
         onClose={() => setDeleteAdminOpen(false)}
         onConfirm={handleConfirmDeleteAdmin}
+      />
+
+      {/* Worker Delete Confirmation Dialog - Modern Clean Style */}
+      <AppConfirmDialog
+        open={Boolean(workerToDelete)}
+        title="Xodimni o‘chirish"
+        message={`Haqiqatan ham "${workerToDelete?.fullName}" xodimini o‘chirishni tasdiqlaysizmi?`}
+        confirmLabel="O‘chirish"
+        severity="danger"
+        loading={isDeletingWorker}
+        onConfirm={async () => {
+          if (!workerToDelete) return;
+          try {
+            await deleteWorker(workerToDelete.id).unwrap();
+            showSuccess(`Xodim (${workerToDelete.fullName}) muvaffaqiyatli o‘chirildi`);
+            refetchWorkers();
+            setWorkerToDelete(null);
+          } catch (err: unknown) {
+            const msg = (err as { data?: { message?: string } })?.data?.message || 'O‘chirishda xatolik yuz berdi';
+            showError(msg);
+          }
+        }}
+        onClose={() => setWorkerToDelete(null)}
       />
 
       {/* Worker Create Dialog - Image 1 Style */}
