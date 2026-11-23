@@ -58,6 +58,7 @@ import { AdminUser, AdminRole } from '../../types';
 import { formatUzPhone, cleanUzPhone, validateUzPhone } from '../../utils/phone';
 import { useToast } from '../../context/ToastContext';
 import { useTranslation } from '../../i18n';
+import { translateDistrictName } from '../../utils/districtNames';
 
 /**
  * Normalizes text for search by lowercasing, replacing curly apostrophes with straight quotes,
@@ -325,7 +326,7 @@ export const StaffPage: React.FC = () => {
         return (
           <Chip
             size="small"
-            label="Viloyat Bosh Administratori"
+            label={lang === 'oz' ? 'Вилоят Бош Администратори' : 'Viloyat Bosh Administratori'}
             sx={{
               bgcolor: '#EEF2FF',
               color: '#4F46E5',
@@ -339,7 +340,7 @@ export const StaffPage: React.FC = () => {
         return (
           <Chip
             size="small"
-            label="Tuman Tozalik Boshlig‘i"
+            label={lang === 'oz' ? 'Туман Тозалик Бошлиғи' : 'Tuman Tozalik Boshlig‘i'}
             sx={{
               bgcolor: '#ECFDF5',
               color: '#059669',
@@ -353,7 +354,7 @@ export const StaffPage: React.FC = () => {
         return (
           <Chip
             size="small"
-            label="Tuman Dispetcheri"
+            label={lang === 'oz' ? 'Туман Диспетчери' : 'Tuman Dispetcheri'}
             sx={{
               bgcolor: '#EFF6FF',
               color: '#0284C7',
@@ -367,7 +368,7 @@ export const StaffPage: React.FC = () => {
         return (
           <Chip
             size="small"
-            label="Hudud nazoratchisi / Usta"
+            label={lang === 'oz' ? 'Ҳудуд назоратчиси / Уста' : 'Hudud nazoratchisi / Usta'}
             sx={{
               bgcolor: '#FEF3C7',
               color: '#92400E',
@@ -381,7 +382,7 @@ export const StaffPage: React.FC = () => {
         return (
           <Chip
             size="small"
-            label="Maxsus texnika haydovchisi"
+            label={lang === 'oz' ? 'Махсус техника ҳайдовчиси' : 'Maxsus texnika haydovchisi'}
             sx={{
               bgcolor: '#F0FDF4',
               color: '#15803D',
@@ -514,14 +515,16 @@ export const StaffPage: React.FC = () => {
               }}
             >
               <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#0F172A', fontSize: '0.95rem' }}>
-                {isManager ? 'Tuman Dispetcherlari' : 'Tizim Mas‘ullari va Dispetcherlar'} ({filteredAdmins.length})
+                {isManager
+                  ? (lang === 'oz' ? 'Туман Диспетчерлари' : 'Tuman Dispetcherlari')
+                  : (lang === 'oz' ? 'Тизим Масъуллари ва Диспетчерлар' : 'Tizim Mas‘ullari va Dispetcherlar')} ({filteredAdmins.length})
               </Typography>
 
               <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap">
                 {/* Search */}
                 <TextField
                   size="small"
-                  placeholder="F.I.Sh yoki telefon raqam..."
+                  placeholder={lang === 'oz' ? 'Ф.И.Ш ёки телефон рақам...' : 'F.I.Sh yoki telefon raqam...'}
                   value={adminSearch}
                   onChange={(e) => {
                     setAdminSearch(e.target.value);
@@ -568,9 +571,9 @@ export const StaffPage: React.FC = () => {
                       setAdminPage(1);
                     }}
                     options={[
-                      { value: 'all', label: 'Barcha holatlar' },
-                      { value: 'active', label: 'Faqat faollar' },
-                      { value: 'inactive', label: 'Faqat nofaollar' }
+                      { value: 'all', label: lang === 'oz' ? 'Барча ҳолатлар' : 'Barcha holatlar' },
+                      { value: 'active', label: lang === 'oz' ? 'Фақат фаоллар' : 'Faqat faollar' },
+                      { value: 'inactive', label: lang === 'oz' ? 'Фақат нофаоллар' : 'Faqat nofaollar' }
                     ]}
                   />
                 </Box>
@@ -585,8 +588,8 @@ export const StaffPage: React.FC = () => {
                         setAdminPage(1);
                       }}
                       options={[
-                        { value: '', label: 'Barcha tumanlar' },
-                        ...districts.map((d) => ({ value: d.id, label: d.name }))
+                        { value: '', label: t('common.allDistricts') },
+                        ...districts.map((d) => ({ value: d.id, label: translateDistrictName(d.name, lang) }))
                       ]}
                     />
                   </Box>
@@ -599,11 +602,11 @@ export const StaffPage: React.FC = () => {
               <TableHead>
                 <TableRow sx={{ bgcolor: '#F8FAFC' }}>
                   <TableCell width={45} sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.78rem', py: 1.25 }}>#</TableCell>
-                  <TableCell sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.78rem', py: 1.25 }}>Xodim (F.I.Sh / Login / Aloqa)</TableCell>
-                  <TableCell sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.78rem', py: 1.25 }}>Lavozimi va Roli</TableCell>
-                  <TableCell width={160} sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.78rem', py: 1.25 }}>Biriktirilgan tuman</TableCell>
-                  <TableCell width={90} align="center" sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.78rem', py: 1.25 }}>Holati</TableCell>
-                  <TableCell width={80} align="center" sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.78rem', py: 1.25 }}>Amallar</TableCell>
+                  <TableCell sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.78rem', py: 1.25 }}>{lang === 'oz' ? 'Ходим (Ф.И.Ш / Логин / Алоқа)' : 'Xodim (F.I.Sh / Login / Aloqa)'}</TableCell>
+                  <TableCell sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.78rem', py: 1.25 }}>{lang === 'oz' ? 'Лавозими ва Роли' : 'Lavozimi va Roli'}</TableCell>
+                  <TableCell width={160} sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.78rem', py: 1.25 }}>{lang === 'oz' ? 'Бириктирилган туман' : 'Biriktirilgan tuman'}</TableCell>
+                  <TableCell width={90} align="center" sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.78rem', py: 1.25 }}>{t('common.status')}</TableCell>
+                  <TableCell width={80} align="center" sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.78rem', py: 1.25 }}>{t('common.actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -618,8 +621,8 @@ export const StaffPage: React.FC = () => {
                     <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
                       <Typography variant="body2" sx={{ color: '#64748B', fontWeight: 500 }}>
                         {adminSearch.trim()
-                          ? `"${adminSearch}" bo‘yicha xodim topilmadi`
-                          : 'Xodimlar yoki dispetcherlar topilmadi'}
+                          ? `"${adminSearch}" ${lang === 'oz' ? 'бўйича ходим топилмади' : 'bo‘yicha xodim topilmadi'}`
+                          : (lang === 'oz' ? 'Ходимлар ёки диспетчерлар топилмади' : 'Xodimlar yoki dispetcherlar topilmadi')}
                       </Typography>
                       {adminSearch.trim() && (
                         <Button
@@ -630,7 +633,7 @@ export const StaffPage: React.FC = () => {
                           }}
                           sx={{ mt: 1, textTransform: 'none', fontSize: '0.8rem', color: 'primary.main', fontWeight: 600 }}
                         >
-                          Qidiruvni tozalash
+                          {lang === 'oz' ? 'Қидирувни тозалаш' : 'Qidiruvni tozalash'}
                         </Button>
                       )}
                     </TableCell>
@@ -686,7 +689,7 @@ export const StaffPage: React.FC = () => {
                               </Typography>
                               {isSelf && (
                                 <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 600, fontSize: '0.72rem' }}>
-                                  (Sizning hisobingiz)
+                                  {lang === 'oz' ? '(Сизнинг ҳисобингиз)' : '(Sizning hisobingiz)'}
                                 </Typography>
                               )}
                             </Box>
@@ -709,7 +712,13 @@ export const StaffPage: React.FC = () => {
                         <TableCell sx={{ py: 1.5 }}>
                           <Chip
                             size="small"
-                            label={admin.district?.name || (admin.role === 'SuperAdmin' ? 'Barcha tumanlar' : 'Biriktirilmagan')}
+                            label={
+                              admin.district?.name
+                                ? translateDistrictName(admin.district.name, lang)
+                                : admin.role === 'SuperAdmin'
+                                ? (lang === 'oz' ? 'Барча туманлар' : 'Barcha tumanlar')
+                                : (lang === 'oz' ? 'Бириктирилмаган' : 'Biriktirilmagan')
+                            }
                             sx={{
                               fontSize: '0.74rem',
                               height: 22,
@@ -725,7 +734,7 @@ export const StaffPage: React.FC = () => {
                         <TableCell align="center" sx={{ py: 1.5 }}>
                           <Chip
                             size="small"
-                            label={admin.isActive ? 'Faol' : 'Nofaol'}
+                            label={admin.isActive ? (lang === 'oz' ? 'Фаол' : 'Faol') : (lang === 'oz' ? 'Нофаол' : 'Nofaol')}
                             sx={{
                               fontSize: '0.72rem',
                               height: 22,
@@ -834,13 +843,13 @@ export const StaffPage: React.FC = () => {
             }}
           >
             <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#0F172A', fontSize: '0.95rem' }}>
-              Haydovchilar va Chiqindi Texnikalari ({filteredWorkers.length})
+              {lang === 'oz' ? 'Ҳайдовчилар ва Чиқинди Техникалари' : 'Haydovchilar va Chiqindi Texnikalari'} ({filteredWorkers.length})
             </Typography>
 
             <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap">
               <TextField
                 size="small"
-                placeholder="F.I.Sh, telefon yoki avtoraqam..."
+                placeholder={lang === 'oz' ? 'Ф.И.Ш, телефон ёки авторақам...' : 'F.I.Sh, telefon yoki avtoraqam...'}
                 value={workerSearch}
                 onChange={(e) => {
                   setWorkerSearch(e.target.value);
@@ -887,8 +896,8 @@ export const StaffPage: React.FC = () => {
                       setWorkerPage(1);
                     }}
                     options={[
-                      { value: '', label: 'Barcha tumanlar' },
-                      ...districts.map((d) => ({ value: d.id, label: d.name }))
+                      { value: '', label: t('common.allDistricts') },
+                      ...districts.map((d) => ({ value: d.id, label: translateDistrictName(d.name, lang) }))
                     ]}
                   />
                 </Box>
@@ -900,10 +909,10 @@ export const StaffPage: React.FC = () => {
             <TableHead>
               <TableRow sx={{ bgcolor: '#F8FAFC' }}>
                 <TableCell width={45} sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.78rem', py: 1.25 }}>#</TableCell>
-                <TableCell sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.78rem', py: 1.25 }}>Xodim (F.I.Sh / Telefon)</TableCell>
-                <TableCell width={160} sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.78rem', py: 1.25 }}>Lavozimi</TableCell>
-                <TableCell sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.78rem', py: 1.25 }}>Avtotransport / Texnika</TableCell>
-                <TableCell width={160} sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.78rem', py: 1.25 }}>Tuman</TableCell>
+                <TableCell sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.78rem', py: 1.25 }}>{lang === 'oz' ? 'Ходим (Ф.И.Ш / Телефон)' : 'Xodim (F.I.Sh / Telefon)'}</TableCell>
+                <TableCell width={160} sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.78rem', py: 1.25 }}>{lang === 'oz' ? 'Лавозими' : 'Lavozimi'}</TableCell>
+                <TableCell sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.78rem', py: 1.25 }}>{lang === 'oz' ? 'Автотранспорт / Техника' : 'Avtotransport / Texnika'}</TableCell>
+                <TableCell width={160} sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.78rem', py: 1.25 }}>{lang === 'oz' ? 'Туман' : 'Tuman'}</TableCell>
                 <TableCell width={120} align="center" sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.78rem', py: 1.25 }}>Telegram bot</TableCell>
                 <TableCell width={60} align="center" sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.78rem', py: 1.25 }}></TableCell>
               </TableRow>
@@ -920,8 +929,8 @@ export const StaffPage: React.FC = () => {
                   <TableCell colSpan={7} align="center" sx={{ py: 6 }}>
                     <Typography variant="body2" sx={{ color: '#64748B', fontWeight: 500 }}>
                       {workerSearch.trim()
-                        ? `"${workerSearch}" bo‘yicha xodim topilmadi`
-                        : 'Xodimlar topilmadi'}
+                        ? `"${workerSearch}" ${lang === 'oz' ? 'бўйича ходим топилмади' : 'bo‘yicha xodim topilmadi'}`
+                        : (lang === 'oz' ? 'Ходимлар топилмади' : 'Xodimlar topilmadi')}
                     </Typography>
                     {workerSearch.trim() && (
                       <Button
@@ -932,7 +941,7 @@ export const StaffPage: React.FC = () => {
                         }}
                         sx={{ mt: 1, textTransform: 'none', fontSize: '0.8rem', color: 'primary.main', fontWeight: 600 }}
                       >
-                        Qidiruvni tozalash
+                        {lang === 'oz' ? 'Қидирувни тозалаш' : 'Qidiruvni tozalash'}
                       </Button>
                     )}
                   </TableCell>
@@ -955,7 +964,11 @@ export const StaffPage: React.FC = () => {
                       <Chip
                         size="small"
                         icon={w.role === 'Inspector' ? <SearchOutlinedIcon sx={{ fontSize: '14px !important' }} /> : <LocalShippingOutlinedIcon sx={{ fontSize: '14px !important' }} />}
-                        label={w.role === 'Inspector' ? 'Hudud nazoratchisi' : 'Haydovchi'}
+                        label={
+                          w.role === 'Inspector'
+                            ? (lang === 'oz' ? 'Ҳудуд назоратчиси' : 'Hudud nazoratchisi')
+                            : (lang === 'oz' ? 'Ҳайдовчи' : 'Haydovchi')
+                        }
                         sx={{
                           fontWeight: 600,
                           fontSize: '0.74rem',
@@ -969,7 +982,12 @@ export const StaffPage: React.FC = () => {
                     <TableCell sx={{ py: 1.5 }}>
                       <Chip
                         size="small"
-                        label={w.vehicleNumber || (w.role === 'Inspector' ? 'Hududiy nazorat' : 'Biriktirilmagan')}
+                        label={
+                          w.vehicleNumber ||
+                          (w.role === 'Inspector'
+                            ? (lang === 'oz' ? 'Ҳудудий назорат' : 'Hududiy nazorat')
+                            : (lang === 'oz' ? 'Бириктирилмаган' : 'Biriktirilmagan'))
+                        }
                         sx={{
                           fontWeight: 600,
                           fontSize: '0.75rem',
@@ -982,7 +1000,7 @@ export const StaffPage: React.FC = () => {
                     <TableCell sx={{ py: 1.5 }}>
                       <Chip
                         size="small"
-                        label={districts.find((d) => d.id === w.districtId)?.name || 'Tuman'}
+                        label={translateDistrictName(districts.find((d) => d.id === w.districtId)?.name || 'Tuman', lang)}
                         sx={{
                           fontSize: '0.74rem',
                           height: 22,
@@ -996,7 +1014,7 @@ export const StaffPage: React.FC = () => {
                     <TableCell align="center" sx={{ py: 1.5 }}>
                       <Chip
                         size="small"
-                        label={w.telegramId ? 'Ulangan' : 'Kutilmoqda'}
+                        label={w.telegramId ? (lang === 'oz' ? 'Уланган' : 'Ulangan') : (lang === 'oz' ? 'Кутилмоқда' : 'Kutilmoqda')}
                         sx={{
                           fontSize: '0.72rem',
                           height: 22,

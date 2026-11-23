@@ -25,6 +25,7 @@ import AppButton from '../../../components/common/AppButton';
 import AppSelectField from '../../../components/common/AppSelectField';
 import { District, Mahalla } from '../../../types';
 import { useTranslation } from '../../../i18n';
+import { translateDistrictName } from '../../../utils/districtNames';
 
 interface MahallasListTableProps {
   districts: District[];
@@ -72,7 +73,7 @@ export const MahallasListTable: React.FC<MahallasListTableProps> = ({
             <HomeWorkOutlinedIcon sx={{ fontSize: 18 }} />
           </Box>
           <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#0F172A', fontSize: '0.95rem' }}>
-            {activeDistrict?.name || (lang === 'oz' ? 'Туман' : 'Tuman')} {t('modules.districts.neighborhoodsTitle')}
+            {translateDistrictName(activeDistrict?.name, lang) || (lang === 'oz' ? 'Туман' : 'Tuman')} {t('modules.districts.neighborhoodsTitle')}
           </Typography>
           <Chip size="small" label={`${mahallas.length} ${lang === 'oz' ? 'та' : 'ta'}`} sx={{ fontWeight: 600, fontSize: '0.72rem', height: 20, bgcolor: '#F1F5F9', color: '#475569', borderRadius: '10px' }} />
         </Stack>
@@ -83,7 +84,7 @@ export const MahallasListTable: React.FC<MahallasListTableProps> = ({
               label={t('modules.map.selectDistrict')}
               value={activeDistrictId || ''}
               onChange={(e) => { onSelectDistrict(Number(e.target.value)); setPage(1); setSearch(''); }}
-              options={districts.map((d) => ({ value: d.id, label: d.name }))}
+              options={districts.map((d) => ({ value: d.id, label: translateDistrictName(d.name, lang) }))}
             />
           </Box>
           <AppButton variant="primary" size="small" startIcon={<AddIcon sx={{ fontSize: 17 }} />} disabled={!activeDistrictId} onClick={onOpenAddMahalla}>
@@ -96,7 +97,11 @@ export const MahallasListTable: React.FC<MahallasListTableProps> = ({
         <TextField
           size="small"
           fullWidth
-          placeholder={lang === 'oz' ? `"${activeDistrict?.name || 'Туман'}" маҳаллалари орасидан қидириш...` : `"${activeDistrict?.name || 'Tuman'}" mahallalari orasidan qidirish...`}
+          placeholder={
+            lang === 'oz'
+              ? `"${translateDistrictName(activeDistrict?.name, 'oz') || 'Туман'}" маҳаллалари орасидан қидириш...`
+              : `"${activeDistrict?.name || 'Tuman'}" mahallalari orasidan qidirish...`
+          }
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(1); }}
           sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px', bgcolor: '#F8FAFC' } }}
@@ -143,7 +148,11 @@ export const MahallasListTable: React.FC<MahallasListTableProps> = ({
                 </TableCell>
                 <TableCell sx={{ fontWeight: 600, color: '#1E293B', fontSize: '0.88rem', py: 1.5 }}>{m.name}</TableCell>
                 <TableCell sx={{ py: 1.5 }}>
-                  <Chip size="small" label={activeDistrict?.name || (lang === 'oz' ? 'Туман' : 'Tuman')} sx={{ fontSize: '0.74rem', height: 22, fontWeight: 500, borderRadius: '8px', bgcolor: '#F1F5F9', color: '#475569' }} />
+                  <Chip
+                    size="small"
+                    label={translateDistrictName(activeDistrict?.name, lang) || (lang === 'oz' ? 'Туман' : 'Tuman')}
+                    sx={{ fontSize: '0.74rem', height: 22, fontWeight: 500, borderRadius: '8px', bgcolor: '#F1F5F9', color: '#475569' }}
+                  />
                 </TableCell>
                 <TableCell align="center" sx={{ py: 1.5 }}>
                   <Chip size="small" label={t('common.active')} sx={{ fontSize: '0.72rem', height: 22, fontWeight: 600, borderRadius: '12px', bgcolor: '#ECFDF5', color: '#059669' }} />

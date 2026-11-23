@@ -19,6 +19,8 @@ import {
   getDistrictPolygon,
   normalizePolygon
 } from '../../constants/boundaries';
+import { useTranslation } from '../../i18n';
+import { translateDistrictName } from '../../utils/districtNames';
 
 export type MapStyleType = 'osm' | 'light' | 'satellite';
 export type LayerModeType = 'markers' | 'heat' | 'both';
@@ -108,6 +110,7 @@ export const WasteMapCanvas: React.FC<WasteMapCanvasProps> = ({
   onSelectRequest,
   onSelectDistrict
 }) => {
+  const { lang } = useTranslation();
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const tileLayerRef = useRef<L.TileLayer | null>(null);
@@ -214,7 +217,9 @@ export const WasteMapCanvas: React.FC<WasteMapCanvasProps> = ({
         fillColor: '#10B981',
         fillOpacity: 0.08
       });
-      poly.bindTooltip(`<b>${district.name}</b> chegarasi`, { permanent: false, direction: 'top' });
+      const translatedSelectedName = translateDistrictName(district.name, lang);
+      const borderSuffix = lang === 'oz' ? 'чегараси' : 'chegarasi';
+      poly.bindTooltip(`<b>${translatedSelectedName}</b> ${borderSuffix}`, { permanent: false, direction: 'top' });
       polyGroup.addLayer(poly);
 
       const mask = L.polygon([outsideRing, polygonCoords], {
@@ -254,10 +259,11 @@ export const WasteMapCanvas: React.FC<WasteMapCanvasProps> = ({
           fillOpacity: 0.08
         });
 
+        const translatedName = translateDistrictName(d.name, lang);
         poly.bindTooltip(
           `<div style="display:flex;align-items:center;gap:6px;font-weight:700;font-size:12px;color:#0F172A;">
              <span style="width:8px;height:8px;border-radius:50%;background:${palette.border};flex-shrink:0;"></span>
-             ${d.name}
+             ${translatedName}
            </div>`,
           {
             permanent: false,
@@ -297,7 +303,7 @@ export const WasteMapCanvas: React.FC<WasteMapCanvasProps> = ({
         }
       }
     }
-  }, [district, districts]);
+  }, [district, districts, lang]);
 
   // 5. Update Markers & Clusters & Heatmap (Zoom va markazga aslo ta'sir qilmaydi!)
   useEffect(() => {

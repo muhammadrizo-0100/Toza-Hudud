@@ -19,6 +19,8 @@ import { AdminUser, AdminRole, District } from '../../types';
 import { useCreateAdminMutation, useUpdateAdminMutation } from '../../api/adminsApi';
 import { cleanUzPhone, validateUzPhone } from '../../utils/phone';
 import { useToast } from '../../context/ToastContext';
+import { useTranslation } from '../../i18n';
+import { translateDistrictName } from '../../utils/districtNames';
 
 interface AdminFormDialogProps {
   open: boolean;
@@ -54,6 +56,7 @@ export const AdminFormDialog: React.FC<AdminFormDialogProps> = ({
   currentUser,
   onSuccess
 }) => {
+  const { t, lang } = useTranslation();
   const isManagerRole = currentUser?.role === 'Manager';
   const isSuperAdminRole = currentUser?.role === 'SuperAdmin';
 
@@ -193,47 +196,49 @@ export const AdminFormDialog: React.FC<AdminFormDialogProps> = ({
 
   const roleOptions = isManagerRole
     ? [
-        { value: 'Dispatcher', label: 'Tuman Dispetcheri (Operator)' },
-        { value: 'Inspector', label: 'Hudud nazoratchisi / Usta' },
-        { value: 'Driver', label: 'Maxsus texnika haydovchisi' }
+        { value: 'Dispatcher', label: lang === 'oz' ? 'Туман Диспетчери (Оператор)' : 'Tuman Dispetcheri (Operator)' },
+        { value: 'Inspector', label: lang === 'oz' ? 'Ҳудуд назоратчиси / Уста' : 'Hudud nazoratchisi / Usta' },
+        { value: 'Driver', label: lang === 'oz' ? 'Махсус техника ҳайдовчиси' : 'Maxsus texnika haydovchisi' }
       ]
     : [
-        { value: 'Manager', label: 'Tuman Tozalik Bo‘limi Boshlig‘i' },
-        { value: 'Dispatcher', label: 'Tuman Dispetcheri (Operator)' },
-        { value: 'Inspector', label: 'Hudud nazoratchisi / Usta' },
-        { value: 'Driver', label: 'Maxsus texnika haydovchisi' },
+        { value: 'Manager', label: lang === 'oz' ? 'Туман Тозалик Бўлими Бошлиғи' : 'Tuman Tozalik Bo‘limi Boshlig‘i' },
+        { value: 'Dispatcher', label: lang === 'oz' ? 'Туман Диспетчери (Оператор)' : 'Tuman Dispetcheri (Operator)' },
+        { value: 'Inspector', label: lang === 'oz' ? 'Ҳудуд назоратчиси / Уста' : 'Hudud nazoratchisi / Usta' },
+        { value: 'Driver', label: lang === 'oz' ? 'Махсус техника ҳайдовчиси' : 'Maxsus texnika haydovchisi' },
         ...(isSuperAdminRole
-          ? [{ value: 'SuperAdmin', label: 'Viloyat Bosh Administratori' }]
+          ? [{ value: 'SuperAdmin', label: lang === 'oz' ? 'Вилоят Бош Администратори' : 'Viloyat Bosh Administratori' }]
           : [])
       ];
 
   const districtOptions = [
     ...(role === 'SuperAdmin'
-      ? [{ value: '', label: '-- Viloyat miqyosida (Barcha tumanlar) --' }]
-      : [{ value: '', label: '-- Tumanni tanlang --' }]),
+      ? [{ value: '', label: lang === 'oz' ? '-- Вилоят миқёсида (Барча туманлар) --' : '-- Viloyat miqyosida (Barcha tumanlar) --' }]
+      : [{ value: '', label: lang === 'oz' ? '-- Туманни танланг --' : '-- Tumanni tanlang --' }]),
     ...districts.map((d) => ({
       value: d.id,
-      label: d.name
+      label: translateDistrictName(d.name, lang)
     }))
   ];
 
   const getDialogTitle = (): string => {
     if (editAdmin) {
-      return `${fullName || editAdmin.fullName || 'Xodim'} ma‘lumotlarini tahrirlash`;
+      return lang === 'oz'
+        ? `${fullName || editAdmin.fullName || 'Ходим'} маълумотларини таҳрирлаш`
+        : `${fullName || editAdmin.fullName || 'Xodim'} ma‘lumotlarini tahrirlash`;
     }
     switch (role) {
       case 'Manager':
-        return 'Yangi Tuman Tozalik Boshlig‘ini Qo‘shish';
+        return lang === 'oz' ? 'Янги Туман Тозалик Бошлиғини Қўшиш' : 'Yangi Tuman Tozalik Boshlig‘ini Qo‘shish';
       case 'Dispatcher':
-        return 'Yangi Tuman Dispetcherini Qo‘shish';
+        return lang === 'oz' ? 'Янги Туман Диспетчерини Қўшиш' : 'Yangi Tuman Dispetcherini Qo‘shish';
       case 'Inspector':
-        return 'Yangi Hudud Nazoratchisini Qo‘shish';
+        return lang === 'oz' ? 'Янги Ҳудуд Назоратчисини Қўшиш' : 'Yangi Hudud Nazoratchisini Qo‘shish';
       case 'Driver':
-        return 'Yangi Maxsus Texnika Haydovchisini Qo‘shish';
+        return lang === 'oz' ? 'Янги Махсус Техника Ҳайдовчисини Қўшиш' : 'Yangi Maxsus Texnika Haydovchisini Qo‘shish';
       case 'SuperAdmin':
-        return 'Yangi Viloyat Bosh Administratorini Qo‘shish';
+        return lang === 'oz' ? 'Янги Вилоят Бош Администраторини Қўшиш' : 'Yangi Viloyat Bosh Administratorini Qo‘shish';
       default:
-        return 'Yangi Xodim Qo‘shish';
+        return lang === 'oz' ? 'Янги Ходим Қўшиш' : 'Yangi Xodim Qo‘shish';
     }
   };
 
@@ -490,7 +495,7 @@ export const AdminFormDialog: React.FC<AdminFormDialogProps> = ({
             }
           }}
         >
-          Bekor qilish
+          {t('common.cancel')}
         </Button>
         <Button
           type="submit"
@@ -512,7 +517,7 @@ export const AdminFormDialog: React.FC<AdminFormDialogProps> = ({
             }
           }}
         >
-          {isSubmitting ? <CircularProgress size={18} color="inherit" /> : 'Saqlash'}
+          {isSubmitting ? <CircularProgress size={18} color="inherit" /> : t('common.save')}
         </Button>
       </DialogActions>
     </Dialog>

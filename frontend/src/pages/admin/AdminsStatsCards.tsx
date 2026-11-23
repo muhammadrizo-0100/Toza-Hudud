@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Paper, Typography } from '@mui/material';
 import { AdminUser, AdminRole } from '../../types';
+import { useTranslation } from '../../i18n';
 
 interface AdminsStatsCardsProps {
   admins: AdminUser[];
@@ -8,6 +9,7 @@ interface AdminsStatsCardsProps {
 }
 
 export const AdminsStatsCards: React.FC<AdminsStatsCardsProps> = ({ admins, currentUserRole = 'SuperAdmin' }) => {
+  const { lang } = useTranslation();
   const isManager = currentUserRole === 'Manager';
   const total = admins.length;
   const superAdminCount = admins.filter((a) => a.role === 'SuperAdmin').length;
@@ -38,7 +40,7 @@ export const AdminsStatsCards: React.FC<AdminsStatsCardsProps> = ({ admins, curr
           }}
         >
           <Typography variant="body2" sx={{ color: '#64748B', fontWeight: 500, fontSize: '0.84rem' }}>
-            Tuman dispetcherlari (Operatorlar)
+            {lang === 'oz' ? 'Туман диспетчерлари (Операторлар)' : 'Tuman dispetcherlari (Operatorlar)'}
           </Typography>
           <Typography variant="h5" sx={{ fontWeight: 700, color: '#0284C7', fontSize: '1.75rem' }}>
             {dispatcherCount}
@@ -59,7 +61,7 @@ export const AdminsStatsCards: React.FC<AdminsStatsCardsProps> = ({ admins, curr
           }}
         >
           <Typography variant="body2" sx={{ color: '#64748B', fontWeight: 500, fontSize: '0.84rem' }}>
-            Faol ishlayotgan xodimlar
+            {lang === 'oz' ? 'Фаол ишлаётган ходимлар' : 'Faol ishlayotgan xodimlar'}
           </Typography>
           <Typography variant="h5" sx={{ fontWeight: 700, color: '#059669', fontSize: '1.75rem' }}>
             {activeCount}
@@ -91,7 +93,7 @@ export const AdminsStatsCards: React.FC<AdminsStatsCardsProps> = ({ admins, curr
         }}
       >
         <Typography variant="body2" sx={{ color: '#64748B', fontWeight: 500, fontSize: '0.84rem' }}>
-          Jami mas’ul xodimlar
+          {lang === 'oz' ? 'Жами масъул ходимлар' : 'Jami mas’ul xodimlar'}
         </Typography>
         <Typography variant="h5" sx={{ fontWeight: 700, color: '#0F172A', fontSize: '1.75rem' }}>
           {total}
@@ -112,7 +114,7 @@ export const AdminsStatsCards: React.FC<AdminsStatsCardsProps> = ({ admins, curr
         }}
       >
         <Typography variant="body2" sx={{ color: '#64748B', fontWeight: 500, fontSize: '0.84rem' }}>
-          Tuman tozalik boshliqlari
+          {lang === 'oz' ? 'Туман тозалик бошлиқлари' : 'Tuman tozalik boshliqlari'}
         </Typography>
         <Typography variant="h5" sx={{ fontWeight: 700, color: '#059669', fontSize: '1.75rem' }}>
           {managerCount}
@@ -133,7 +135,7 @@ export const AdminsStatsCards: React.FC<AdminsStatsCardsProps> = ({ admins, curr
         }}
       >
         <Typography variant="body2" sx={{ color: '#64748B', fontWeight: 500, fontSize: '0.84rem' }}>
-          Tuman dispetcherlari
+          {lang === 'oz' ? 'Туман диспетчерлари' : 'Tuman dispetcherlari'}
         </Typography>
         <Typography variant="h5" sx={{ fontWeight: 700, color: '#0284C7', fontSize: '1.75rem' }}>
           {dispatcherCount}
@@ -154,7 +156,7 @@ export const AdminsStatsCards: React.FC<AdminsStatsCardsProps> = ({ admins, curr
         }}
       >
         <Typography variant="body2" sx={{ color: '#64748B', fontWeight: 500, fontSize: '0.84rem' }}>
-          Viloyat bosh administratorlari
+          {lang === 'oz' ? 'Вилоят бош администраторлари' : 'Viloyat bosh administratorlari'}
         </Typography>
         <Typography variant="h5" sx={{ fontWeight: 700, color: '#4F46E5', fontSize: '1.75rem' }}>
           {superAdminCount}

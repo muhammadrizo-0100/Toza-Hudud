@@ -38,6 +38,7 @@ import { StatusBadge } from '../../components/common/StatusBadge';
 import { useAppSelector } from '../../store/hooks';
 import { useToast } from '../../context/ToastContext';
 import { useTranslation } from '../../i18n';
+import { translateDistrictName } from '../../utils/districtNames';
 
 const DISTRICTS_PER_PAGE = 5;
 const NEIGHBORHOODS_PER_PAGE = 5;
@@ -215,7 +216,7 @@ export const SystemPage: React.FC = () => {
               }}
               options={[
                 { value: '', label: t('common.allDistricts') },
-                ...districts.map((d) => ({ value: d.id, label: d.name }))
+                ...districts.map((d) => ({ value: d.id, label: translateDistrictName(d.name, lang) }))
               ]}
             />
           </Box>
@@ -264,7 +265,7 @@ export const SystemPage: React.FC = () => {
         >
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
             <Typography variant="body2" sx={{ fontWeight: 600, color: '#64748B', fontSize: '0.85rem' }}>
-              Jami murojaatlar
+              {lang === 'oz' ? 'Жами мурожаатлар' : 'Jami murojaatlar'}
             </Typography>
             <Box
               sx={{
@@ -285,7 +286,7 @@ export const SystemPage: React.FC = () => {
             {overview.totalRequests}
           </Typography>
           <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.75rem' }}>
-            Barcha kelib tushgan murojaatlar
+            {lang === 'oz' ? 'Барча келиб тушган мурожаатлар' : 'Barcha kelib tushgan murojaatlar'}
           </Typography>
         </Paper>
 
@@ -305,7 +306,7 @@ export const SystemPage: React.FC = () => {
         >
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
             <Typography variant="body2" sx={{ fontWeight: 600, color: '#64748B', fontSize: '0.85rem' }}>
-              Faol murojaatlar
+              {lang === 'oz' ? 'Фаол мурожаатлар' : 'Faol murojaatlar'}
             </Typography>
             <Box
               sx={{
@@ -328,7 +329,7 @@ export const SystemPage: React.FC = () => {
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
             <Chip
               size="small"
-              label={`Yangi: ${overview.newRequests}`}
+              label={`${lang === 'oz' ? 'Янги' : 'Yangi'}: ${overview.newRequests}`}
               sx={{
                 height: 20,
                 fontSize: '0.72rem',
@@ -340,7 +341,7 @@ export const SystemPage: React.FC = () => {
             />
             <Chip
               size="small"
-              label={`Jarayonda: ${overview.inProgressRequests}`}
+              label={`${lang === 'oz' ? 'Жараёнда' : 'Jarayonda'}: ${overview.inProgressRequests}`}
               sx={{
                 height: 20,
                 fontSize: '0.72rem',
@@ -352,7 +353,7 @@ export const SystemPage: React.FC = () => {
             />
             <Chip
               size="small"
-              label={`Tasdiqda: ${overview.submittedRequests}`}
+              label={`${lang === 'oz' ? 'Тасдиқда' : 'Tasdiqda'}: ${overview.submittedRequests}`}
               sx={{
                 height: 20,
                 fontSize: '0.72rem',
@@ -381,7 +382,7 @@ export const SystemPage: React.FC = () => {
         >
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
             <Typography variant="body2" sx={{ fontWeight: 600, color: '#64748B', fontSize: '0.85rem' }}>
-              Muvaffaqiyatli tozalandi
+              {lang === 'oz' ? 'Муваффақиятли тозаланди' : 'Muvaffaqiyatli tozalandi'}
             </Typography>
             <Box
               sx={{
@@ -402,7 +403,7 @@ export const SystemPage: React.FC = () => {
             {overview.completedRequests}
           </Typography>
           <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.75rem' }}>
-            Xodimlar tomonidan bajarilgan va tasdiqlangan
+            {lang === 'oz' ? 'Ходимлар томонидан бажарилган ва тасдиқланган' : 'Xodimlar tomonidan bajarilgan va tasdiqlangan'}
           </Typography>
         </Paper>
 
@@ -422,7 +423,7 @@ export const SystemPage: React.FC = () => {
         >
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
             <Typography variant="body2" sx={{ fontWeight: 600, color: '#64748B', fontSize: '0.85rem' }}>
-              Yechim darajasi
+              {lang === 'oz' ? 'Ечим даражаси' : 'Yechim darajasi'}
             </Typography>
             <Box
               sx={{
@@ -473,10 +474,12 @@ export const SystemPage: React.FC = () => {
       >
         <Box sx={{ mb: 2 }}>
           <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#0F172A', fontSize: '1rem' }}>
-            Hududiy resurslar va infratuzilma quvvati
+            {lang === 'oz' ? 'Ҳудудий ресурслар ва инфратузилма қуввати' : 'Hududiy resurslar va infratuzilma quvvati'}
           </Typography>
           <Typography variant="body2" sx={{ color: '#64748B', fontSize: '0.82rem' }}>
-            Boshqaruvdagi tumanlar, mahallalar, xodimlar va maxsus texnikalar umumiy soni
+            {lang === 'oz'
+              ? 'Бошқарувдаги туманлар, маҳаллалар, ходимлар ва махсус техникалар умумий сони'
+              : 'Boshqaruvdagi tumanlar, mahallalar, xodimlar va maxsus texnikalar umumiy soni'}
           </Typography>
         </Box>
 
@@ -520,7 +523,7 @@ export const SystemPage: React.FC = () => {
             </Box>
             <Box>
               <Typography variant="caption" color="text.secondary" fontWeight={600} display="block">
-                Tumanlar
+                {lang === 'oz' ? 'Туманлар' : 'Tumanlar'}
               </Typography>
               <Typography variant="h5" fontWeight={800} color="#0F172A">
                 {overview.totalDistricts}
@@ -557,7 +560,7 @@ export const SystemPage: React.FC = () => {
             </Box>
             <Box>
               <Typography variant="caption" color="text.secondary" fontWeight={600} display="block">
-                Mahallalar
+                {lang === 'oz' ? 'Маҳаллалар' : 'Mahallalar'}
               </Typography>
               <Typography variant="h5" fontWeight={800} color="#0F172A">
                 {overview.totalNeighborhoods}
@@ -594,7 +597,7 @@ export const SystemPage: React.FC = () => {
             </Box>
             <Box>
               <Typography variant="caption" color="text.secondary" fontWeight={600} display="block">
-                Dispetcherlar
+                {lang === 'oz' ? 'Диспетчерлар' : 'Dispetcherlar'}
               </Typography>
               <Typography variant="h5" fontWeight={800} color="#0F172A">
                 {overview.totalManagers}
@@ -631,7 +634,7 @@ export const SystemPage: React.FC = () => {
             </Box>
             <Box>
               <Typography variant="caption" color="text.secondary" fontWeight={600} display="block">
-                Xodimlar
+                {lang === 'oz' ? 'Ходимлар' : 'Xodimlar'}
               </Typography>
               <Typography variant="h5" fontWeight={800} color="#0F172A">
                 {overview.totalWorkers}
@@ -668,7 +671,7 @@ export const SystemPage: React.FC = () => {
             </Box>
             <Box>
               <Typography variant="caption" color="text.secondary" fontWeight={600} display="block">
-                Maxsus texnikalar
+                {lang === 'oz' ? 'Махсус техникалар' : 'Maxsus texnikalar'}
               </Typography>
               <Typography variant="h5" fontWeight={800} color="#0F172A">
                 {overview.totalVehicles}
@@ -705,7 +708,7 @@ export const SystemPage: React.FC = () => {
             </Box>
             <Box>
               <Typography variant="caption" color="text.secondary" fontWeight={600} display="block">
-                Fuqarolar
+                {lang === 'oz' ? 'Фуқаролар' : 'Fuqarolar'}
               </Typography>
               <Typography variant="h5" fontWeight={800} color="#0F172A">
                 {overview.totalClients}
@@ -719,10 +722,12 @@ export const SystemPage: React.FC = () => {
       <DataTableCard>
         <Box sx={{ px: 0.5, pb: 1.5 }}>
           <Typography variant="h6" sx={{ fontWeight: 700, color: '#0F172A', fontSize: '1.05rem' }}>
-            Tumanlar faoliyati monitoringi
+            {lang === 'oz' ? 'Туманлар фаолияти мониторинги' : 'Tumanlar faoliyati monitoringi'}
           </Typography>
           <Typography variant="body2" sx={{ color: '#64748B', fontSize: '0.82rem' }}>
-            Hududiy sanitar bo‘limlar, texnika quvvati va tozalash samaradorligi ko‘rsatkichlari.
+            {lang === 'oz'
+              ? 'Ҳудудий санитар бўлимлар, техника қуввати ва тозалаш самарадорлиги кўрсаткичлари.'
+              : 'Hududiy sanitar bo‘limlar, texnika quvvati va tozalash samaradorligi ko‘rsatkichlari.'}
           </Typography>
         </Box>
 
@@ -730,21 +735,21 @@ export const SystemPage: React.FC = () => {
           <TableHead>
             <TableRow>
               <TableCell sx={{ width: 60 }}>ID</TableCell>
-              <TableCell sx={{ minWidth: 150 }}>Tuman nomi</TableCell>
-              <TableCell align="center">Faol arizalar</TableCell>
-              <TableCell align="center">Tozalandi</TableCell>
-              <TableCell align="center">Jami arizalar</TableCell>
-              <TableCell align="center">Biriktirilgan brigadalar</TableCell>
-              <TableCell align="center">Maxsus texnikalar</TableCell>
-              <TableCell align="center">Yechim darajasi</TableCell>
-              <TableCell align="right" sx={{ width: 100 }}>Harakat</TableCell>
+              <TableCell sx={{ minWidth: 150 }}>{lang === 'oz' ? 'Туман номи' : 'Tuman nomi'}</TableCell>
+              <TableCell align="center">{lang === 'oz' ? 'Фаол аризалар' : 'Faol arizalar'}</TableCell>
+              <TableCell align="center">{lang === 'oz' ? 'Тозаланди' : 'Tozalandi'}</TableCell>
+              <TableCell align="center">{lang === 'oz' ? 'Жами аризалар' : 'Jami arizalar'}</TableCell>
+              <TableCell align="center">{lang === 'oz' ? 'Бириктирилган бригадалар' : 'Biriktirilgan brigadalar'}</TableCell>
+              <TableCell align="center">{lang === 'oz' ? 'Махсус техникалар' : 'Maxsus texnikalar'}</TableCell>
+              <TableCell align="center">{lang === 'oz' ? 'Ечим даражаси' : 'Yechim darajasi'}</TableCell>
+              <TableCell align="right" sx={{ width: 100 }}>{lang === 'oz' ? 'Ҳаракат' : 'Harakat'}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {paginatedDistricts.map((d) => (
               <TableRow key={d.id} hover>
                 <TableCell sx={{ fontWeight: 700 }}>#{d.id}</TableCell>
-                <TableCell sx={{ fontWeight: 700 }}>{d.name}</TableCell>
+                <TableCell sx={{ fontWeight: 700 }}>{translateDistrictName(d.name, lang)}</TableCell>
                 <TableCell align="center">
                   <Chip
                     size="small"
@@ -761,8 +766,8 @@ export const SystemPage: React.FC = () => {
                 <TableCell align="center" sx={{ fontWeight: 700 }}>
                   {d.totalRequests}
                 </TableCell>
-                <TableCell align="center">{d.workersCount} nafar</TableCell>
-                <TableCell align="center">{d.vehiclesCount} ta</TableCell>
+                <TableCell align="center">{d.workersCount} {lang === 'oz' ? 'нафар' : 'nafar'}</TableCell>
+                <TableCell align="center">{d.vehiclesCount} {lang === 'oz' ? 'та' : 'ta'}</TableCell>
                 <TableCell align="center">
                   <Chip
                     size="small"
@@ -777,7 +782,7 @@ export const SystemPage: React.FC = () => {
                     size="small"
                     onClick={() => navigate(`/admin/requests?districtId=${d.id}`)}
                   >
-                    Arizalar
+                    {lang === 'oz' ? 'Аризалар' : 'Arizalar'}
                   </AppButton>
                 </TableCell>
               </TableRow>
@@ -799,7 +804,7 @@ export const SystemPage: React.FC = () => {
           }}
         >
           <Typography variant="body2" color="text.secondary">
-            Jami: <strong>{districtCards.length}</strong> ta tuman
+            {lang === 'oz' ? 'Жами:' : 'Jami:'} <strong>{districtCards.length}</strong> {lang === 'oz' ? 'та туман' : 'ta tuman'}
           </Typography>
           <Pagination
             count={totalDistrictsPages}
@@ -819,34 +824,34 @@ export const SystemPage: React.FC = () => {
           <Box>
             <Box sx={{ px: 0.5, pb: 1.5 }}>
               <Typography variant="h6" sx={{ fontWeight: 700, color: '#0F172A', fontSize: '1.05rem' }}>
-                Eng faol mahallalar
+                {lang === 'oz' ? 'Энг фаол маҳаллалар' : 'Eng faol mahallalar'}
               </Typography>
               <Typography variant="body2" sx={{ color: '#64748B', fontSize: '0.82rem' }}>
-                Aholi tomonidan eng ko‘p ariza tushayotgan hududlar
+                {lang === 'oz' ? 'Аҳоли томонидан энг кўп ариза тушаётган ҳудудлар' : 'Aholi tomonidan eng ko‘p ariza tushayotgan hududlar'}
               </Typography>
             </Box>
 
             <AppTable minWidth="100%">
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ width: '40%' }}>Mahalla</TableCell>
-                  <TableCell sx={{ width: '30%' }}>Tuman</TableCell>
-                  <TableCell align="center" sx={{ width: '15%' }}>Faol</TableCell>
-                  <TableCell align="center" sx={{ width: '15%' }}>Jami</TableCell>
+                  <TableCell sx={{ width: '40%' }}>{lang === 'oz' ? 'Маҳалла' : 'Mahalla'}</TableCell>
+                  <TableCell sx={{ width: '30%' }}>{lang === 'oz' ? 'Туман' : 'Tuman'}</TableCell>
+                  <TableCell align="center" sx={{ width: '15%' }}>{lang === 'oz' ? 'Фаол' : 'Faol'}</TableCell>
+                  <TableCell align="center" sx={{ width: '15%' }}>{lang === 'oz' ? 'Жами' : 'Jami'}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {paginatedNeighborhoods.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={4} align="center" sx={{ py: 4, color: 'text.secondary' }}>
-                      Ma‘lumot topilmadi
+                      {lang === 'oz' ? 'Маълумот топилмади' : 'Ma‘lumot topilmadi'}
                     </TableCell>
                   </TableRow>
                 ) : (
                   paginatedNeighborhoods.map((m) => (
                     <TableRow key={m.id} hover>
                       <TableCell sx={{ fontWeight: 700 }}>{m.name}</TableCell>
-                      <TableCell sx={{ color: 'text.secondary' }}>{m.districtName}</TableCell>
+                      <TableCell sx={{ color: 'text.secondary' }}>{translateDistrictName(m.districtName, lang)}</TableCell>
                       <TableCell align="center">
                         <Chip
                           size="small"
@@ -879,7 +884,7 @@ export const SystemPage: React.FC = () => {
             }}
           >
             <Typography variant="caption" color="text.secondary">
-              Jami: <strong>{topNeighborhoods.length}</strong> ta mahalla
+              {lang === 'oz' ? 'Жами:' : 'Jami:'} <strong>{topNeighborhoods.length}</strong> {lang === 'oz' ? 'та маҳалла' : 'ta mahalla'}
             </Typography>
             <Pagination
               count={totalNeighborhoodsPages}
@@ -897,10 +902,10 @@ export const SystemPage: React.FC = () => {
           <Box>
             <Box sx={{ px: 0.5, pb: 1.5 }}>
               <Typography variant="h6" sx={{ fontWeight: 700, color: '#0F172A', fontSize: '1.05rem' }}>
-                Operativ arizalar nazorati
+                {lang === 'oz' ? 'Оператив аризалар назорати' : 'Operativ arizalar nazorati'}
               </Typography>
               <Typography variant="body2" sx={{ color: '#64748B', fontSize: '0.82rem' }}>
-                Tizimga eng oxirgi kelib tushgan arizalar
+                {lang === 'oz' ? 'Тизимга энг охирги келиб тушган аризалар' : 'Tizimga eng oxirgi kelib tushgan arizalar'}
               </Typography>
             </Box>
 
@@ -908,16 +913,16 @@ export const SystemPage: React.FC = () => {
               <TableHead>
                 <TableRow>
                   <TableCell sx={{ width: '12%' }}>ID</TableCell>
-                  <TableCell sx={{ width: '46%' }}>Fuqaro / Mahalla</TableCell>
-                  <TableCell sx={{ width: '22%' }}>Holati</TableCell>
-                  <TableCell align="right" sx={{ width: '20%' }}>Harakat</TableCell>
+                  <TableCell sx={{ width: '46%' }}>{lang === 'oz' ? 'Фуқаро / Маҳалла' : 'Fuqaro / Mahalla'}</TableCell>
+                  <TableCell sx={{ width: '22%' }}>{lang === 'oz' ? 'Ҳолати' : 'Holati'}</TableCell>
+                  <TableCell align="right" sx={{ width: '20%' }}>{lang === 'oz' ? 'Ҳаракат' : 'Harakat'}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {paginatedRecentRequests.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={4} align="center" sx={{ py: 4, color: 'text.secondary' }}>
-                      Arizalar mavjud emas
+                      {lang === 'oz' ? 'Аризалар мавжуд эмас' : 'Arizalar mavjud emas'}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -928,10 +933,10 @@ export const SystemPage: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2" fontWeight={700} sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 160 }}>
-                          {r.mahallaName || 'Mahalla ko‘rsatilmagan'}
+                          {r.mahallaName || (lang === 'oz' ? 'Маҳалла кўрсатилмаган' : 'Mahalla ko‘rsatilmagan')}
                         </Typography>
                         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 160 }}>
-                          {r.citizenFullName || 'Noma‘lum'} • {r.citizenPhone || '-'}
+                          {r.citizenFullName || (lang === 'oz' ? 'Номаълум' : 'Noma‘lum')} • {r.citizenPhone || '-'}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ whiteSpace: 'nowrap' }}>
@@ -944,7 +949,7 @@ export const SystemPage: React.FC = () => {
                           startIcon={<VisibilityOutlinedIcon fontSize="small" />}
                           onClick={() => navigate(`/admin/requests?requestId=${r.id}`)}
                         >
-                          Ko‘rish
+                          {lang === 'oz' ? 'Кўриш' : 'Ko‘rish'}
                         </AppButton>
                       </TableCell>
                     </TableRow>
@@ -968,7 +973,7 @@ export const SystemPage: React.FC = () => {
             }}
           >
             <Typography variant="caption" color="text.secondary">
-              Jami: <strong>{recentRequests.length}</strong> ta operativ ariza
+              {lang === 'oz' ? 'Жами:' : 'Jami:'} <strong>{recentRequests.length}</strong> {lang === 'oz' ? 'та оператив ариза' : 'ta operativ ariza'}
             </Typography>
             <Pagination
               count={totalRecentPages}

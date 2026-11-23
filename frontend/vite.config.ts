@@ -5,7 +5,14 @@ import { fileURLToPath, URL } from 'node:url';
 const logger = createLogger();
 const originalLoggerError = logger.error.bind(logger);
 logger.error = (msg, options) => {
-  if (msg.includes('ECONNABORTED') || msg.includes('ECONNRESET')) {
+  const str = String(msg || '');
+  if (
+    str.includes('ECONNABORTED') ||
+    str.includes('ECONNRESET') ||
+    str.includes('ws proxy error') ||
+    str.includes('ws proxy socket error') ||
+    str.includes('writeGeneric')
+  ) {
     return;
   }
   originalLoggerError(msg, options);

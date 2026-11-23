@@ -24,6 +24,8 @@ import { useGetMahallasQuery } from '../../api/mahallasApi';
 import { useSubmitPublicRequestMutation } from '../../api/publicApi';
 import { formatUzPhone, cleanUzPhone, validateUzPhone } from '../../utils/phone';
 import { useToast } from '../../context/ToastContext';
+import { useTranslation } from '../../i18n';
+import { translateDistrictName } from '../../utils/districtNames';
 
 interface ManualRequestModalProps {
   open: boolean;
@@ -32,6 +34,7 @@ interface ManualRequestModalProps {
 }
 
 export const ManualRequestModal: React.FC<ManualRequestModalProps> = ({ open, onClose, onSaved }) => {
+  const { t, lang } = useTranslation();
   const [districtId, setDistrictId] = useState<number | ''>(1);
   const [mahallaId, setMahallaId] = useState<number | ''>('');
   const [fullName, setFullName] = useState('');
@@ -107,7 +110,7 @@ export const ManualRequestModal: React.FC<ManualRequestModalProps> = ({ open, on
     >
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 2, pt: 1, pb: 0.5 }}>
         <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.05rem', color: '#0F172A' }}>
-          Yangi chiqindi murojaati kiritish
+          {lang === 'oz' ? 'Янги чиқинди мурожаати киритиш' : 'Yangi chiqindi murojaati kiritish'}
         </Typography>
         <IconButton
           size="small"
@@ -130,7 +133,7 @@ export const ManualRequestModal: React.FC<ManualRequestModalProps> = ({ open, on
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
               <Box sx={{ flex: 1 }}>
                 <Typography variant="caption" sx={{ color: '#475569', fontWeight: 600, display: 'block', mb: 0.5 }}>
-                  Tuman
+                  {lang === 'oz' ? 'Туман' : 'Tuman'}
                 </Typography>
                 <AppSelectField
                   value={districtId}
@@ -138,19 +141,22 @@ export const ManualRequestModal: React.FC<ManualRequestModalProps> = ({ open, on
                     setDistrictId(e.target.value as number);
                     setMahallaId('');
                   }}
-                  options={districts.map((d) => ({ value: d.id, label: d.name }))}
+                  options={districts.map((d) => ({
+                    value: d.id,
+                    label: translateDistrictName(d.name, lang)
+                  }))}
                 />
               </Box>
 
               <Box sx={{ flex: 1 }}>
                 <Typography variant="caption" sx={{ color: '#475569', fontWeight: 600, display: 'block', mb: 0.5 }}>
-                  Mahalla
+                  {lang === 'oz' ? 'Маҳалла' : 'Mahalla'}
                 </Typography>
                 <AppSelectField
                   value={mahallaId}
                   onChange={(e) => setMahallaId(e.target.value as number)}
                   options={[
-                    { value: '', label: 'Tanlanmagan' },
+                    { value: '', label: lang === 'oz' ? 'Танланмаган' : 'Tanlanmagan' },
                     ...mahallas.map((m) => ({ value: m.id, label: m.name }))
                   ]}
                 />
@@ -160,12 +166,12 @@ export const ManualRequestModal: React.FC<ManualRequestModalProps> = ({ open, on
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
               <Box sx={{ flex: 1 }}>
                 <Typography variant="caption" sx={{ color: '#475569', fontWeight: 600, display: 'block', mb: 0.5 }}>
-                  Fuqaro F.I.Sh
+                  {lang === 'oz' ? 'Фуқаро Ф.И.Ш' : 'Fuqaro F.I.Sh'}
                 </Typography>
                 <TextField
                   fullWidth
                   size="small"
-                  placeholder="Masalan: Aliyev Vali"
+                  placeholder={lang === 'oz' ? 'Масалан: Алиев Вали' : 'Masalan: Aliyev Vali'}
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}
@@ -173,7 +179,7 @@ export const ManualRequestModal: React.FC<ManualRequestModalProps> = ({ open, on
               </Box>
               <Box sx={{ flex: 1 }}>
                 <Typography variant="caption" sx={{ color: '#475569', fontWeight: 600, display: 'block', mb: 0.5 }}>
-                  Telefon raqami
+                  {lang === 'oz' ? 'Телефон рақами' : 'Telefon raqami'}
                 </Typography>
                 <AppPhoneField
                   value={phone}
@@ -185,29 +191,29 @@ export const ManualRequestModal: React.FC<ManualRequestModalProps> = ({ open, on
 
             <Box>
               <Typography variant="caption" sx={{ color: '#475569', fontWeight: 600, display: 'block', mb: 0.5 }}>
-                Chiqindi turi
+                {lang === 'oz' ? 'Чиқинди тури' : 'Chiqindi turi'}
               </Typography>
               <AppSelectField
                 value={wasteType}
                 onChange={(e) => setWasteType(String(e.target.value))}
                 options={[
-                  { value: 'maishiy', label: 'Maishiy chiqindilar' },
-                  { value: 'qurilish', label: 'Qurilish chiqindilari' },
-                  { value: 'xazon', label: 'Xazon va daraxt shoxlari' },
-                  { value: 'katta_hajmli', label: 'Katta hajmli chiqindilar' },
-                  { value: 'noqonuniy', label: 'Noqonuniy tashlandiq joy' }
+                  { value: 'maishiy', label: t('modules.requests.householdWaste') },
+                  { value: 'qurilish', label: t('modules.requests.constructionWaste') },
+                  { value: 'xazon', label: t('modules.requests.foliageWaste') },
+                  { value: 'katta_hajmli', label: t('modules.requests.bulkyWaste') },
+                  { value: 'noqonuniy', label: lang === 'oz' ? 'Ноқонуний ташландиқ жой' : 'Noqonuniy tashlandiq joy' }
                 ]}
               />
             </Box>
 
             <Box>
               <Typography variant="caption" sx={{ color: '#475569', fontWeight: 600, display: 'block', mb: 0.5 }}>
-                Aniq manzil
+                {lang === 'oz' ? 'Аниқ манзил' : 'Aniq manzil'}
               </Typography>
               <TextField
                 fullWidth
                 size="small"
-                placeholder="Ko‘cha, uy yoki mo‘ljal"
+                placeholder={lang === 'oz' ? 'Кўча, уй ёки мўлжал' : 'Ko‘cha, uy yoki mo‘ljal'}
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}
@@ -216,14 +222,14 @@ export const ManualRequestModal: React.FC<ManualRequestModalProps> = ({ open, on
 
             <Box>
               <Typography variant="caption" sx={{ color: '#475569', fontWeight: 600, display: 'block', mb: 0.5 }}>
-                Izoh / Qo‘shimcha ma’lumot
+                {lang === 'oz' ? 'Изоҳ / Қўшимча маълумот' : 'Izoh / Qo‘shimcha ma’lumot'}
               </Typography>
               <TextField
                 fullWidth
                 size="small"
                 multiline
                 rows={2}
-                placeholder="Holat bo‘yicha qo‘shimcha tavsif..."
+                placeholder={lang === 'oz' ? 'Ҳолат бўйича қўшимча тавсиф...' : 'Holat bo‘yicha qo‘shimcha tavsif...'}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}
@@ -232,7 +238,7 @@ export const ManualRequestModal: React.FC<ManualRequestModalProps> = ({ open, on
 
             <Box>
               <Typography variant="caption" sx={{ color: '#475569', fontWeight: 600, display: 'block', mb: 0.5 }}>
-                Surat yuklash (Majburiy)
+                {lang === 'oz' ? 'Сурат юклаш (Мажбурий)' : 'Surat yuklash (Majburiy)'}
               </Typography>
               <AppImageUpload value={file} onChange={setFile} />
             </Box>
@@ -255,7 +261,7 @@ export const ManualRequestModal: React.FC<ManualRequestModalProps> = ({ open, on
               '&:hover': { borderColor: '#CBD5E1', bgcolor: '#F8FAFC' }
             }}
           >
-            Bekor qilish
+            {t('common.cancel')}
           </Button>
           <Button
             type="submit"
@@ -273,7 +279,7 @@ export const ManualRequestModal: React.FC<ManualRequestModalProps> = ({ open, on
               '&:hover': { bgcolor: 'primary.dark', boxShadow: 'none' }
             }}
           >
-            {isLoading ? <CircularProgress size={18} color="inherit" /> : 'Murojaatni saqlash'}
+            {isLoading ? <CircularProgress size={18} color="inherit" /> : (lang === 'oz' ? 'Мурожаатни сақлаш' : 'Murojaatni saqlash')}
           </Button>
         </DialogActions>
       </form>

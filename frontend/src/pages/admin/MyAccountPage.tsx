@@ -38,6 +38,7 @@ import AppBreadcrumbs from '../../components/common/AppBreadcrumbs';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { getUserRoleBadgeText } from '../../utils/roles';
 import { useTranslation } from '../../i18n';
+import { translateDistrictName } from '../../utils/districtNames';
 
 export const MyAccountPage: React.FC = () => {
   const navigate = useNavigate();
@@ -58,14 +59,14 @@ export const MyAccountPage: React.FC = () => {
   const isInsp = user.role === 'Inspector' || user.workerRole === 'Inspector';
 
   const roleLabel = isInsp
-    ? 'Hudud nazoratchisi / Usta'
+    ? (lang === 'oz' ? 'Ҳудуд назоратчиси / Уста' : 'Hudud nazoratchisi / Usta')
     : isDriver
-    ? 'Maxsus texnika haydovchisi'
+    ? (lang === 'oz' ? 'Махсус техника ҳайдовчиси' : 'Maxsus texnika haydovchisi')
     : user.role === 'Manager'
-    ? 'Tuman Bo‘limi Boshlig‘i'
+    ? (lang === 'oz' ? 'Туман Бўлими Бошлиғи' : 'Tuman Bo‘limi Boshlig‘i')
     : user.role === 'Dispatcher'
-    ? 'Tuman Dispetcheri'
-    : 'Viloyat Bosh Administratori';
+    ? (lang === 'oz' ? 'Туман Диспетчери' : 'Tuman Dispetcheri')
+    : (lang === 'oz' ? 'Вилоят Бош Администратори' : 'Viloyat Bosh Administratori');
 
   const wasteTypeLabels: Record<string, string> = {
     maishiy: t('modules.requests.householdWaste'),
@@ -204,7 +205,7 @@ export const MyAccountPage: React.FC = () => {
                       {lang === 'oz' ? 'Ҳудуд / Туман' : 'Hudud / Tuman'}
                     </Typography>
                     <Typography variant="body2" fontWeight={600}>
-                      {user.district || (lang === 'oz' ? 'Наманган вилояти' : 'Namangan viloyati')}
+                      {user.district ? translateDistrictName(user.district, lang) : (lang === 'oz' ? 'Наманган вилояти' : 'Namangan viloyati')}
                     </Typography>
                   </Box>
                 </Stack>
@@ -266,12 +267,12 @@ export const MyAccountPage: React.FC = () => {
             {/* Waste type breakdown card */}
             <DataTableCard sx={{ p: 2.5 }}>
               <Typography variant="h6" fontWeight={800} sx={{ mb: 2, fontSize: '1rem' }}>
-                Chiqindi yo‘nalishlari taqsimoti
+                {lang === 'oz' ? 'Чиқинди йўналишлари тақсимоти' : 'Chiqindi yo‘nalishlari taqsimoti'}
               </Typography>
 
               {wasteBreakdown.length === 0 ? (
                 <Typography variant="body2" color="text.secondary">
-                  Hozircha biriktirilgan vazifalar yo‘q
+                  {lang === 'oz' ? 'Ҳозирча бириктирилган вазифалар йўқ' : 'Hozircha biriktirilgan vazifalar yo‘q'}
                 </Typography>
               ) : (
                 <Stack spacing={1.75}>
@@ -286,7 +287,7 @@ export const MyAccountPage: React.FC = () => {
                             {label}
                           </Typography>
                           <Typography variant="body2" fontWeight={700} color="text.secondary">
-                            {wb.count} ta ({pct}%)
+                            {wb.count} {lang === 'oz' ? 'та' : 'ta'} ({pct}%)
                           </Typography>
                         </Stack>
                         <LinearProgress
@@ -431,12 +432,20 @@ export const MyAccountPage: React.FC = () => {
                   </Stack>
                   <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
                     {user.role === 'SuperAdmin'
-                      ? 'Viloyat miqyosidagi murojaatlarni sifatli va o‘z vaqtida bartaraf etilishini nazorat qilish va boshqarish samaradorligi.'
+                      ? (lang === 'oz'
+                          ? 'Вилоят миқёсидаги мурожаатларни сифатли ва ўз вақтида бартараф этилишини назорат қилиш ва бошқариш самарадорлиги.'
+                          : 'Viloyat miqyosidagi murojaatlarni sifatli va o‘z vaqtida bartaraf etilishini nazorat qilish va boshqarish samaradorligi.')
                       : user.role === 'Manager'
-                      ? 'Tuman bo‘yicha kelib tushgan murojaatlarni o‘z vaqtida hal etish va tozalash brigadalarini boshqarish samaradorligi.'
+                      ? (lang === 'oz'
+                          ? 'Туман бўйича келиб тушган мурожаатларни ўз вақтида ҳал этиш ва тозалаш бригадаларини бошқариш самарадорлиги.'
+                          : 'Tuman bo‘yicha kelib tushgan murojaatlarni o‘z vaqtida hal etish va tozalash brigadalarini boshqarish samaradorligi.')
                       : user.role === 'Dispatcher'
-                      ? 'Murojaatlarni qabul qilish, brigadalarga taqsimlash va ijrosini nazorat qilish ko‘rsatkichi.'
-                      : 'Sizga biriktirilgan murojaatlarni sifatli tozalash, fotosurat hisobotlarini taqdim etish va mas’ullar tomonidan qabul qilinish ko‘rsatkichi.'}
+                      ? (lang === 'oz'
+                          ? 'Мурожаатларни қабул қилиш, бригадаларга тақсимлаш ва ижросини назорат қилиш кўрсаткичи.'
+                          : 'Murojaatlarni qabul qilish, brigadalarga taqsimlash va ijrosini nazorat qilish ko‘rsatkichi.')
+                      : (lang === 'oz'
+                          ? 'Сизга бириктирилган мурожаатларни сифатли тозалаш, фотосурат ҳисоботларини тақдим этиш ва масъуллар томонидан қабул қилиниш кўрсаткичи.'
+                          : 'Sizga biriktirilgan murojaatlarni sifatli tozalash, fotosurat hisobotlarini taqdim etish va mas’ullar tomonidan qabul qilinish ko‘rsatkichi.')}
                   </Typography>
                 </Box>
 
@@ -518,7 +527,15 @@ export const MyAccountPage: React.FC = () => {
                     </Typography>
                     <Chip
                       size="small"
-                      label={stats.completionRate >= 90 ? "A'lo" : stats.completionRate >= 70 ? "Yaxshi" : stats.completionRate >= 50 ? "O‘rtacha" : "Qoniqarsiz"}
+                      label={
+                        stats.completionRate >= 90
+                          ? (lang === 'oz' ? 'Аъло' : "A'lo")
+                          : stats.completionRate >= 70
+                          ? (lang === 'oz' ? 'Яхши' : 'Yaxshi')
+                          : stats.completionRate >= 50
+                          ? (lang === 'oz' ? 'Ўртача' : 'O‘rtacha')
+                          : (lang === 'oz' ? 'Қониқарсиз' : 'Qoniqarsiz')
+                      }
                       sx={{
                         height: 18,
                         fontSize: '0.62rem',

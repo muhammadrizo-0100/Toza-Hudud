@@ -20,6 +20,7 @@ import DataTableCard from '../../../components/common/DataTableCard';
 import { AppTable } from '../../../components/common/AppTable';
 import { District } from '../../../types';
 import { useTranslation } from '../../../i18n';
+import { translateDistrictName } from '../../../utils/districtNames';
 
 interface DistrictsListTableProps {
   districts: District[];
@@ -98,9 +99,9 @@ export const DistrictsListTable: React.FC<DistrictsListTableProps> = ({
                 >
                   <TableCell sx={{ py: 1.5 }}>
                     <Typography variant="body2" sx={{ fontWeight: isSelected ? 600 : 500, color: isSelected ? 'primary.main' : '#1E293B', fontSize: '0.88rem' }}>
-                      {d.name}
+                      {translateDistrictName(d.name, lang)}
                     </Typography>
-                    <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.75rem' }}>Kod: {d.code}</Typography>
+                    <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.75rem' }}>{lang === 'oz' ? 'Код' : 'Kod'}: {d.code}</Typography>
                   </TableCell>
                   <TableCell align="center" sx={{ py: 1.5 }}>
                     <Chip

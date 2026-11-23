@@ -16,6 +16,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import { District } from '../../../types';
 import { useCreateMahallaMutation } from '../../../api/mahallasApi';
 import { useToast } from '../../../context/ToastContext';
+import { useTranslation } from '../../../i18n';
+import { translateDistrictName } from '../../../utils/districtNames';
 import AppSelectField from '../../../components/common/AppSelectField';
 
 interface MahallaAddDialogProps {
@@ -34,6 +36,7 @@ export const MahallaAddDialog: React.FC<MahallaAddDialogProps> = ({
   onCreated
 }) => {
   const { showSuccess, showError } = useToast();
+  const { t, lang } = useTranslation();
   const [createMahalla, { isLoading: creating }] = useCreateMahallaMutation();
   const [targetDistrictId, setTargetDistrictId] = useState<number | ''>('');
   const [name, setName] = useState('');
@@ -55,13 +58,17 @@ export const MahallaAddDialog: React.FC<MahallaAddDialogProps> = ({
     setErrorMsg(null);
     try {
       await createMahalla({ districtId: chosenDistrictId, name: trimmed }).unwrap();
-      showSuccess(`"${trimmed}" mahallasi muvaffaqiyatli qo‘shildi!`);
+      showSuccess(
+        lang === 'oz'
+          ? `"${trimmed}" маҳалласи муваффақиятли қўшилди!`
+          : `"${trimmed}" mahallasi muvaffaqiyatli qo‘shildi!`
+      );
       onCreated(chosenDistrictId, trimmed);
       onClose();
     } catch (err: unknown) {
       const msg =
         (err as { data?: { message?: string } })?.data?.message ||
-        'Mahalla qo‘shishda xatolik yuz berdi.';
+        (lang === 'oz' ? 'Маҳалла қўшишда хатолик юз берди.' : 'Mahalla qo‘shishda xatolik yuz berdi.');
       setErrorMsg(msg);
       showError(msg);
     }
@@ -71,7 +78,7 @@ export const MahallaAddDialog: React.FC<MahallaAddDialogProps> = ({
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth PaperProps={{ sx: { borderRadius: '16px', p: 1.5 } }}>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 2, pt: 1, pb: 0.5 }}>
         <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.05rem', color: '#0F172A' }}>
-          Yangi mahalla qo‘shish
+          {lang === 'oz' ? 'Янги маҳалла қўшиш' : 'Yangi mahalla qo‘shish'}
         </Typography>
         <IconButton size="small" onClick={onClose} sx={{ color: '#94A3B8', '&:hover': { color: '#0F172A' } }}>
           <CloseIcon sx={{ fontSize: 18 }} />
@@ -83,22 +90,25 @@ export const MahallaAddDialog: React.FC<MahallaAddDialogProps> = ({
           {errorMsg && <Alert severity="error" sx={{ fontSize: '0.82rem', borderRadius: '8px' }}>{errorMsg}</Alert>}
           <Box>
             <Typography variant="caption" sx={{ color: '#475569', fontWeight: 600, display: 'block', mb: 0.5 }}>
-              Biriktiriladigan tuman
+              {lang === 'oz' ? 'Бириктириладиган туман' : 'Biriktiriladigan tuman'}
             </Typography>
             <AppSelectField
               value={targetDistrictId}
               onChange={(e) => setTargetDistrictId(Number(e.target.value))}
-              options={districts.map((d) => ({ value: d.id, label: d.name }))}
+              options={districts.map((d) => ({
+                value: d.id,
+                label: translateDistrictName(d.name, lang)
+              }))}
             />
           </Box>
           <Box>
             <Typography variant="caption" sx={{ color: '#475569', fontWeight: 600, display: 'block', mb: 0.5 }}>
-              Mahalla nomi
+              {lang === 'oz' ? 'Маҳалла номи' : 'Mahalla nomi'}
             </Typography>
             <TextField
               fullWidth
               size="small"
-              placeholder="Masalan: Guliston MFY yoki Navbahor MFY"
+              placeholder={lang === 'oz' ? 'Масалан: Гулистон МФЙ ёки Навбаҳор МФЙ' : 'Masalan: Guliston MFY yoki Navbahor MFY'}
               value={name}
               onChange={(e) => { setName(e.target.value); setErrorMsg(null); }}
               autoFocus
@@ -116,7 +126,7 @@ export const MahallaAddDialog: React.FC<MahallaAddDialogProps> = ({
           disabled={!name.trim() || !targetDistrictId || creating}
           sx={{ height: 42, borderRadius: '10px', bgcolor: 'primary.main', fontWeight: 600, textTransform: 'none' }}
         >
-          {creating ? <CircularProgress size={20} color="inherit" /> : 'Mahallani saqlash'}
+          {creating ? <CircularProgress size={20} color="inherit" /> : (lang === 'oz' ? 'Маҳаллани сақлаш' : 'Mahallani saqlash')}
         </Button>
       </DialogActions>
     </Dialog>

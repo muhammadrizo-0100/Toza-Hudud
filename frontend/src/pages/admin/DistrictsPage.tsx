@@ -10,6 +10,7 @@ import AppBreadcrumbs from '../../components/common/AppBreadcrumbs';
 import { useToast } from '../../context/ToastContext';
 import { District, Mahalla } from '../../types';
 import { useTranslation } from '../../i18n';
+import { translateDistrictName } from '../../utils/districtNames';
 
 import { DistrictsListTable } from './districts/DistrictsListTable';
 import { MahallasListTable } from './districts/MahallasListTable';
@@ -48,7 +49,11 @@ export const DistrictsPage: React.FC = () => {
     if (!districtToDelete) return;
     try {
       await deleteDistrict(districtToDelete.id).unwrap();
-      showSuccess(`"${districtToDelete.name}" tumani muvaffaqiyatli o‘chirildi`);
+      showSuccess(
+        lang === 'oz'
+          ? `"${translateDistrictName(districtToDelete.name, 'oz')}" муваффақиятли ўчирилди`
+          : `"${districtToDelete.name}" tumani muvaffaqiyatli o‘chirildi`
+      );
       if (selectedDistrictId === districtToDelete.id) setSelectedDistrictId(null);
       setDistrictToDelete(null);
     } catch (err: unknown) {
@@ -125,7 +130,7 @@ export const DistrictsPage: React.FC = () => {
         title={lang === 'oz' ? 'Туманни ўчириш' : 'Tumanni o‘chirish'}
         message={
           lang === 'oz'
-            ? `Ҳақиқатан ҳам "${districtToDelete?.name}" туманини ўчиришни тасдиқлайсизми? Унга бириктирилган барча маҳаллалар ҳам ўчирилади.`
+            ? `Ҳақиқатан ҳам "${translateDistrictName(districtToDelete?.name, 'oz')}" туманини ўчиришни тасдиқлайсизми? Унга бириктирилган барча маҳаллалар ҳам ўчирилади.`
             : `Haqiqatan ham "${districtToDelete?.name}" tumanini o‘chirishni tasdiqlaysizmi? Unga biriktirilgan barcha mahallalar ham o‘chiriladi.`
         }
         confirmLabel={t('common.delete')}

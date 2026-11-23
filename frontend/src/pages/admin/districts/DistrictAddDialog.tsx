@@ -16,6 +16,8 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { District } from '../../../types';
 import { useCreateDistrictMutation } from '../../../api/districtsApi';
 import { useToast } from '../../../context/ToastContext';
+import { useTranslation } from '../../../i18n';
+import { translateDistrictName } from '../../../utils/districtNames';
 import AppSelectField from '../../../components/common/AppSelectField';
 import { NAMANGAN_DISTRICTS } from './districts.constants';
 
@@ -33,6 +35,7 @@ export const DistrictAddDialog: React.FC<DistrictAddDialogProps> = ({
   onCreated
 }) => {
   const { showSuccess, showError } = useToast();
+  const { t, lang } = useTranslation();
   const [createDistrict, { isLoading: creating }] = useCreateDistrictMutation();
   const [selectedName, setSelectedName] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -60,14 +63,18 @@ export const DistrictAddDialog: React.FC<DistrictAddDialogProps> = ({
         fetchOsmBoundary: true
       }).unwrap();
 
-      showSuccess(`"${res.name}" tumani muvaffaqiyatli qo‘shildi!`);
+      showSuccess(
+        lang === 'oz'
+          ? `"${translateDistrictName(res.name, 'oz')}" муваффақиятли қўшилди!`
+          : `"${res.name}" tumani muvaffaqiyatli qo‘shildi!`
+      );
       onCreated(res);
       setSelectedName('');
       onClose();
     } catch (err: unknown) {
       const msg =
         (err as { data?: { message?: string } })?.data?.message ||
-        'Tuman qo‘shishda xatolik yuz berdi.';
+        (lang === 'oz' ? 'Туман қўшишда хатолик юз берди.' : 'Tuman qo‘shishda xatolik yuz berdi.');
       setErrorMsg(msg);
       showError(msg);
     }
@@ -79,7 +86,7 @@ export const DistrictAddDialog: React.FC<DistrictAddDialogProps> = ({
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth PaperProps={{ sx: { borderRadius: '16px', p: 1.5 } }}>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 2, pt: 1, pb: 0.5 }}>
         <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.05rem', color: '#0F172A' }}>
-          Yangi tuman qo‘shish
+          {lang === 'oz' ? 'Янги туман қўшиш' : 'Yangi tuman qo‘shish'}
         </Typography>
         <IconButton size="small" onClick={onClose} sx={{ color: '#94A3B8', '&:hover': { color: '#0F172A' } }}>
           <CloseIcon sx={{ fontSize: 18 }} />
@@ -96,12 +103,14 @@ export const DistrictAddDialog: React.FC<DistrictAddDialogProps> = ({
 
           {allAdded ? (
             <Alert severity="success" icon={<CheckCircleOutlineIcon fontSize="inherit" />} sx={{ fontSize: '0.85rem', borderRadius: '10px' }}>
-              Namangan viloyatining barcha 14 ta tumani tizimga to‘liq kiritilgan va faol.
+              {lang === 'oz'
+                ? 'Наманган вилоятининг барча 14 та тумани тизимга тўлиқ киритилган ва фаол.'
+                : 'Namangan viloyatining barcha 14 ta tumani tizimga to‘liq kiritilgan va faol.'}
             </Alert>
           ) : (
             <Box>
               <Typography variant="caption" sx={{ color: '#475569', fontWeight: 600, display: 'block', mb: 0.5 }}>
-                Tuman nomi
+                {lang === 'oz' ? 'Туман номи' : 'Tuman nomi'}
               </Typography>
               <AppSelectField
                 value={selectedName}
@@ -111,7 +120,7 @@ export const DistrictAddDialog: React.FC<DistrictAddDialogProps> = ({
                 }}
                 options={missingDistricts.map((d) => ({
                   value: d.name,
-                  label: d.name
+                  label: translateDistrictName(d.name, lang)
                 }))}
               />
             </Box>
@@ -127,7 +136,7 @@ export const DistrictAddDialog: React.FC<DistrictAddDialogProps> = ({
             onClick={onClose}
             sx={{ height: 40, borderRadius: '10px', textTransform: 'none', fontWeight: 600 }}
           >
-            Yopish
+            {t('common.close')}
           </Button>
         ) : (
           <Button
@@ -145,7 +154,7 @@ export const DistrictAddDialog: React.FC<DistrictAddDialogProps> = ({
               '&:hover': { bgcolor: 'primary.dark', boxShadow: 'none' }
             }}
           >
-            {creating ? <CircularProgress size={20} color="inherit" /> : 'Tumanni qo‘shish'}
+            {creating ? <CircularProgress size={20} color="inherit" /> : (lang === 'oz' ? 'Туманни қўшиш' : 'Tumanni qo‘shish')}
           </Button>
         )}
       </DialogActions>

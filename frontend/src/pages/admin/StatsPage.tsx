@@ -37,6 +37,7 @@ import AppButton from '../../components/common/AppButton';
 import AppBreadcrumbs from '../../components/common/AppBreadcrumbs';
 import { useAppSelector } from '../../store/hooks';
 import { useTranslation } from '../../i18n';
+import { translateDistrictName } from '../../utils/districtNames';
 import DataTableCard from '../../components/common/DataTableCard';
 import { AppTable } from '../../components/common/AppTable';
 import { TableBody, TableCell, TableHead, TableRow } from '@mui/material';
@@ -78,6 +79,41 @@ const renderInnerPieLabel = ({
   );
 };
 
+const translateCategoryName = (name: string, lang: 'uz' | 'oz'): string => {
+  if (lang !== 'oz') return name;
+  const map: Record<string, string> = {
+    'Maishiy chiqindilar': 'Маиший чиқиндилар',
+    'Maishiy': 'Маиший',
+    'Qurilish chiqindilari': 'Қурилиш чиқиндилари',
+    'Qurilish': 'Қурилиш',
+    'Xazon va shoxlar': 'Хазон ва шохлар',
+    'Xazon': 'Хазон',
+    'Yirik gabaritli chiqindilar': 'Йирик габаритли чиқиндилар',
+    'Yirik gabaritli': 'Йирик габаритли',
+    'Noqonuniy tashlandiq': 'Ноқонуний ташландиқ',
+    'Noqonuniy': 'Ноқонуний'
+  };
+  return map[name] || name;
+};
+
+const translateDateLabel = (label: string | undefined, lang: 'uz' | 'oz'): string => {
+  if (!label) return '';
+  if (lang !== 'oz') return label;
+  return label
+    .replace(/\byan\b/gi, 'янв')
+    .replace(/\bfev\b/gi, 'фев')
+    .replace(/\bmar\b/gi, 'мар')
+    .replace(/\bapr\b/gi, 'апр')
+    .replace(/\bmay\b/gi, 'май')
+    .replace(/\biyun\b/gi, 'июн')
+    .replace(/\biyul\b/gi, 'июл')
+    .replace(/\bavg\b/gi, 'авг')
+    .replace(/\bsen\b/gi, 'сен')
+    .replace(/\bokt\b/gi, 'окт')
+    .replace(/\bnoy\b/gi, 'ноя')
+    .replace(/\bdek\b/gi, 'дек');
+};
+
 export const StatsPage: React.FC = () => {
   const { user } = useAppSelector((state) => state.auth);
   const { t, lang } = useTranslation();
@@ -116,15 +152,31 @@ export const StatsPage: React.FC = () => {
       return [];
     }
     return stats.categoryList.map((item) => ({
-      name: item.name,
+      name: translateCategoryName(item.name, lang),
       value: item.value,
       percent: item.percent
     }));
-  }, [stats]);
+  }, [stats, lang]);
 
   const totalCategorySum = useMemo(() => {
     return categoryPieData.reduce((acc, cur) => acc + cur.value, 0);
   }, [categoryPieData]);
+
+  const translatedDailyTrend = useMemo(() => {
+    if (!stats?.dailyTrend) return [];
+    return stats.dailyTrend.map((d) => ({
+      ...d,
+      dateLabel: translateDateLabel(d.dateLabel, lang)
+    }));
+  }, [stats?.dailyTrend, lang]);
+
+  const translatedDistrictBreakdown = useMemo(() => {
+    if (!stats?.districtBreakdown) return [];
+    return stats.districtBreakdown.map((d) => ({
+      ...d,
+      name: translateDistrictName(d.name, lang)
+    }));
+  }, [stats?.districtBreakdown, lang]);
 
   if (isLoading || !stats) {
     return (
@@ -134,15 +186,15 @@ export const StatsPage: React.FC = () => {
     );
   }
 
-  const { overall, dailyTrend, mahallaBreakdown, districtBreakdown } = stats;
+  const { overall, mahallaBreakdown } = stats;
 
   const completionRate = overall.total > 0 ? Math.round((overall.completed / overall.total) * 100) : 0;
 
   const statusBarData = [
-    { name: 'Yangi', count: overall.new, fill: '#0284C7' },
-    { name: 'Jarayonda', count: overall.inProgress, fill: '#F59E0B' },
-    { name: 'Tasdiqda', count: overall.submitted, fill: '#6366F1' },
-    { name: 'Tozalandi', count: overall.completed, fill: '#10B981' }
+    { name: lang === 'oz' ? 'Янги' : 'Yangi', count: overall.new, fill: '#0284C7' },
+    { name: lang === 'oz' ? 'Жараёнда' : 'Jarayonda', count: overall.inProgress, fill: '#F59E0B' },
+    { name: lang === 'oz' ? 'Тасдиқда' : 'Tasdiqda', count: overall.submitted, fill: '#6366F1' },
+    { name: lang === 'oz' ? 'Тозаланди' : 'Tozalandi', count: overall.completed, fill: '#10B981' }
   ];
 
   return (
@@ -182,7 +234,7 @@ export const StatsPage: React.FC = () => {
               onChange={(e) => setDistrictId(e.target.value ? Number(e.target.value) : '')}
               options={[
                 { value: '', label: t('common.allDistricts') },
-                ...districts.map((d) => ({ value: d.id, label: d.name }))
+                ...districts.map((d) => ({ value: d.id, label: translateDistrictName(d.name, lang) }))
               ]}
             />
           </Box>
@@ -212,7 +264,7 @@ export const StatsPage: React.FC = () => {
               <AssignmentOutlinedIcon fontSize="small" />
             </Box>
             <Typography variant="caption" color="text.secondary" fontWeight={700}>
-              JAMI MUROJAATLAR
+              {lang === 'oz' ? 'ЖАМИ МУРОЖААТЛАР' : 'JAMI MUROJAATLAR'}
             </Typography>
           </Stack>
           <Typography variant="h4" fontWeight={800}>
@@ -226,7 +278,7 @@ export const StatsPage: React.FC = () => {
               <CheckCircleOutlinedIcon fontSize="small" />
             </Box>
             <Typography variant="caption" color="text.secondary" fontWeight={700}>
-              YAKUNLANGAN (TOZALANDI)
+              {lang === 'oz' ? 'ЯКУНЛАНГАН (ТОЗАЛАНДИ)' : 'YAKUNLANGAN (TOZALANDI)'}
             </Typography>
           </Stack>
           <Typography variant="h4" fontWeight={800} color="#059669">
@@ -240,7 +292,7 @@ export const StatsPage: React.FC = () => {
               <PlayCircleOutlineOutlinedIcon fontSize="small" />
             </Box>
             <Typography variant="caption" color="text.secondary" fontWeight={700}>
-              FAOL (JARAYONDA)
+              {lang === 'oz' ? 'ФАОЛ (ЖАРАЁНДА)' : 'FAOL (JARAYONDA)'}
             </Typography>
           </Stack>
           <Typography variant="h4" fontWeight={800} color="#D97706">
@@ -254,7 +306,7 @@ export const StatsPage: React.FC = () => {
               <TrendingUpOutlinedIcon fontSize="small" />
             </Box>
             <Typography variant="caption" color="text.secondary" fontWeight={700}>
-              YECHIM DARAJASI
+              {lang === 'oz' ? 'ЕЧИМ ДАРАЖАСИ' : 'YECHIM DARAJASI'}
             </Typography>
           </Stack>
           <Typography variant="h4" fontWeight={800} color="#BE185D">
@@ -268,12 +320,12 @@ export const StatsPage: React.FC = () => {
               <AccessTimeOutlinedIcon fontSize="small" />
             </Box>
             <Typography variant="caption" color="text.secondary" fontWeight={700}>
-              O‘RTACHA BAJARISH
+              {lang === 'oz' ? 'ЎРТАЧА БАЖАРИШ' : 'O‘RTACHA BAJARISH'}
             </Typography>
           </Stack>
           <Typography variant="h4" fontWeight={800} color="#0284C7">
             {(overall as any).avgResolutionHours && (overall as any).avgResolutionHours > 0
-              ? `${(overall as any).avgResolutionHours} soat`
+              ? `${(overall as any).avgResolutionHours} ${lang === 'oz' ? 'соат' : 'soat'}`
               : '-'}
           </Typography>
         </Paper>
@@ -284,14 +336,16 @@ export const StatsPage: React.FC = () => {
         {/* 1. Murojaatlar dinamikasi (Curved LineChart) */}
         <DataTableCard sx={{ p: 2.5 }}>
           <Typography variant="h6" fontWeight={800} sx={{ mb: 0.5 }}>
-            Murojaatlar dinamikasi
+            {lang === 'oz' ? 'Мурожаатлар динамикаси' : 'Murojaatlar dinamikasi'}
           </Typography>
           <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
-            Sariq: Faol muammolar | Ko‘k: Jami tushgan | Yashil: Yakunlangan tozalash
+            {lang === 'oz'
+              ? 'Сариқ: Фаол муаммолар | Кўк: Жами тушган | Яшил: Якунланган тозалаш'
+              : 'Sariq: Faol muammolar | Ko‘k: Jami tushgan | Yashil: Yakunlangan tozalash'}
           </Typography>
           <Box sx={{ height: 300, width: '100%' }}>
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={dailyTrend} margin={{ top: 12, right: 15, bottom: 5, left: -10 }}>
+              <LineChart data={translatedDailyTrend} margin={{ top: 12, right: 15, bottom: 5, left: -10 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
                 <XAxis
                   dataKey="dateLabel"
@@ -306,7 +360,7 @@ export const StatsPage: React.FC = () => {
                     boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
                     fontSize: '0.85rem'
                   }}
-                  formatter={(val: any, name: any) => [`${val} ta`, name]}
+                  formatter={(val: any, name: any) => [`${val} ${lang === 'oz' ? 'та' : 'ta'}`, name]}
                 />
                 <Legend
                   wrapperStyle={{ paddingTop: 10, fontSize: '0.82rem' }}
@@ -315,7 +369,7 @@ export const StatsPage: React.FC = () => {
                 <Line
                   type="monotone"
                   dataKey="active"
-                  name="Faol muammo"
+                  name={lang === 'oz' ? 'Фаол муаммо' : 'Faol muammo'}
                   stroke="#F59E0B"
                   strokeWidth={2.8}
                   dot={{ r: 3, fill: '#F59E0B', strokeWidth: 1 }}
@@ -324,7 +378,7 @@ export const StatsPage: React.FC = () => {
                 <Line
                   type="monotone"
                   dataKey="total"
-                  name="Jami tushgan"
+                  name={lang === 'oz' ? 'Жами тушган' : 'Jami tushgan'}
                   stroke="#0284C7"
                   strokeWidth={2.8}
                   dot={{ r: 3, fill: '#0284C7', strokeWidth: 1 }}
@@ -333,7 +387,7 @@ export const StatsPage: React.FC = () => {
                 <Line
                   type="monotone"
                   dataKey="completed"
-                  name="Yakunlangan"
+                  name={lang === 'oz' ? 'Якунланган' : 'Yakunlangan'}
                   stroke="#10B981"
                   strokeWidth={2.8}
                   dot={{ r: 3, fill: '#10B981', strokeWidth: 1 }}
@@ -347,10 +401,12 @@ export const StatsPage: React.FC = () => {
         {/* 2. Holatlar nisbati (BarChart) */}
         <DataTableCard sx={{ p: 2.5 }}>
           <Typography variant="h6" fontWeight={800} sx={{ mb: 0.5 }}>
-            Holatlar nisbati
+            {lang === 'oz' ? 'Ҳолатлар нисбати' : 'Holatlar nisbati'}
           </Typography>
           <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
-            Murojaatlarning ijro bosqichlari bo‘yicha taqsimlanishi
+            {lang === 'oz'
+              ? 'Мурожаатларнинг ижро босқичлари бўйича тақсимланиши'
+              : 'Murojaatlarning ijro bosqichlari bo‘yicha taqsimlanishi'}
           </Typography>
           <Box sx={{ height: 300, width: '100%' }}>
             <ResponsiveContainer width="100%" height="100%">
@@ -360,9 +416,9 @@ export const StatsPage: React.FC = () => {
                 <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: '#64748B' }} />
                 <Tooltip
                   contentStyle={{ borderRadius: 10, border: '1px solid #E2E8F0' }}
-                  formatter={(val: any, name: any) => [`${val} ta`, name]}
+                  formatter={(val: any, name: any) => [`${val} ${lang === 'oz' ? 'та' : 'ta'}`, name]}
                 />
-                <Bar dataKey="count" name="Arizalar soni" radius={[6, 6, 0, 0]} barSize={36}>
+                <Bar dataKey="count" name={lang === 'oz' ? 'Аризалар сони' : 'Arizalar soni'} radius={[6, 6, 0, 0]} barSize={36}>
                   {statusBarData.map((entry, index) => (
                     <Cell key={index} fill={entry.fill} />
                   ))}
@@ -375,15 +431,19 @@ export const StatsPage: React.FC = () => {
         {/* 3. Yo‘nalishlar bo‘yicha ulush (Donut / PieChart) */}
         <DataTableCard sx={{ p: 2.5 }}>
           <Typography variant="h6" fontWeight={800} sx={{ mb: 0.5 }}>
-            Yo‘nalishlar bo‘yicha ulush
+            {lang === 'oz' ? 'Йўналишлар бўйича улуш' : 'Yo‘nalishlar bo‘yicha ulush'}
           </Typography>
           <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
-            Kategoriyalar nisbati (Jami: {totalCategorySum} ta)
+            {lang === 'oz'
+              ? `Категориялар нисбати (Жами: ${totalCategorySum} та)`
+              : `Kategoriyalar nisbati (Jami: ${totalCategorySum} ta)`}
           </Typography>
           {totalCategorySum === 0 ? (
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 290, width: '100%' }}>
               <Typography variant="body2" color="text.secondary">
-                Hozircha chiqindi toifalari bo‘yicha arizalar mavjud emas
+                {lang === 'oz'
+                  ? 'Ҳозирча чиқинди тоифалари бўйича аризалар мавжуд эмас'
+                  : 'Hozircha chiqindi toifalari bo‘yicha arizalar mavjud emas'}
               </Typography>
             </Box>
           ) : (
@@ -437,10 +497,10 @@ export const StatsPage: React.FC = () => {
                       fontSize={11}
                       fontWeight={700}
                     >
-                      Jami arizalar
+                      {lang === 'oz' ? 'Жами аризалар' : 'Jami arizalar'}
                     </text>
                     <Tooltip
-                      formatter={(val: any, name: any) => [`${val} ta`, name]}
+                      formatter={(val: any, name: any) => [`${val} ${lang === 'oz' ? 'та' : 'ta'}`, name]}
                       contentStyle={{
                         borderRadius: 10,
                         border: '1px solid #E2E8F0',
@@ -506,7 +566,7 @@ export const StatsPage: React.FC = () => {
                           whiteSpace: 'nowrap'
                         }}
                       >
-                        {item.value} ta ({item.percent}%)
+                        {item.value} {lang === 'oz' ? 'та' : 'ta'} ({item.percent}%)
                       </Typography>
                     </Box>
                   );
@@ -519,15 +579,17 @@ export const StatsPage: React.FC = () => {
         {/* 4. Tumanlar kesimi bo‘yicha yuklama (Horizontal BarChart) */}
         <DataTableCard sx={{ p: 2.5 }}>
           <Typography variant="h6" fontWeight={800} sx={{ mb: 0.5 }}>
-            Tumanlar kesimi bo‘yicha yuklama
+            {lang === 'oz' ? 'Туманлар кесими бўйича юклама' : 'Tumanlar kesimi bo‘yicha yuklama'}
           </Typography>
           <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
-            Tuman sanitar bo‘limlari o‘rtasidagi yuklama solishtiruvi
+            {lang === 'oz'
+              ? 'Туман санитар бўлимлари ўртасидаги юклама солиштируви'
+              : 'Tuman sanitar bo‘limlari o‘rtasidagi yuklama solishtiruvi'}
           </Typography>
           <Box sx={{ height: 280, width: '100%' }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
-                data={districtBreakdown}
+                data={translatedDistrictBreakdown}
                 layout="vertical"
                 margin={{ top: 10, right: 20, bottom: 5, left: 30 }}
               >
@@ -536,8 +598,8 @@ export const StatsPage: React.FC = () => {
                 <YAxis dataKey="name" type="category" tick={{ fontSize: 12, fill: '#334155' }} width={110} />
                 <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid #E2E8F0' }} />
                 <Legend wrapperStyle={{ paddingTop: 8, fontSize: '0.8rem' }} />
-                <Bar dataKey="total" name="Jami arizalar" fill="#0284C7" radius={[0, 4, 4, 0]} barSize={14} />
-                <Bar dataKey="completed" name="Tozalangan" fill="#10B981" radius={[0, 4, 4, 0]} barSize={14} />
+                <Bar dataKey="total" name={lang === 'oz' ? 'Жами аризалар' : 'Jami arizalar'} fill="#0284C7" radius={[0, 4, 4, 0]} barSize={14} />
+                <Bar dataKey="completed" name={lang === 'oz' ? 'Тозаланган' : 'Tozalangan'} fill="#10B981" radius={[0, 4, 4, 0]} barSize={14} />
               </BarChart>
             </ResponsiveContainer>
           </Box>
@@ -548,19 +610,21 @@ export const StatsPage: React.FC = () => {
       <DataTableCard>
         <Box sx={{ px: 1, pb: 1.5 }}>
           <Typography variant="h5" fontWeight={800}>
-            Eng ko‘p ariza tushgan mahallalar reytingi
+            {lang === 'oz' ? 'Энг кўп ариза тушган маҳаллалар рейтинги' : 'Eng ko‘p ariza tushgan mahallalar reytingi'}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Sanitar tozalash ehtiyoji yuqori bo‘lgan mahallalar ko‘rsatkichlari
+            {lang === 'oz'
+              ? 'Санитар тозалаш эҳтиёжи юқори бўлган маҳаллалар кўрсаткичлари'
+              : 'Sanitar tozalash ehtiyoji yuqori bo‘lgan mahallalar ko‘rsatkichlari'}
           </Typography>
         </Box>
         <AppTable>
           <TableHead>
             <TableRow>
-              <TableCell>O‘rin</TableCell>
-              <TableCell>Mahalla nomi</TableCell>
-              <TableCell align="center">Murojaatlar soni</TableCell>
-              <TableCell align="center">Ulush</TableCell>
+              <TableCell>{lang === 'oz' ? 'Ўрин' : 'O‘rin'}</TableCell>
+              <TableCell>{lang === 'oz' ? 'Маҳалла номи' : 'Mahalla nomi'}</TableCell>
+              <TableCell align="center">{lang === 'oz' ? 'Мурожаатлар сони' : 'Murojaatlar soni'}</TableCell>
+              <TableCell align="center">{lang === 'oz' ? 'Улуш' : 'Ulush'}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
