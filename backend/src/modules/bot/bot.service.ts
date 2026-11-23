@@ -464,9 +464,8 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
     bot.hears('📞 Aloqa', async (ctx) => {
       await ctx.reply(
         `📞 **"Toza Hudud" axborot xizmati:**\n\n` +
-        `• Call-markaz: +998 (71) 200-00-00\n` +
-        `• Ish vaqti: Har kuni 08:00 dan 20:00 gacha\n` +
-        `• Manzil: Hududiy sanitar-tozalash boshqarmasi`
+        `ℹ️ Hozircha dispetcherlik xizmati mavjud emas.\n\n` +
+        `Chiqindilarni tozalash bo‘yicha murojaat yuborish uchun pastdagi **"📸 Chiqindi haqida xabar berish"** tugmasidan foydalanishingiz mumkin.`
       );
     });
 
