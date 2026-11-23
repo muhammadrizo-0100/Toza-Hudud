@@ -19,6 +19,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { UZBEKISTAN_BOUNDS, UZBEKISTAN_MIN_ZOOM } from '../../constants/boundaries';
 
 export const LocationPickerPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -56,16 +57,10 @@ export const LocationPickerPage: React.FC = () => {
     if (!mapContainerRef.current) return;
     if (mapRef.current) return;
 
-    // O‘zbekiston chegarasi (chegaradan chiqib ketishni qat'iy cheklash)
-    const UZBEKISTAN_BOUNDS: L.LatLngBoundsExpression = [
-      [37.15, 55.90], // Janubiy-G'arbiy burchak (Termiz / Qoraqalpog'iston)
-      [45.65, 73.20]  // Shimoliy-Sharqiy burchak (Farg'ona / Orol)
-    ];
-
     const map = L.map(mapContainerRef.current, {
       center: [initialLat, initialLng],
       zoom: 16,
-      minZoom: 6,
+      minZoom: UZBEKISTAN_MIN_ZOOM,
       maxZoom: 19,
       maxBounds: UZBEKISTAN_BOUNDS,
       maxBoundsViscosity: 1.0, // Xaritani O'zbekiston hududidan tashqariga surishni taqiqlaydi

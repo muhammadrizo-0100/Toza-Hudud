@@ -14,6 +14,8 @@ import {
   DAVLATOBOD_POLYGON,
   YANGI_NAMANGAN_POLYGON,
   CHUST_POLYGON,
+  UZBEKISTAN_BOUNDS,
+  UZBEKISTAN_MIN_ZOOM,
   getDistrictPolygon,
   normalizePolygon
 } from '../../constants/boundaries';
@@ -128,6 +130,9 @@ export const WasteMapCanvas: React.FC<WasteMapCanvasProps> = ({
     if (!mapContainerRef.current || mapRef.current) return;
 
     const map = L.map(mapContainerRef.current, {
+      minZoom: UZBEKISTAN_MIN_ZOOM,
+      maxBounds: UZBEKISTAN_BOUNDS,
+      maxBoundsViscosity: 1.0,
       zoomControl: true,
       attributionControl: false
     }).setView(DAVLATOBOD_CENTER, 12);

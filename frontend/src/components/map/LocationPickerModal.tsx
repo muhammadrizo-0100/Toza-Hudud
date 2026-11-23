@@ -23,6 +23,8 @@ import {
   DAVLATOBOD_POLYGON,
   YANGI_NAMANGAN_POLYGON,
   CHUST_POLYGON,
+  UZBEKISTAN_BOUNDS,
+  UZBEKISTAN_MIN_ZOOM,
   detectDistrictByPoint
 } from '../../constants/boundaries';
 
@@ -89,6 +91,9 @@ export const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
         const map = L.map(mapContainerRef.current, {
           center: defaultCenter,
           zoom: 14,
+          minZoom: UZBEKISTAN_MIN_ZOOM,
+          maxBounds: UZBEKISTAN_BOUNDS,
+          maxBoundsViscosity: 1.0,
           zoomControl: true
         });
 
