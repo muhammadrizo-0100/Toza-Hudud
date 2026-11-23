@@ -440,39 +440,6 @@ export const MyAccountPage: React.FC = () => {
                       ? 'Murojaatlarni qabul qilish, brigadalarga taqsimlash va ijrosini nazorat qilish ko‘rsatkichi.'
                       : 'Sizga biriktirilgan murojaatlarni sifatli tozalash, fotosurat hisobotlarini taqdim etish va mas’ullar tomonidan qabul qilinish ko‘rsatkichi.'}
                   </Typography>
-
-                  <Box sx={{ mt: 2.5 }}>
-                    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.75 }}>
-                      <Typography variant="caption" fontWeight={700} color="text.secondary">
-                        Umumiy holat nisbati:
-                      </Typography>
-                      <Chip
-                        size="small"
-                        label={`${stats.completed} / ${stats.total} ta yakunlangan`}
-                        sx={{
-                          fontWeight: 700,
-                          fontSize: '0.75rem',
-                          height: 24,
-                          bgcolor: '#ECFDF5',
-                          color: '#059669',
-                          borderRadius: '8px'
-                        }}
-                      />
-                    </Stack>
-                    <LinearProgress
-                      variant="determinate"
-                      value={stats.completionRate}
-                      sx={{
-                        height: 9,
-                        borderRadius: 5,
-                        bgcolor: '#F1F5F9',
-                        '& .MuiLinearProgress-bar': {
-                          bgcolor: stats.completionRate >= 80 ? '#059669' : stats.completionRate >= 50 ? '#D97706' : '#DC2626',
-                          borderRadius: 5
-                        }
-                      }}
-                    />
-                  </Box>
                 </Box>
 
                 {/* Circular Percentage Meter - Centered and Gorgeous */}
