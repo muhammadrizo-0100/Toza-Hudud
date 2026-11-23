@@ -94,6 +94,7 @@ export class RequestEntity {
   status!: RequestStatus;
 
   @Column({ name: 'assigned_worker_id', type: 'int', nullable: true })
+  @Index()
   assignedWorkerId!: number | null;
 
   @ManyToOne(() => WorkerEntity, (w) => w.assignedRequests, { nullable: true, onDelete: 'SET NULL' })
