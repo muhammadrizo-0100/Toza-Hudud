@@ -25,7 +25,7 @@ import AppButton from '../../../components/common/AppButton';
 import AppSelectField from '../../../components/common/AppSelectField';
 import { District, Mahalla } from '../../../types';
 import { useTranslation } from '../../../i18n';
-import { translateDistrictName } from '../../../utils/districtNames';
+import { translateDistrictName, translateMahallaName } from '../../../utils/districtNames';
 
 interface MahallasListTableProps {
   districts: District[];
@@ -137,7 +137,9 @@ export const MahallasListTable: React.FC<MahallasListTableProps> = ({
           ) : paginated.length === 0 ? (
             <TableRow>
               <TableCell colSpan={5} align="center" sx={{ py: 6, color: '#94A3B8', fontSize: '0.875rem' }}>
-                {search ? `"${search}" bo‘yicha mahalla topilmadi` : `"${activeDistrict?.name || 'Tanlangan tuman'}"ga hali mahallalar kiritilmagan`}
+                {search
+                  ? `"${search}" ${lang === 'oz' ? 'бўйича маҳалла топилмади' : 'bo‘yicha mahalla topilmadi'}`
+                  : `"${translateDistrictName(activeDistrict?.name, lang) || (lang === 'oz' ? 'Танланган туман' : 'Tanlangan tuman')}" ${lang === 'oz' ? 'га ҳали маҳаллалар киритилмаган' : 'ga hali mahallalar kiritilmagan'}`}
               </TableCell>
             </TableRow>
           ) : (
@@ -146,7 +148,9 @@ export const MahallasListTable: React.FC<MahallasListTableProps> = ({
                 <TableCell sx={{ color: '#94A3B8', fontWeight: 500, fontSize: '0.82rem', py: 1.5 }}>
                   {(page - 1) * PER_PAGE + idx + 1}
                 </TableCell>
-                <TableCell sx={{ fontWeight: 600, color: '#1E293B', fontSize: '0.88rem', py: 1.5 }}>{m.name}</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: '#1E293B', fontSize: '0.88rem', py: 1.5 }}>
+                  {translateMahallaName(m.name, lang)}
+                </TableCell>
                 <TableCell sx={{ py: 1.5 }}>
                   <Chip
                     size="small"

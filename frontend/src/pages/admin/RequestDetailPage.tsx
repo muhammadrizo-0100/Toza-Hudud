@@ -43,6 +43,24 @@ import AppImageUpload from '../../components/common/AppImageUpload';
 import AppBreadcrumbs from '../../components/common/AppBreadcrumbs';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { RequestItem } from '../../types';
+import { useTranslation } from '../../i18n';
+import { translateDistrictName, translateMahallaName } from '../../utils/districtNames';
+
+function getWasteTypeLabel(type?: string | null, lang: 'uz' | 'oz' = 'uz'): string {
+  switch (type) {
+    case 'qurilish':
+      return lang === 'oz' ? 'Қурилиш чиқиндилари' : 'Qurilish chiqindilari';
+    case 'xazon':
+      return lang === 'oz' ? 'Хазон ва шохлар' : 'Xazon va shoxlar';
+    case 'katta_hajmli':
+      return lang === 'oz' ? 'Йирик габаритли чиқиндилар' : 'Katta hajmli chiqindilar';
+    case 'noqonuniy':
+      return lang === 'oz' ? 'Ноқонуний ташландиқ' : 'Noqonuniy tashlandiq';
+    case 'maishiy':
+    default:
+      return lang === 'oz' ? 'Маиший чиқиндилар' : 'Maishiy chiqindilar';
+  }
+}
 
 interface RequestDetailPageProps {
   requestId: number;
@@ -76,6 +94,7 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
   onBack,
   onUpdated
 }) => {
+  const { t, lang } = useTranslation();
   const { data: request, isLoading, refetch } = useGetRequestByIdQuery(requestId, {
     refetchOnMountOrArgChange: true
   });
@@ -112,17 +131,23 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
       await assignWorker({ id: request.id, workerId: Number(selectedWorkerId) }).unwrap();
       showSuccess(
         request.status === 'rejected'
-          ? `Murojaat yangi xodimga muvaffaqiyatli qayta biriktirildi (#${request.id})`
+          ? (lang === 'oz'
+              ? `Мурожаат янги ходимга муваффақиятли қайта бириктирилди (#${request.id})`
+              : `Murojaat yangi xodimga muvaffaqiyatli qayta biriktirildi (#${request.id})`)
           : request.status === 'in_progress'
-          ? `Mas'ul xodim muvaffaqiyatli almashtirildi (#${request.id})`
-          : `Topshiriq xodimga muvaffaqiyatli biriktirildi (#${request.id})`
+          ? (lang === 'oz'
+              ? `Масъул ходим муваффақиятли алмаштирилди (#${request.id})`
+              : `Mas'ul xodim muvaffaqiyatli almashtirildi (#${request.id})`)
+          : (lang === 'oz'
+              ? `Топшириқ ходимга муваффақиятли бириктирилди (#${request.id})`
+              : `Topshiriq xodimga muvaffaqiyatli biriktirildi (#${request.id})`)
       );
       setSelectedWorkerId('');
       refetch();
       onUpdated?.();
     } catch (err: any) {
       console.error('Assign error:', err);
-      showError(err?.data?.message || 'Biriktirishda xatolik yuz berdi');
+      showError(err?.data?.message || (lang === 'oz' ? 'Бириктиришда хатолик юз берди' : 'Biriktirishda xatolik yuz berdi'));
     }
   };
 
@@ -130,12 +155,16 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
     if (!request) return;
     try {
       await verifyWork(request.id).unwrap();
-      showSuccess(`Murojaat #${request.id} tasdiqlandi va muvaffaqiyatli yakunlandi!`);
+      showSuccess(
+        lang === 'oz'
+          ? `Мурожаат #${request.id} тасдиқланди ва муваффақиятли якунланди!`
+          : `Murojaat #${request.id} tasdiqlandi va muvaffaqiyatli yakunlandi!`
+      );
       refetch();
       onUpdated?.();
     } catch (err: any) {
       console.error('Verify error:', err);
-      showError(err?.data?.message || 'Tasdiqlashda xatolik yuz berdi');
+      showError(err?.data?.message || (lang === 'oz' ? 'Тасдиқлашда хатолик юз берди' : 'Tasdiqlashda xatolik yuz berdi'));
     }
   };
 
@@ -147,13 +176,17 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
       } else {
         await submitWork({ id: request.id, afterPhotoUrl: request.beforePhotoUrl }).unwrap();
       }
-      showSuccess('Tozalash fotohisoboti yuklandi va tasdiqlash uchun yuborildi!');
+      showSuccess(
+        lang === 'oz'
+          ? 'Тозалаш фотоҳисоботи юкланди ва тасдиқлаш учун юборилди!'
+          : 'Tozalash fotohisoboti yuklandi va tasdiqlash uchun yuborildi!'
+      );
       setCompleteModalOpen(false);
       refetch();
       onUpdated?.();
     } catch (err: any) {
       console.error('Complete error:', err);
-      showError(err?.data?.message || 'Hisobotni yuborishda xatolik yuz berdi');
+      showError(err?.data?.message || (lang === 'oz' ? 'Ҳисоботни юборишда хатолик юз берди' : 'Hisobotni yuborishda xatolik yuz berdi'));
     }
   };
 
@@ -161,19 +194,23 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
     if (!request) return;
     const cleanReason = rejectReason.trim();
     if (!cleanReason || cleanReason.length < 5) {
-      showError('Iltimos, rad etish sababini aniqroq yozing (kamida 5 ta belgi)');
+      showError(
+        lang === 'oz'
+          ? 'Илтимос, рад этиш сабабини аниқроқ ёзинг (камида 5 та белги)'
+          : 'Iltimos, rad etish sababini aniqroq yozing (kamida 5 ta belgi)'
+      );
       return;
     }
     try {
       await rejectWork({ id: request.id, reason: cleanReason }).unwrap();
-      showWarning(`Murojaat #${request.id} rad etildi`);
+      showWarning(lang === 'oz' ? `Мурожаат #${request.id} рад этилди` : `Murojaat #${request.id} rad etildi`);
       setRejectModalOpen(false);
       setRejectReason('');
       refetch();
       onUpdated?.();
     } catch (err: any) {
       console.error('Reject error:', err);
-      showError(err?.data?.message || 'Rad etishda xatolik yuz berdi');
+      showError(err?.data?.message || (lang === 'oz' ? 'Рад этишда хатолик юз берди' : 'Rad etishda xatolik yuz berdi'));
     }
   };
 
@@ -196,8 +233,8 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
       {/* Breadcrumbs for deep navigation */}
       <AppBreadcrumbs
         items={[
-          { label: 'Murojaatlar', path: '/admin/requests' },
-          { label: `Murojaat #${request.id}` }
+          { label: t('nav.requests'), path: '/admin/requests' },
+          { label: `${lang === 'oz' ? 'Мурожаат' : 'Murojaat'} #${request.id}` }
         ]}
       />
 
@@ -209,10 +246,10 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
           onClick={onBack}
           sx={{ borderRadius: 2.5, px: 2, height: 40 }}
         >
-          Orqaga
+          {lang === 'oz' ? 'Орқага' : 'Orqaga'}
         </AppButton>
         <Typography variant="h4" fontWeight={800} sx={{ fontSize: { xs: '1.25rem', md: '1.5rem' } }}>
-          Murojaat tafsiloti #{request.id}
+          {lang === 'oz' ? 'Мурожаат тафсилоти' : 'Murojaat tafsiloti'} #{request.id}
         </Typography>
       </Stack>
 
@@ -261,11 +298,11 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
                     sx={{ mb: 1 }}
                   >
                     <Typography variant="h6" fontWeight={800} sx={{ color: '#991B1B' }}>
-                      Murojaat xodim tomonidan rad etilgan!
+                      {lang === 'oz' ? 'Мурожаат ходим томонидан рад этилган!' : 'Murojaat xodim tomonidan rad etilgan!'}
                     </Typography>
                     <Chip
                       size="small"
-                      label="Qayta biriktirish talab etiladi"
+                      label={lang === 'oz' ? 'Қайта бириктириш талаб этилади' : 'Qayta biriktirish talab etiladi'}
                       sx={{
                         bgcolor: '#FEE2E2',
                         color: '#B91C1C',
@@ -276,7 +313,9 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
                     />
                   </Stack>
                   <Typography variant="body2" sx={{ color: '#7F1D1D', mb: 2, fontSize: '0.88rem' }}>
-                    Ushbu topshiriq ijrochisi tomonidan rad etilgan va hozirda ijrochisiz holatda turibdi. Hududdagi chiqindini bartaraf etish uchun o‘ng tarafdagi boshqaruv blokidan boshqa mas'ul xodim yoki mos texnikani tanlab topshiriqni qayta biriktiring.
+                    {lang === 'oz'
+                      ? 'Ушбу топшириқ ижрочиси томонидан рад этилган ва ҳозирда ижрочисиз ҳолатда турибди. Ҳудуддаги чиқиндини бартараф этиш учун ўнг тарафдаги бошқарув блокидан бошқа масъул ходим ёки мос техникани танлаб топшириқни қайта бириктиринг.'
+                      : 'Ushbu topshiriq ijrochisi tomonidan rad etilgan va hozirda ijrochisiz holatda turibdi. Hududdagi chiqindini bartaraf etish uchun o‘ng tarafdagi boshqaruv blokidan boshqa mas\'ul xodim yoki mos texnikani tanlab topshiriqni qayta biriktiring.'}
                   </Typography>
 
                   <Box
@@ -299,7 +338,7 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
                         mb: 0.5
                       }}
                     >
-                      Rad etish sababi:
+                      {lang === 'oz' ? 'Рад этиш сабаби:' : 'Rad etish sababi:'}
                     </Typography>
                     <Typography
                       variant="body1"
@@ -311,11 +350,11 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
                         wordBreak: 'break-word'
                       }}
                     >
-                      "{request.rejectionReason || 'Sabab ko‘rsatilmagan'}"
+                      "{request.rejectionReason || (lang === 'oz' ? 'Сабаб кўрсатилмаган' : 'Sabab ko‘rsatilmagan')}"
                     </Typography>
                     {request.assignedWorker && (
                       <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mt: 1.25 }}>
-                        Rad etgan sobiq ijrochi: <strong>{request.assignedWorker.fullName}</strong> ({request.assignedWorker.role === 'Inspector' ? 'Hudud nazoratchisi' : 'Maxsus texnika haydovchisi'}{request.assignedWorker.vehicleNumber ? `, davlat raqami: ${request.assignedWorker.vehicleNumber}` : ''})
+                        {lang === 'oz' ? 'Рад этган собиқ ижрочи:' : 'Rad etgan sobiq ijrochi:'} <strong>{request.assignedWorker.fullName}</strong> ({request.assignedWorker.role === 'Inspector' ? (lang === 'oz' ? 'Ҳудуд назоратчиси' : 'Hudud nazoratchisi') : (lang === 'oz' ? 'Махсус техника ҳайдовчиси' : 'Maxsus texnika haydovchisi')}{request.assignedWorker.vehicleNumber ? `, ${lang === 'oz' ? 'давлат рақами' : 'davlat raqami'}: ${request.assignedWorker.vehicleNumber}` : ''})
                       </Typography>
                     )}
                   </Box>
@@ -327,17 +366,27 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
           {/* 1. Asosiy ma'lumotlar Card */}
           <DataTableCard>
             <Typography variant="h5" fontWeight={800} sx={{ mb: 2.5 }}>
-              Asosiy ma‘lumotlar
+              {lang === 'oz' ? 'Асосий маълумотлар' : 'Asosiy ma‘lumotlar'}
             </Typography>
 
             <Box sx={{ display: 'grid', gap: 2.5, gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' } }}>
-              <DetailItem label="Fuqaro" value={request.citizenFullName || 'Noma‘lum'} />
-              <DetailItem label="Telefon" value={request.citizenPhone || '-'} />
-              <DetailItem label="Kategoriya" value="Maishiy chiqindilar" accent />
+              <DetailItem
+                label={lang === 'oz' ? 'Фуқаро' : 'Fuqaro'}
+                value={request.citizenFullName || (lang === 'oz' ? 'Номаълум' : 'Noma‘lum')}
+              />
+              <DetailItem
+                label={lang === 'oz' ? 'Телефон' : 'Telefon'}
+                value={request.citizenPhone || '-'}
+              />
+              <DetailItem
+                label={lang === 'oz' ? 'Категория' : 'Kategoriya'}
+                value={getWasteTypeLabel(request.wasteType, lang)}
+                accent
+              />
 
               <Box>
                 <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.825rem' }}>
-                  Joriy holat
+                  {lang === 'oz' ? 'Жорий ҳолат' : 'Joriy holat'}
                 </Typography>
                 <Box sx={{ mt: 0.75 }}>
                   <StatusBadge status={request.status} />
@@ -346,10 +395,10 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
 
               <Box sx={{ gridColumn: { xs: 'auto', sm: '1 / -1' } }}>
                 <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.825rem' }}>
-                  Hudud va Manzil
+                  {lang === 'oz' ? 'Ҳудуд ва Манзил' : 'Hudud va Manzil'}
                 </Typography>
                 <Typography variant="h6" fontWeight={800} sx={{ mt: 0.5 }}>
-                  {request.mahalla?.name || request.mahallaName || 'Hudud ko‘rsatilmagan'}
+                  {translateMahallaName(request.mahalla?.name || request.mahallaName, lang) || (lang === 'oz' ? 'Ҳудуд кўрсатилмаган' : 'Hudud ko‘rsatilmagan')}
                 </Typography>
                 <Box
                   sx={{
@@ -361,11 +410,11 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
                   }}
                 >
                   <Typography variant="body2" fontWeight={600} color="#1E293B">
-                    {request.address || 'Aniq manzil kiritilmagan'}
+                    {request.address || (lang === 'oz' ? 'Аниқ манзил киритилмаган' : 'Aniq manzil kiritilmagan')}
                   </Typography>
                   {request.description && (
                     <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-                      Qo‘shimcha izoh: {request.description}
+                      {lang === 'oz' ? 'Қўшимча изоҳ:' : 'Qo‘shimcha izoh:'} {request.description}
                     </Typography>
                   )}
                 </Box>
@@ -384,7 +433,7 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
                   )
                 }
               >
-                Xaritada ochish
+                {lang === 'oz' ? 'Харитада очиш' : 'Xaritada ochish'}
               </AppButton>
             )}
           </DataTableCard>
@@ -394,15 +443,19 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
             <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
               <BusinessOutlinedIcon color="primary" />
               <Typography variant="h5" fontWeight={800}>
-                Mas‘ul Tashkilot (Sanitar Bo‘lim)
+                {lang === 'oz' ? 'Масъул Ташкилот (Санитар Бўлим)' : 'Mas‘ul Tashkilot (Sanitar Bo‘lim)'}
               </Typography>
             </Stack>
             <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' } }}>
               <DetailItem
-                label="Tashkilot nomi"
-                value={`${request.district?.name || 'Davlatobod'} Toza Hudud DUK`}
+                label={lang === 'oz' ? 'Ташкилот номи' : 'Tashkilot nomi'}
+                value={
+                  lang === 'oz'
+                    ? `${translateDistrictName(request.district?.name, 'oz') || 'Давлатобод тумани'} Тоза Ҳудуд ДУК`
+                    : `${request.district?.name || 'Davlatobod tumani'} Toza Hudud DUK`
+                }
               />
-              <DetailItem label="Aloqa raqami" value="+998 69 227-00-00" accent />
+              <DetailItem label={lang === 'oz' ? 'Алоқа рақами' : 'Aloqa raqami'} value="+998 69 227-00-00" accent />
             </Box>
           </DataTableCard>
 
@@ -412,18 +465,22 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
               <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
                 <AssignmentIndOutlinedIcon color="success" />
                 <Typography variant="h5" fontWeight={800}>
-                  Mas‘ul Xodim (Brigada)
+                  {lang === 'oz' ? 'Масъул Ходим (Бригада)' : 'Mas‘ul Xodim (Brigada)'}
                 </Typography>
               </Stack>
               <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr 1fr' } }}>
-                <DetailItem label="F.I.Sh" value={request.assignedWorker.fullName} />
+                <DetailItem label={lang === 'oz' ? 'Ф.И.Ш' : 'F.I.Sh'} value={request.assignedWorker.fullName} />
                 <DetailItem
-                  label="Lavozim"
-                  value={request.assignedWorker.role === 'Inspector' ? 'Hudud nazoratchisi / Usta' : 'Maxsus texnika haydovchisi'}
+                  label={lang === 'oz' ? 'Лавозим' : 'Lavozim'}
+                  value={
+                    request.assignedWorker.role === 'Inspector'
+                      ? (lang === 'oz' ? 'Ҳудуд назоратчиси / Уста' : 'Hudud nazoratchisi / Usta')
+                      : (lang === 'oz' ? 'Махсус техника ҳайдовчиси' : 'Maxsus texnika haydovchisi')
+                  }
                 />
-                <DetailItem label="Aloqa raqami" value={request.assignedWorker.phone} accent />
+                <DetailItem label={lang === 'oz' ? 'Алоқа рақами' : 'Aloqa raqami'} value={request.assignedWorker.phone} accent />
                 {request.assignedWorker.vehicleNumber && (
-                  <DetailItem label="Avtotransport" value={request.assignedWorker.vehicleNumber} />
+                  <DetailItem label={lang === 'oz' ? 'Автотранспорт' : 'Avtotransport'} value={request.assignedWorker.vehicleNumber} />
                 )}
               </Box>
             </DataTableCard>
@@ -433,11 +490,11 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
           {request.beforePhotoUrl && (
             <DataTableCard>
               <Typography variant="h5" fontWeight={800} sx={{ mb: 2 }}>
-                Dastlabki biriktirilgan fayllar
+                {lang === 'oz' ? 'Дастлабки бириктирилган файллар' : 'Dastlabki biriktirilgan fayllar'}
               </Typography>
               <Box sx={{ maxWidth: 380 }}>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 600 }}>
-                  Rasm 1 (Fuqaro)
+                  {lang === 'oz' ? '1-расм (Фуқаро)' : 'Rasm 1 (Fuqaro)'}
                 </Typography>
                 {beforeImgError ? (
                   <Box
@@ -450,14 +507,14 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
                     }}
                   >
                     <Typography variant="body2" color="text.secondary">
-                      Fotosurat ochilmadi yoki yuklanmagan
+                      {lang === 'oz' ? 'Фотосурат очилмади ёки юкланмаган' : 'Fotosurat ochilmadi yoki yuklanmagan'}
                     </Typography>
                   </Box>
                 ) : (
                   <Box
                     component="img"
                     src={request.beforePhotoUrl}
-                    alt="Fuqaro yuborgan rasm"
+                    alt={lang === 'oz' ? 'Фуқаро юборган расм' : 'Fuqaro yuborgan rasm'}
                     onError={() => setBeforeImgError(true)}
                     onClick={() => setZoomImage(request.beforePhotoUrl)}
                     sx={{
@@ -480,11 +537,11 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
           {request.afterPhotoUrl && (
             <DataTableCard>
               <Typography variant="h5" fontWeight={800} sx={{ mb: 2 }}>
-                Xodim yuborgan isbot fayli
+                {lang === 'oz' ? 'Ходим юборган исбот файли' : 'Xodim yuborgan isbot fayli'}
               </Typography>
               <Box sx={{ maxWidth: 380 }}>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 600 }}>
-                  Isbot rasmi (Tozalanganidan so‘ng)
+                  {lang === 'oz' ? 'Исбот расми (Тозаланганидан сўнг)' : 'Isbot rasmi (Tozalanganidan so‘ng)'}
                 </Typography>
                 {afterImgError ? (
                   <Box
@@ -527,7 +584,7 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
         {/* Right Column: Boshqaruv Card (BSK Style) */}
         <DataTableCard sx={{ p: 2.5, position: 'sticky', top: 100 }}>
           <Typography variant="h5" fontWeight={800} sx={{ mb: 2 }}>
-            Boshqaruv
+            {lang === 'oz' ? 'Бошқарув' : 'Boshqaruv'}
           </Typography>
 
           {isCompleted ? (
@@ -536,10 +593,10 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
                 <CheckCircleOutlinedIcon sx={{ color: '#059669', fontSize: 24 }} />
                 <Box>
                   <Typography variant="subtitle2" sx={{ color: '#065F46', fontWeight: 700 }}>
-                    Murojaat to‘liq yakunlangan
+                    {lang === 'oz' ? 'Мурожаат тўлиқ якунланган' : 'Murojaat to‘liq yakunlangan'}
                   </Typography>
                   <Typography variant="caption" sx={{ color: '#047857', display: 'block', mt: 0.25 }}>
-                    Tozalash ishlari muvaffaqiyatli qabul qilingan va arxivlangan.
+                    {lang === 'oz' ? 'Тозалаш ишлари муваффақиятли қабул қилинган ва архивланган.' : 'Tozalash ishlari muvaffaqiyatli qabul qilingan va arxivlangan.'}
                   </Typography>
                 </Box>
               </Stack>
@@ -553,13 +610,13 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
                     <HighlightOffOutlinedIcon sx={{ color: '#DC2626', fontSize: 24, mt: 0.2 }} />
                     <Box>
                       <Typography variant="subtitle2" sx={{ color: '#991B1B', fontWeight: 700 }}>
-                        Vazifa rad etilgan
+                        {lang === 'oz' ? 'Вазифа рад этилган' : 'Vazifa rad etilgan'}
                       </Typography>
                       <Typography variant="caption" sx={{ color: '#B91C1C', display: 'block', mt: 0.5 }}>
-                        Ko‘rsatilgan sabab: "{request.rejectionReason || 'Sabab ko‘rsatilmagan'}"
+                        {lang === 'oz' ? 'Кўрсатилган сабаб:' : 'Ko‘rsatilgan sabab:'} "{request.rejectionReason || (lang === 'oz' ? 'Сабаб кўрсатилмаган' : 'Sabab ko‘rsatilmagan')}"
                       </Typography>
                       <Typography variant="caption" sx={{ color: '#7F1D1D', display: 'block', mt: 1 }}>
-                        Dispetcher yoki tuman rahbari tomonidan boshqa xodimga qayta biriktirilishi kutilmoqda.
+                        {lang === 'oz' ? 'Диспетчер ёки туман раҳбари томонидан бошқа ходимга қайта бириктирилиши кутилмоқда.' : 'Dispetcher yoki tuman rahbari tomonidan boshqa xodimga qayta biriktirilishi kutilmoqda.'}
                       </Typography>
                     </Box>
                   </Stack>
@@ -571,10 +628,10 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
                       <TaskAltOutlinedIcon sx={{ color: '#166534', fontSize: 24 }} />
                       <Box>
                         <Typography variant="subtitle2" sx={{ color: '#166534', fontWeight: 700 }}>
-                          Topshiriq sizga biriktirilgan
+                          {lang === 'oz' ? 'Топшириқ сизга бириктирилган' : 'Topshiriq sizga biriktirilgan'}
                         </Typography>
                         <Typography variant="caption" sx={{ color: '#15803D', display: 'block', mt: 0.25 }}>
-                          Hududga boring, tozalashni amalga oshirib fotosuratli hisobot yuklang.
+                          {lang === 'oz' ? 'Ҳудудга боринг, тозалашни амалга ошириб фотосуратли ҳисобот юкланг.' : 'Hududga boring, tozalashni amalga oshirib fotosuratli hisobot yuklang.'}
                         </Typography>
                       </Box>
                     </Stack>
@@ -587,7 +644,7 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
                     onClick={() => setCompleteModalOpen(true)}
                     sx={{ py: 1.4, fontSize: '0.95rem', fontWeight: 700, borderRadius: 2 }}
                   >
-                    Hisobot yuklash (Bajarildi)
+                    {lang === 'oz' ? 'Ҳисобот юклаш (Бажарилди)' : 'Hisobot yuklash (Bajarildi)'}
                   </AppButton>
 
                   <AppButton
@@ -597,7 +654,7 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
                     onClick={() => setRejectModalOpen(true)}
                     sx={{ py: 1 }}
                   >
-                    Muammo haqida bildirish / Rad etish
+                    {lang === 'oz' ? 'Муаммо ҳақида билдириш / Рад этиш' : 'Muammo haqida bildirish / Rad etish'}
                   </AppButton>
                 </Stack>
               ) : (
@@ -607,10 +664,10 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
                       <HourglassTopOutlinedIcon sx={{ color: '#2563EB', fontSize: 24, mt: 0.2 }} />
                       <Box>
                         <Typography variant="subtitle2" sx={{ color: '#1E40AF', fontWeight: 700 }}>
-                          Hisobot tekshiruvda
+                          {lang === 'oz' ? 'Ҳисобот текширувда' : 'Hisobot tekshiruvda'}
                         </Typography>
                         <Typography variant="caption" sx={{ color: '#1D4ED8', display: 'block', mt: 0.5 }}>
-                          Siz yuklagan fotosurat dispetcher yoki bo‘lim boshlig‘i tomonidan tasdiqlanishi kutilmoqda.
+                          {lang === 'oz' ? 'Сиз юклаган фотосурат диспетчер ёки бўлим бошлиғи томонидан тасдиқланиши кутилмоқда.' : 'Siz yuklagan fotosurat dispetcher yoki bo‘lim boshlig‘i tomonidan tasdiqlanishi kutilmoqda.'}
                         </Typography>
                       </Box>
                     </Stack>
@@ -623,7 +680,7 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
                     onClick={() => setCompleteModalOpen(true)}
                     sx={{ py: 1.1, fontSize: '0.88rem' }}
                   >
-                    Hisobot rasmini almashtirish
+                    {lang === 'oz' ? 'Ҳисобот расмини алмаштириш' : 'Hisobot rasmini almashtirish'}
                   </AppButton>
                 </Stack>
               )}
@@ -637,13 +694,13 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
                     <HighlightOffOutlinedIcon sx={{ color: '#DC2626', fontSize: 24, mt: 0.2 }} />
                     <Box sx={{ flex: 1 }}>
                       <Typography variant="subtitle2" sx={{ color: '#991B1B', fontWeight: 800 }}>
-                        Murojaat rad etilgan
+                        {lang === 'oz' ? 'Мурожаат рад этилган' : 'Murojaat rad etilgan'}
                       </Typography>
                       <Typography variant="caption" sx={{ color: '#B91C1C', display: 'block', mt: 0.5, lineHeight: 1.4 }}>
-                        <strong>Sabab:</strong> "{request.rejectionReason || 'Xodim tomonidan rad etilgan.'}"
+                        <strong>{lang === 'oz' ? 'Сабаб:' : 'Sabab:'}</strong> "{request.rejectionReason || (lang === 'oz' ? 'Ходим томонидан рад этилган.' : 'Xodim tomonidan rad etilgan.')}"
                       </Typography>
                       <Typography variant="caption" sx={{ color: '#7F1D1D', display: 'block', mt: 1, fontWeight: 600 }}>
-                        Pastdagi ro‘yxatdan boshqa mas'ul xodimni tanlab, murojaatni qayta biriktiring:
+                        {lang === 'oz' ? 'Пастдаги рўйхатдан бошқа масъул ходимни танлаб, мурожаатни қайта бириктиринг:' : 'Pastdagi ro‘yxatdan boshqa mas\'ul xodimni tanlab, murojaatni qayta biriktiring:'}
                       </Typography>
                     </Box>
                   </Stack>
@@ -654,7 +711,11 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
               {(isNew || isInProgress || isRejected) && (
                 <Box>
                   <AppSelectField
-                    label={isRejected ? 'Qayta biriktirish uchun yangi xodim' : 'Mas‘ul xodim'}
+                    label={
+                      isRejected
+                        ? (lang === 'oz' ? 'Қайта бириктириш учун янги ходим' : 'Qayta biriktirish uchun yangi xodim')
+                        : (lang === 'oz' ? 'Масъул ходим' : 'Mas‘ul xodim')
+                    }
                     value={
                       selectedWorkerId !== ''
                         ? selectedWorkerId
@@ -669,12 +730,14 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
                       {
                         value: '',
                         label: isRejected
-                          ? '-- Qayta biriktirish uchun xodimni tanlang --'
-                          : '-- Mas’ul xodimni tanlang --'
+                          ? (lang === 'oz' ? '-- Қайта бириктириш учун ходимни танланг --' : '-- Qayta biriktirish uchun xodimni tanlang --')
+                          : (lang === 'oz' ? '-- Масъул ходимни танланг --' : '-- Mas’ul xodimni tanlang --')
                       },
                       ...workers.map((w) => {
                         const isInsp = w.role === 'Inspector';
-                        const roleTag = isInsp ? 'Hudud nazoratchisi' : 'Haydovchi';
+                        const roleTag = isInsp
+                          ? (lang === 'oz' ? 'Ҳудуд назоратчиси' : 'Hudud nazoratchisi')
+                          : (lang === 'oz' ? 'Ҳайдовчи' : 'Haydovchi');
                         const extra = isInsp ? '' : w.vehicleNumber ? ` [${w.vehicleNumber}]` : '';
                         return {
                           value: String(w.id),
@@ -696,7 +759,7 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
                   onClick={handleAssign}
                   sx={{ py: 1.25 }}
                 >
-                  Xodim biriktirish va jarayonga olish
+                  {lang === 'oz' ? 'Ходим бириктириш ва жараёнга олиш' : 'Xodim biriktirish va jarayonga olish'}
                 </AppButton>
               )}
 
@@ -716,7 +779,7 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
                     '&:hover': { bgcolor: '#047857' }
                   }}
                 >
-                  Boshqa xodimga qayta biriktirish
+                  {lang === 'oz' ? 'Бошқа ходимга қайта бириктириш' : 'Boshqa xodimga qayta biriktirish'}
                 </AppButton>
               )}
 
@@ -727,10 +790,12 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
                       <HourglassTopOutlinedIcon sx={{ color: '#16A34A', fontSize: 24, mt: 0.2 }} />
                       <Box sx={{ flex: 1 }}>
                         <Typography variant="subtitle2" sx={{ color: '#15803D', fontWeight: 800 }}>
-                          Tozalash jarayoni davom etmoqda
+                          {lang === 'oz' ? 'Тозалаш жараёни давом этмоқда' : 'Tozalash jarayoni davom etmoqda'}
                         </Typography>
                         <Typography variant="caption" sx={{ color: '#166534', display: 'block', mt: 0.5, lineHeight: 1.4 }}>
-                          Mas’ul xodim (<b>{request.assignedWorker?.fullName || 'Xodim'}</b>) tozalashni yakunlab, fotosuratli hisobot yuklagach, qabul qilish tugmasi faollashadi.
+                          {lang === 'oz'
+                            ? <>Масъул ходим (<b>{request.assignedWorker?.fullName || 'Ходим'}</b>) тозалашни якунлаб, фотосуратли ҳисобот юклагач, қабул қилиш тугмаси фаоллашади.</>
+                            : <>Mas’ul xodim (<b>{request.assignedWorker?.fullName || 'Xodim'}</b>) tozalashni yakunlab, fotosuratli hisobot yuklagach, qabul qilish tugmasi faollashadi.</>}
                         </Typography>
                       </Box>
                     </Stack>
@@ -744,7 +809,7 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
                       onClick={handleAssign}
                       sx={{ py: 1.25 }}
                     >
-                      Boshqa xodimga qayta biriktirish
+                      {lang === 'oz' ? 'Бошқа ходимга қайта бириктириш' : 'Boshqa xodimga qayta biriktirish'}
                     </AppButton>
                   )}
 
@@ -754,7 +819,7 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
                     startIcon={<HighlightOffOutlinedIcon />}
                     onClick={() => setRejectModalOpen(true)}
                   >
-                    Rad etish
+                    {lang === 'oz' ? 'Рад этиш' : 'Rad etish'}
                   </AppButton>
                 </Stack>
               )}
@@ -763,10 +828,10 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
                 <Stack spacing={2}>
                   <Box sx={{ p: 1.75, bgcolor: '#FEF3C7', border: '1px solid #FDE68A', borderRadius: 2 }}>
                     <Typography variant="subtitle2" sx={{ color: '#92400E', fontWeight: 700 }}>
-                      Xodim hisobot yuklagan
+                      {lang === 'oz' ? 'Ходим ҳисобот юклаган' : 'Xodim hisobot yuklagan'}
                     </Typography>
                     <Typography variant="caption" sx={{ color: '#78350F', display: 'block', mt: 0.5 }}>
-                      Yuklangan isbot fotosuratini tekshiring va ishni qabul qiling.
+                      {lang === 'oz' ? 'Юкланган исбот фотосуратини текширинг ва ишни қабул қилинг.' : 'Yuklangan isbot fotosuratini tekshiring va ishni qabul qiling.'}
                     </Typography>
                   </Box>
 
@@ -778,7 +843,7 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
                     onClick={handleVerify}
                     sx={{ py: 1.35, bgcolor: '#059669', '&:hover': { bgcolor: '#047857' }, fontWeight: 700 }}
                   >
-                    Ishni tasdiqlash va qabul qilish
+                    {lang === 'oz' ? 'Ишни тасдиқлаш ва қабул қилиш' : 'Ishni tasdiqlash va qabul qilish'}
                   </AppButton>
 
                   <AppButton
@@ -787,7 +852,7 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
                     startIcon={<HighlightOffOutlinedIcon />}
                     onClick={() => setRejectModalOpen(true)}
                   >
-                    Rad etish / Qaytarish
+                    {lang === 'oz' ? 'Рад этиш / Қайтариш' : 'Rad etish / Qaytarish'}
                   </AppButton>
                 </Stack>
               )}
@@ -800,18 +865,18 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
       <Dialog open={completeModalOpen} onClose={() => setCompleteModalOpen(false)} maxWidth="xs" fullWidth>
         <Box sx={{ p: 3 }}>
           <Typography variant="h5" fontWeight={800} sx={{ mb: 1.5 }}>
-            Tozalashni yakunlash
+            {lang === 'oz' ? 'Тозалашни якунлаш' : 'Tozalashni yakunlash'}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5 }}>
-            Chiqindi tozalanganligini tasdiqlovchi yakuniy fotosuratni yuklang:
+            {lang === 'oz' ? 'Чиқинди тозаланганлигини тасдиқловчи якуний фотосуратни юкланг:' : 'Chiqindi tozalanganligini tasdiqlovchi yakuniy fotosuratni yuklang:'}
           </Typography>
           <AppImageUpload value={proofFile} onChange={setProofFile} />
           <Stack direction="row" spacing={1.5} justifyContent="flex-end" sx={{ mt: 3 }}>
             <AppButton variant="secondary" onClick={() => setCompleteModalOpen(false)}>
-              Bekor qilish
+              {t('common.cancel')}
             </AppButton>
             <AppButton variant="primary" loading={isSubmitting} disabled={!proofFile} onClick={handleComplete}>
-              Tasdiqlash
+              {lang === 'oz' ? 'Тасдиқлаш' : 'Tasdiqlash'}
             </AppButton>
           </Stack>
         </Box>
@@ -836,12 +901,14 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
               <HighlightOffOutlinedIcon />
             </Box>
             <Typography variant="h5" fontWeight={800}>
-              Topshiriqni rad etish
+              {lang === 'oz' ? 'Топшириқни рад этиш' : 'Topshiriqni rad etish'}
             </Typography>
           </Stack>
 
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Rad etish sababini aniq va to‘liq bayon qiling. Ushbu sabab tuman rahbari, dispetcher va fuqaroga ko‘rsatiladi hamda topshiriqni qayta biriktirish uchun asos bo‘ladi:
+            {lang === 'oz'
+              ? 'Рад этиш сабабини аниқ ва тўлиқ баён қилинг. Ушбу сабаб туман раҳбари, диспетчер ва фуқарога кўрсатилади ҳамда топшириқни қайта бириктириш учун асос бўлади:'
+              : 'Rad etish sababini aniq va to‘liq bayon qiling. Ushbu sabab tuman rahbari, dispetcher va fuqaroga ko‘rsatiladi hamda topshiriqni qayta biriktirish uchun asos bo‘ladi:'}
           </Typography>
 
           <TextField
@@ -849,21 +916,25 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
             multiline
             rows={4}
             required
-            label="Rad etish sababi (majburiy) *"
+            label={lang === 'oz' ? 'Рад этиш сабаби (мажбурий) *' : 'Rad etish sababi (majburiy) *'}
             value={rejectReason}
             onChange={(e) => setRejectReason(e.target.value)}
-            placeholder="Masalan: Ushbu joyda chiqindi juda ko‘p to‘plangan, oddiy furgon emas, balki katta hajmli samosval yoki yuklagich texnika kerak..."
+            placeholder={
+              lang === 'oz'
+                ? 'Масалан: Ушбу жойда чиқинди жуда кўп тўпланган, оддий фургон эмас, балки катта ҳажмли самосвал ёки юклагич техника керак...'
+                : 'Masalan: Ushbu joyda chiqindi juda ko‘p to‘plangan, oddiy furgon emas, balki katta hajmli samosval yoki yuklagich texnika kerak...'
+            }
             error={rejectReason.length > 0 && rejectReason.trim().length < 5}
             helperText={
               rejectReason.length > 0 && rejectReason.trim().length < 5
-                ? 'Sabab kamida 5 ta belgidan iborat bo‘lishi lozim'
-                : 'Rad etish sababini kiritish majburiy (kamida 5 ta belgi)'
+                ? (lang === 'oz' ? 'Сабаб камида 5 та белгидан иборат бўлиши лозим' : 'Sabab kamida 5 ta belgidan iborat bo‘lishi lozim')
+                : (lang === 'oz' ? 'Рад этиш сабабини киритиш мажбурий (камида 5 та белги)' : 'Rad etish sababini kiritish majburiy (kamida 5 ta belgi)')
             }
           />
 
           <Stack direction="row" spacing={1.5} justifyContent="flex-end" sx={{ mt: 3 }}>
             <AppButton variant="secondary" onClick={() => setRejectModalOpen(false)}>
-              Bekor qilish
+              {t('common.cancel')}
             </AppButton>
             <AppButton
               variant="danger"
@@ -872,7 +943,7 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
               onClick={handleReject}
               sx={{ px: 3, fontWeight: 700 }}
             >
-              Rad etishni tasdiqlash
+              {lang === 'oz' ? 'Рад этишни тасдиқлаш' : 'Rad etishni tasdiqlash'}
             </AppButton>
           </Stack>
         </Box>
@@ -891,7 +962,7 @@ export const RequestDetailPage: React.FC<RequestDetailPageProps> = ({
             <Box
               component="img"
               src={zoomImage}
-              alt="Kattalashtirilgan rasm"
+              alt={lang === 'oz' ? 'Катталаштирилган расм' : 'Kattalashtirilgan rasm'}
               sx={{ width: '100%', maxHeight: '80vh', objectFit: 'contain' }}
             />
           )}

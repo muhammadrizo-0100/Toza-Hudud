@@ -77,7 +77,9 @@ export const DistrictsListTable: React.FC<DistrictsListTableProps> = ({
             </TableRow>
           ) : districts.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={3} align="center" sx={{ py: 6, color: '#94A3B8', fontSize: '0.875rem' }}>Tumanlar kiritilmagan</TableCell>
+              <TableCell colSpan={3} align="center" sx={{ py: 6, color: '#94A3B8', fontSize: '0.875rem' }}>
+                {lang === 'oz' ? 'Туманлар киритилмаган' : 'Tumanlar kiritilmagan'}
+              </TableCell>
             </TableRow>
           ) : (
             districts.map((d) => {

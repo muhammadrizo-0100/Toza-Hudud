@@ -31,6 +31,7 @@ import { AppTable } from '../../components/common/AppTable';
 import AppButton from '../../components/common/AppButton';
 import { RequestStatus } from '../../types';
 import { useTranslation } from '../../i18n';
+import { translateDistrictName, translateMahallaName } from '../../utils/districtNames';
 
 function formatDateTime(dateStr: string, lang: 'uz' | 'oz' = 'uz') {
   if (!dateStr) return { date: '-', time: '' };
@@ -236,7 +237,7 @@ export const RequestsPage: React.FC = () => {
               }}
               options={[
                 { value: '', label: t('common.allDistricts') },
-                ...districts.map((d) => ({ value: d.id, label: d.name }))
+                ...districts.map((d) => ({ value: d.id, label: translateDistrictName(d.name, lang) }))
               ]}
             />
           </Box>
@@ -253,7 +254,7 @@ export const RequestsPage: React.FC = () => {
             }}
             options={[
               { value: '', label: lang === 'oz' ? 'Барча маҳаллалар' : 'Barcha mahallalar' },
-              ...mahallas.map((m) => ({ value: m.id, label: m.name }))
+              ...mahallas.map((m) => ({ value: m.id, label: translateMahallaName(m.name, lang) }))
             ]}
           />
         </Box>
@@ -376,9 +377,9 @@ export const RequestsPage: React.FC = () => {
 
                     <TableCell>
                       <Typography variant="body2" fontWeight={700}>
-                        {req.district?.name ? req.district.name : ''}
+                        {req.district?.name ? translateDistrictName(req.district.name, lang) : ''}
                         {req.district?.name && req.mahalla?.name ? ' • ' : ''}
-                        {req.mahalla?.name || (lang === 'oz' ? 'Маҳалла кўрсатилмаган' : 'Mahalla ko‘rsatilmagan')}
+                        {req.mahalla?.name ? translateMahallaName(req.mahalla.name, lang) : (lang === 'oz' ? 'Маҳалла кўрсатилмаган' : 'Mahalla ko‘rsatilmagan')}
                       </Typography>
                       <Typography
                         variant="caption"
@@ -488,9 +489,9 @@ export const RequestsPage: React.FC = () => {
           }}
         >
           <Typography variant="body2" color="text.secondary">
-            Jami: <strong>{totalItems}</strong> ta murojaat
+            {lang === 'oz' ? 'Жами:' : 'Jami:'} <strong>{totalItems}</strong> {lang === 'oz' ? 'та мурожаат' : 'ta murojaat'}
             {totalItems > 0 && (
-              <> (Ko‘rsatilmoqda: <strong>{(page - 1) * limit + 1} - {Math.min(page * limit, totalItems)}</strong> ta)</>
+              <> ({lang === 'oz' ? 'Кўрсатилмоқда:' : 'Ko‘rsatilmoqda:'} <strong>{(page - 1) * limit + 1} - {Math.min(page * limit, totalItems)}</strong> {lang === 'oz' ? 'та' : 'ta'})</>
             )}
           </Typography>
 
@@ -506,7 +507,7 @@ export const RequestsPage: React.FC = () => {
       </DataTableCard>
 
       {/* Floating Action Button */}
-      <Tooltip title="Yangi murojaat qo‘shish" placement="left">
+      <Tooltip title={lang === 'oz' ? 'Янги мурожаат қўшиш' : 'Yangi murojaat qo‘shish'} placement="left">
         <Fab
           color="primary"
           onClick={() => setManualModalOpen(true)}
