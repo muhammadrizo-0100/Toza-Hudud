@@ -1,8 +1,18 @@
-import { defineConfig } from 'vite';
+import { defineConfig, createLogger } from 'vite';
 import react from '@vitejs/plugin-react';
 import { fileURLToPath, URL } from 'node:url';
 
+const logger = createLogger();
+const originalLoggerError = logger.error.bind(logger);
+logger.error = (msg, options) => {
+  if (msg.includes('ECONNABORTED') || msg.includes('ECONNRESET')) {
+    return;
+  }
+  originalLoggerError(msg, options);
+};
+
 export default defineConfig({
+  customLogger: logger,
   plugins: [react()],
   resolve: {
     alias: {

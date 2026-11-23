@@ -149,13 +149,6 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
       dispatch(baseApi.util.invalidateTags(['NOTIFICATIONS', 'REQUESTS', 'STATS']));
     });
 
-    // Heartbeat ping every 15s to keep websocket tunnel alive
-    const pingInterval = setInterval(() => {
-      if (socket.connected) {
-        socket.emit('ping');
-      }
-    }, 15000);
-
     socket.on('notification.new', (event: AppNotificationItem & { actorAdminId?: number }) => {
       // 1. Never notify the user about their own action
       if (event.actorAdminId && Number(event.actorAdminId) === Number(user.id)) {
@@ -214,8 +207,8 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
     });
 
     return () => {
-      clearInterval(pingInterval);
-      socket.disconnect();
+      socket.removeAllListeners();
+      socket.close();
     };
   }, [user, dispatch, showInfo]);
 
