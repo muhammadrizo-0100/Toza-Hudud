@@ -6,6 +6,7 @@ import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 import AssignmentTurnedInOutlinedIcon from '@mui/icons-material/AssignmentTurnedInOutlined';
 import { RequestStatus } from '../../types';
+import { useTranslation } from '../../i18n';
 
 interface StatusBadgeProps {
   status: RequestStatus | string;
@@ -13,36 +14,30 @@ interface StatusBadgeProps {
   showIcon?: boolean;
 }
 
-const STATUS_CONFIG: Record<
+const STATUS_ICONS: Record<
   string,
   {
-    label: string;
     color: ChipProps['color'];
     Icon: React.ComponentType<{ fontSize?: 'small' | 'inherit' | 'medium' | 'large' }>;
   }
 > = {
   new: {
-    label: 'Yangi',
     color: 'default',
     Icon: AccessTimeOutlinedIcon
   },
   in_progress: {
-    label: 'Jarayonda',
     color: 'warning',
     Icon: AutorenewOutlinedIcon
   },
   submitted: {
-    label: 'Tasdiqlashda',
     color: 'info',
     Icon: AssignmentTurnedInOutlinedIcon
   },
   completed: {
-    label: 'Tozalandi',
     color: 'success',
     Icon: CheckCircleOutlinedIcon
   },
   rejected: {
-    label: 'Rad etildi',
     color: 'error',
     Icon: HighlightOffOutlinedIcon
   }
@@ -53,20 +48,21 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
   size = 'small',
   showIcon = true
 }) => {
-  const config = STATUS_CONFIG[status] || {
-    label: status,
+  const { getStatusLabel } = useTranslation();
+  const config = STATUS_ICONS[status] || {
     color: 'default' as ChipProps['color'],
     Icon: AccessTimeOutlinedIcon
   };
 
   const IconComponent = config.Icon;
+  const label = getStatusLabel(status);
 
   return (
     <Chip
       size={size}
       variant={config.color === 'default' ? 'outlined' : 'filled'}
       color={config.color}
-      label={config.label}
+      label={label}
       icon={showIcon ? <IconComponent fontSize="small" /> : undefined}
       sx={{
         fontWeight: 600,

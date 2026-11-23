@@ -37,10 +37,12 @@ import AppButton from '../../components/common/AppButton';
 import AppBreadcrumbs from '../../components/common/AppBreadcrumbs';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { getUserRoleBadgeText } from '../../utils/roles';
+import { useTranslation } from '../../i18n';
 
 export const MyAccountPage: React.FC = () => {
   const navigate = useNavigate();
   const { showSuccess } = useToast();
+  const { t, lang, formatDate, getRoleTitle } = useTranslation();
   const { data, isLoading, refetch } = useGetMyAccountQuery();
 
   if (isLoading || !data) {
@@ -66,11 +68,11 @@ export const MyAccountPage: React.FC = () => {
     : 'Viloyat Bosh Administratori';
 
   const wasteTypeLabels: Record<string, string> = {
-    maishiy: 'Maishiy chiqindilar',
-    qurilish: 'Qurilish chiqindilari',
-    xazon: 'Xazon va shoxlar',
-    katta_hajmli: 'Katta hajmli chiqindilar',
-    noqonuniy: 'Noqonuniy tashlandiq'
+    maishiy: t('modules.requests.householdWaste'),
+    qurilish: t('modules.requests.constructionWaste'),
+    xazon: t('modules.requests.foliageWaste'),
+    katta_hajmli: t('modules.requests.bulkyWaste'),
+    noqonuniy: lang === 'oz' ? 'Ноқонуний ташландиқ' : 'Noqonuniy tashlandiq'
   };
 
   const wasteColors: Record<string, string> = {
@@ -83,16 +85,16 @@ export const MyAccountPage: React.FC = () => {
 
   return (
     <Stack spacing={2.5}>
-      <AppBreadcrumbs items={[{ label: 'Mening hisobim' }]} />
+      <AppBreadcrumbs items={[{ label: t('nav.myAccount') }]} />
 
       {/* Header bar */}
       <Stack direction="row" alignItems="center" justifyContent="space-between">
         <Box>
           <Typography variant="h4" fontWeight={800} sx={{ fontSize: { xs: '1.35rem', md: '1.65rem' } }}>
-            Mening hisobim
+            {t('modules.account.title')}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-            Shaxsiy ma’lumotlar, biriktirilgan vazifalar va shaxsiy samaradorlik ko‘rsatkichlari
+            {t('modules.account.subtitle')}
           </Typography>
         </Box>
 
@@ -101,10 +103,10 @@ export const MyAccountPage: React.FC = () => {
           size="small"
           onClick={() => {
             refetch();
-            showSuccess('Ma’lumotlar yangilandi');
+            showSuccess(lang === 'oz' ? 'Маълумотлар янгиланди' : 'Ma’lumotlar yangilandi');
           }}
         >
-          Yangilash
+          {t('common.refresh')}
         </AppButton>
       </Stack>
 
@@ -199,10 +201,10 @@ export const MyAccountPage: React.FC = () => {
                   <LocationOnOutlinedIcon sx={{ color: '#059669', fontSize: 20 }} />
                   <Box>
                     <Typography variant="caption" color="text.secondary" display="block">
-                      Hudud / Tuman
+                      {lang === 'oz' ? 'Ҳудуд / Туман' : 'Hudud / Tuman'}
                     </Typography>
                     <Typography variant="body2" fontWeight={600}>
-                      {user.district || 'Namangan viloyati'}
+                      {user.district || (lang === 'oz' ? 'Наманган вилояти' : 'Namangan viloyati')}
                     </Typography>
                   </Box>
                 </Stack>
@@ -211,10 +213,10 @@ export const MyAccountPage: React.FC = () => {
                   <PhoneOutlinedIcon sx={{ color: '#059669', fontSize: 20 }} />
                   <Box>
                     <Typography variant="caption" color="text.secondary" display="block">
-                      Aloqa telefoni
+                      {lang === 'oz' ? 'Алоқа телефони' : 'Aloqa telefoni'}
                     </Typography>
                     <Typography variant="body2" fontWeight={600}>
-                      {user.phone || 'Kiritilmagan'}
+                      {user.phone || (lang === 'oz' ? 'Киритилмаган' : 'Kiritilmagan')}
                     </Typography>
                   </Box>
                 </Stack>
@@ -224,7 +226,7 @@ export const MyAccountPage: React.FC = () => {
                     <LocalShippingOutlinedIcon sx={{ color: '#059669', fontSize: 20 }} />
                     <Box>
                       <Typography variant="caption" color="text.secondary" display="block">
-                        Maxsus texnika davlat raqami
+                        {lang === 'oz' ? 'Махсус техника давлат рақами' : 'Maxsus texnika davlat raqami'}
                       </Typography>
                       <Typography
                         variant="body2"
@@ -250,14 +252,10 @@ export const MyAccountPage: React.FC = () => {
                     <CalendarTodayOutlinedIcon sx={{ color: '#059669', fontSize: 20 }} />
                     <Box>
                       <Typography variant="caption" color="text.secondary" display="block">
-                        Tizimda ro‘yxatdan o‘tgan sana
+                        {lang === 'oz' ? 'Тизимда рўйхатдан ўтган сана' : 'Tizimda ro‘yxatdan o‘tgan sana'}
                       </Typography>
                       <Typography variant="body2" fontWeight={600}>
-                        {(() => {
-                          const d = new Date(user.createdAt);
-                          const months = ['yanvar', 'fevral', 'mart', 'aprel', 'may', 'iyun', 'iyul', 'avgust', 'sentabr', 'oktabr', 'noyabr', 'dekabr'];
-                          return `${d.getDate()}-${months[d.getMonth()]}, ${d.getFullYear()}-yil`;
-                        })()}
+                        {formatDate(user.createdAt)}
                       </Typography>
                     </Box>
                   </Stack>
@@ -335,7 +333,7 @@ export const MyAccountPage: React.FC = () => {
                   <AssignmentOutlinedIcon fontSize="small" />
                 </Box>
                 <Typography variant="caption" fontWeight={700} color="text.secondary">
-                  Jami ishlar
+                  {t('modules.account.totalTasks')}
                 </Typography>
               </Stack>
               <Typography variant="h4" fontWeight={800} color="#0F172A">
@@ -359,7 +357,7 @@ export const MyAccountPage: React.FC = () => {
                   <CheckCircleOutlinedIcon fontSize="small" />
                 </Box>
                 <Typography variant="caption" fontWeight={700} sx={{ color: '#166534' }}>
-                  Bajarildi
+                  {t('modules.account.completed')}
                 </Typography>
               </Stack>
               <Typography variant="h4" fontWeight={800} color="#15803D">
@@ -383,7 +381,7 @@ export const MyAccountPage: React.FC = () => {
                   <HourglassEmptyOutlinedIcon fontSize="small" />
                 </Box>
                 <Typography variant="caption" fontWeight={700} sx={{ color: '#1E40AF' }}>
-                  Jarayonda
+                  {t('modules.account.inProgress')}
                 </Typography>
               </Stack>
               <Typography variant="h4" fontWeight={800} color="#1D4ED8">
@@ -407,7 +405,7 @@ export const MyAccountPage: React.FC = () => {
                   <HighlightOffOutlinedIcon fontSize="small" />
                 </Box>
                 <Typography variant="caption" fontWeight={700} sx={{ color: '#991B1B' }}>
-                  Rad etildi
+                  {t('modules.account.rejected')}
                 </Typography>
               </Stack>
               <Typography variant="h4" fontWeight={800} color="#B91C1C">
@@ -428,7 +426,7 @@ export const MyAccountPage: React.FC = () => {
                   <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
                     <TrendingUpOutlinedIcon sx={{ color: '#059669', fontSize: 24 }} />
                     <Typography variant="h6" fontWeight={800} color="#0F172A">
-                      Samaradorlik va Bajarilish Ko‘rsatkichi
+                      {t('modules.account.performanceTitle')}
                     </Typography>
                   </Stack>
                   <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
@@ -541,10 +539,10 @@ export const MyAccountPage: React.FC = () => {
               <Box sx={{ p: 2.5, pb: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Box>
                   <Typography variant="h6" fontWeight={800} sx={{ fontSize: '1.05rem' }}>
-                    So‘nggi vazifalar tarixi
+                    {t('modules.account.recentTasksHistory')}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    Oxirgi biriktirilgan murojaatlar va ularning holati
+                    {lang === 'oz' ? 'Охирги бириктирилган мурожаатлар ва уларнинг ҳолати' : 'Oxirgi biriktirilgan murojaatlar va ularning holati'}
                   </Typography>
                 </Box>
 
@@ -554,7 +552,7 @@ export const MyAccountPage: React.FC = () => {
                   endIcon={<ArrowForwardOutlinedIcon fontSize="small" />}
                   onClick={() => navigate('/admin/requests')}
                 >
-                  Barcha vazifalar
+                  {t('modules.account.allTasks')}
                 </AppButton>
               </Box>
 
@@ -563,31 +561,31 @@ export const MyAccountPage: React.FC = () => {
                   <TableHead>
                     <TableRow sx={{ bgcolor: '#F8FAFC' }}>
                       <TableCell sx={{ fontWeight: 700, color: '#475569', py: 1.5 }}># ID</TableCell>
-                      <TableCell sx={{ fontWeight: 700, color: '#475569' }}>Mahalla</TableCell>
-                      <TableCell sx={{ fontWeight: 700, color: '#475569' }}>Chiqindi turi</TableCell>
-                      <TableCell sx={{ fontWeight: 700, color: '#475569' }}>Holat</TableCell>
-                      <TableCell sx={{ fontWeight: 700, color: '#475569' }} align="right">Amal</TableCell>
+                      <TableCell sx={{ fontWeight: 700, color: '#475569' }}>{lang === 'oz' ? 'Маҳалла' : 'Mahalla'}</TableCell>
+                      <TableCell sx={{ fontWeight: 700, color: '#475569' }}>{t('modules.requests.category')}</TableCell>
+                      <TableCell sx={{ fontWeight: 700, color: '#475569' }}>{t('common.status')}</TableCell>
+                      <TableCell sx={{ fontWeight: 700, color: '#475569' }} align="right">{t('common.actions')}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {recentTasks.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={5} sx={{ py: 4, textAlign: 'center', color: '#64748B' }}>
-                          Biriktirilgan topshiriqlar mavjud emas
+                          {t('common.noData')}
                         </TableCell>
                       </TableRow>
                     ) : (
-                      recentTasks.map((t) => (
-                        <TableRow key={t.id} hover sx={{ '&:last-child td': { borderBottom: 0 } }}>
+                      recentTasks.map((task) => (
+                        <TableRow key={task.id} hover sx={{ '&:last-child td': { borderBottom: 0 } }}>
                           <TableCell sx={{ fontWeight: 700, py: 1.5 }}>
-                            #{t.id}
+                            #{task.id}
                           </TableCell>
                           <TableCell sx={{ fontWeight: 600 }}>
-                            {t.mahallaName || 'Mahalla ko‘rsatilmagan'}
+                            {task.mahallaName || (lang === 'oz' ? 'Маҳалла кўрсатилмаган' : 'Mahalla ko‘rsatilmagan')}
                           </TableCell>
                           <TableCell>
                             <Chip
-                              label={wasteTypeLabels[t.wasteType || 'maishiy'] || t.wasteType}
+                              label={wasteTypeLabels[task.wasteType || 'maishiy'] || task.wasteType}
                               size="small"
                               sx={{
                                 fontSize: '0.72rem',
@@ -598,15 +596,15 @@ export const MyAccountPage: React.FC = () => {
                             />
                           </TableCell>
                           <TableCell>
-                            <StatusBadge status={t.status as any} />
+                            <StatusBadge status={task.status as any} />
                           </TableCell>
                           <TableCell align="right">
                             <AppButton
                               variant="action"
                               size="small"
-                              onClick={() => navigate(`/admin/requests?requestId=${t.id}`)}
+                              onClick={() => navigate(`/admin/requests?requestId=${task.id}`)}
                             >
-                              Ko‘rish
+                              {t('common.view')}
                             </AppButton>
                           </TableCell>
                         </TableRow>

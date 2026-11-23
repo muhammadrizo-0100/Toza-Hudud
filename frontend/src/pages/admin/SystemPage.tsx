@@ -37,6 +37,7 @@ import { AppTable } from '../../components/common/AppTable';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { useAppSelector } from '../../store/hooks';
 import { useToast } from '../../context/ToastContext';
+import { useTranslation } from '../../i18n';
 
 const DISTRICTS_PER_PAGE = 5;
 const NEIGHBORHOODS_PER_PAGE = 5;
@@ -46,6 +47,7 @@ export const SystemPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAppSelector((state) => state.auth);
   const { showSuccess } = useToast();
+  const { t, lang } = useTranslation();
   const isSuperAdmin = user?.role === 'SuperAdmin';
   const isManager = user?.role === 'Manager';
 
@@ -144,12 +146,12 @@ export const SystemPage: React.FC = () => {
   }
 
   const pageTitle = isManager
-    ? `${user?.district?.name || 'Tuman'} Tozalik Boshqaruvi Markazi`
-    : 'Viloyat Boshqaruv Markazi';
+    ? `${user?.district?.name || (lang === 'oz' ? 'Туман' : 'Tuman')} ${lang === 'oz' ? 'Тозалик Бошқаруви Маркази' : 'Tozalik Boshqaruvi Markazi'}`
+    : t('nav.superAdminTitle');
 
   const pageSubtitle = isManager
-    ? 'Tumaningizdagi mahalla, xodim va murojaatlar bo‘yicha jamlangan boshqaruv ko‘rinishi'
-    : 'Tuman, mahalla, xodim va murojaatlar bo‘yicha jamlangan boshqaruv ko‘rinishi';
+    ? (lang === 'oz' ? 'Туманингиздаги маҳалла, ходим ва мурожаатлар бўйича жамланган бошқарув кўриниши' : 'Tumaningizdagi mahalla, xodim va murojaatlar bo‘yicha jamlangan boshqaruv ko‘rinishi')
+    : (lang === 'oz' ? 'Туман, маҳалла, ходим ва мурожаатлар бўйича жамланган бошқарув кўриниши' : 'Tuman, mahalla, xodim va murojaatlar bo‘yicha jamlangan boshqaruv ko‘rinishi');
 
   return (
     <Stack spacing={2.5} sx={{ position: 'relative' }}>
@@ -183,7 +185,7 @@ export const SystemPage: React.FC = () => {
 
         <Box sx={{ width: 170 }}>
           <AppSelectField
-            label="Davr"
+            label={lang === 'oz' ? 'Давр' : 'Davr'}
             value={dateRange}
             onChange={(e) => {
               setDateRange(e.target.value as 'all');
@@ -192,10 +194,10 @@ export const SystemPage: React.FC = () => {
               setRecentPage(1);
             }}
             options={[
-              { value: 'all', label: 'Barcha vaqt' },
-              { value: 'today', label: 'Bugun' },
-              { value: 'week', label: 'So‘nggi 7 kun' },
-              { value: 'month', label: 'So‘nggi 30 kun' }
+              { value: 'all', label: t('modules.map.allTime') },
+              { value: 'today', label: lang === 'oz' ? 'Бугун' : 'Bugun' },
+              { value: 'week', label: t('modules.map.last7Days') },
+              { value: 'month', label: t('modules.map.last30Days') }
             ]}
           />
         </Box>
@@ -203,7 +205,7 @@ export const SystemPage: React.FC = () => {
         {isSuperAdmin && (
           <Box sx={{ width: 200 }}>
             <AppSelectField
-              label="Tuman"
+              label={t('modules.map.selectDistrict')}
               value={districtFilter}
               onChange={(e) => {
                 setDistrictFilter(e.target.value ? Number(e.target.value) : '');
@@ -212,7 +214,7 @@ export const SystemPage: React.FC = () => {
                 setRecentPage(1);
               }}
               options={[
-                { value: '', label: 'Barcha tumanlar' },
+                { value: '', label: t('common.allDistricts') },
                 ...districts.map((d) => ({ value: d.id, label: d.name }))
               ]}
             />
@@ -224,11 +226,11 @@ export const SystemPage: React.FC = () => {
           startIcon={<RefreshIcon fontSize="small" />}
           onClick={() => {
             refetch();
-            showSuccess('Ma’lumotlar yangilandi');
+            showSuccess(lang === 'oz' ? 'Маълумотлар янгиланди' : 'Ma’lumotlar yangilandi');
           }}
           sx={{ ml: 'auto' }}
         >
-          Yangilash
+          {t('common.refresh')}
         </AppButton>
       </FilterBar>
 

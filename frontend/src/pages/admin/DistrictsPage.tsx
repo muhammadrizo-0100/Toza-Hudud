@@ -9,6 +9,7 @@ import AppButton from '../../components/common/AppButton';
 import AppBreadcrumbs from '../../components/common/AppBreadcrumbs';
 import { useToast } from '../../context/ToastContext';
 import { District, Mahalla } from '../../types';
+import { useTranslation } from '../../i18n';
 
 import { DistrictsListTable } from './districts/DistrictsListTable';
 import { MahallasListTable } from './districts/MahallasListTable';
@@ -18,6 +19,7 @@ import AppConfirmDialog from '../../components/common/AppConfirmDialog';
 
 export const DistrictsPage: React.FC = () => {
   const { showSuccess, showError } = useToast();
+  const { t, lang } = useTranslation();
   const [selectedDistrictId, setSelectedDistrictId] = useState<number | null>(null);
   const [successNotice, setSuccessNotice] = useState<string | null>(null);
 
@@ -69,20 +71,20 @@ export const DistrictsPage: React.FC = () => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-      <AppBreadcrumbs items={[{ label: 'Tumanlar va mahallalar' }]} />
+      <AppBreadcrumbs items={[{ label: t('nav.districtsAndNeighborhoods') }]} />
 
       <Stack direction="row" alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={1.5}>
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 700, color: '#0F172A', letterSpacing: '-0.02em' }}>
-            Tumanlar va Mahallalar
+            {t('modules.districts.title')}
           </Typography>
           <Typography variant="body2" sx={{ color: '#64748B', mt: 0.25, fontWeight: 500 }}>
-            Ma’muriy tumanlar, xarita chegaralari va hududiy mahallalar ro‘yxati
+            {t('modules.districts.subtitle')}
           </Typography>
         </Box>
 
         <AppButton variant="primary" startIcon={<AddIcon />} onClick={() => setDistrictDialogOpen(true)}>
-          Yangi Tuman
+          {t('modules.districts.addDistrict')}
         </AppButton>
       </Stack>
 
@@ -120,9 +122,14 @@ export const DistrictsPage: React.FC = () => {
 
       <AppConfirmDialog
         open={Boolean(districtToDelete)}
-        title="Tumanni o‘chirish"
-        message={`Haqiqatan ham "${districtToDelete?.name}" tumanini o‘chirishni tasdiqlaysizmi? Unga biriktirilgan barcha mahallalar ham o‘chiriladi.`}
-        confirmLabel="O‘chirish"
+        title={lang === 'oz' ? 'Туманни ўчириш' : 'Tumanni o‘chirish'}
+        message={
+          lang === 'oz'
+            ? `Ҳақиқатан ҳам "${districtToDelete?.name}" туманини ўчиришни тасдиқлайсизми? Унга бириктирилган барча маҳаллалар ҳам ўчирилади.`
+            : `Haqiqatan ham "${districtToDelete?.name}" tumanini o‘chirishni tasdiqlaysizmi? Unga biriktirilgan barcha mahallalar ham o‘chiriladi.`
+        }
+        confirmLabel={t('common.delete')}
+        cancelLabel={t('common.cancel')}
         severity="danger"
         loading={deletingDistrict}
         onConfirm={handleConfirmDeleteDistrict}
@@ -131,9 +138,14 @@ export const DistrictsPage: React.FC = () => {
 
       <AppConfirmDialog
         open={Boolean(mahallaToDelete)}
-        title="Mahallani o‘chirish"
-        message={`Haqiqatan ham "${mahallaToDelete?.name}" mahallasini o‘chirishni tasdiqlaysizmi?`}
-        confirmLabel="O‘chirish"
+        title={lang === 'oz' ? 'Маҳаллани ўчириш' : 'Mahallani o‘chirish'}
+        message={
+          lang === 'oz'
+            ? `Ҳақиқатан ҳам "${mahallaToDelete?.name}" маҳалласини ўчиришни тасдиқлайсизми?`
+            : `Haqiqatan ham "${mahallaToDelete?.name}" mahallasini o‘chirishni tasdiqlaysizmi?`
+        }
+        confirmLabel={t('common.delete')}
+        cancelLabel={t('common.cancel')}
         severity="danger"
         loading={deletingMahalla}
         onConfirm={handleConfirmDeleteMahalla}

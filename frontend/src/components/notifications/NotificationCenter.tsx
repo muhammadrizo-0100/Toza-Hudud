@@ -46,24 +46,29 @@ import {
   useClearAllNotificationsApiMutation
 } from '../../api/notificationsApi';
 import { AppNotificationItem } from '../../types';
+import { useTranslation } from '../../i18n';
 
 interface NotificationCenterProps {
   onOpenRequest?: (requestId: number) => void;
 }
 
-function formatNotificationTime(dateStr?: string): string {
+function formatNotificationTime(dateStr?: string, lang: 'uz' | 'oz' = 'uz'): string {
   if (!dateStr) return '';
   try {
     const d = new Date(dateStr);
     if (isNaN(d.getTime())) return '';
     const now = new Date();
     const diffSec = Math.floor((now.getTime() - d.getTime()) / 1000);
-    if (diffSec < 60) return 'Hozirgina';
-    if (diffSec < 3600) return `${Math.floor(diffSec / 60)} daqiqa oldin`;
-    if (diffSec < 86400 && d.getDate() === now.getDate()) {
-      return `Bugun, ${d.toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' })}`;
+    if (diffSec < 60) return lang === 'oz' ? 'Ҳозиргина' : 'Hozirgina';
+    if (diffSec < 3600) {
+      const mins = Math.floor(diffSec / 60);
+      return lang === 'oz' ? `${mins} дақиқа олдин` : `${mins} daqiqa oldin`;
     }
-    return d.toLocaleDateString('uz-UZ', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+    if (diffSec < 86400 && d.getDate() === now.getDate()) {
+      const todayWord = lang === 'oz' ? 'Бугун' : 'Bugun';
+      return `${todayWord}, ${d.toLocaleTimeString(lang === 'oz' ? 'ru-RU' : 'uz-UZ', { hour: '2-digit', minute: '2-digit' })}`;
+    }
+    return d.toLocaleDateString(lang === 'oz' ? 'ru-RU' : 'uz-UZ', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
   } catch {
     return '';
   }
@@ -84,6 +89,7 @@ function getIcon(kind: string, status: string) {
 
 export const NotificationCenter: React.FC<NotificationCenterProps> = ({ onOpenRequest }) => {
   const dispatch = useAppDispatch();
+  const { lang, t } = useTranslation();
   const { items, unreadCount, totalCount, soundEnabled } = useAppSelector((state) => state.notifications);
 
   const [markReadApi] = useMarkNotificationAsReadMutation();
@@ -230,12 +236,12 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({ onOpenRe
           <Stack direction="row" alignItems="center" justifyContent="space-between">
             <Stack direction="row" spacing={1} alignItems="center">
               <Typography variant="subtitle1" fontWeight={700}>
-                Bildirishnomalar
+                {t('modules.notifications.title')}
               </Typography>
               {unreadCount > 0 && (
                 <Chip
                   size="small"
-                  label={`${unreadCount} ta yangi`}
+                  label={`${unreadCount} ${lang === 'oz' ? 'та янги' : 'ta yangi'}`}
                   color="primary"
                   sx={{ height: 22, fontWeight: 700, fontSize: '0.72rem' }}
                 />
@@ -243,7 +249,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({ onOpenRe
             </Stack>
 
             <Stack direction="row" spacing={0.5}>
-              <Tooltip title={soundEnabled ? 'Ovoz yoniq' : 'Ovoz o‘chiq'}>
+              <Tooltip title={soundEnabled ? (lang === 'oz' ? 'Овоз ёниқ' : 'Ovoz yoniq') : (lang === 'oz' ? 'Овоз ўчиқ' : 'Ovoz o‘chiq')}>
                 <IconButton size="small" onClick={() => dispatch(toggleSound())}>
                   {soundEnabled ? (
                     <VolumeUpOutlinedIcon fontSize="small" color="action" />
@@ -254,7 +260,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({ onOpenRe
               </Tooltip>
 
               {unreadCount > 0 && (
-                <Tooltip title="Barchasini o‘qilgan qilish">
+                <Tooltip title={t('modules.notifications.markAllRead')}>
                   <IconButton size="small" onClick={handleMarkAllRead}>
                     <DoneAllOutlinedIcon fontSize="small" color="primary" />
                   </IconButton>
@@ -279,8 +285,8 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({ onOpenRe
               }
             }}
           >
-            <Tab value="all" label={`Barchasi (${totalDisplayCount})`} />
-            <Tab value="unread" label={`O‘qilmagan (${unreadCount})`} />
+            <Tab value="all" label={`${t('common.all')} (${totalDisplayCount})`} />
+            <Tab value="unread" label={`${lang === 'oz' ? 'Ўқилмаган' : 'O‘qilmagan'} (${unreadCount})`} />
           </Tabs>
         </Box>
 
@@ -290,7 +296,9 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({ onOpenRe
           {filteredItems.length === 0 ? (
             <Box sx={{ py: 5, textAlign: 'center' }}>
               <Typography variant="body2" color="text.secondary">
-                {filterTab === 'unread' ? 'O‘qilmagan bildirishnomalar yo‘q' : 'Bildirishnomalar mavjud emas'}
+                {filterTab === 'unread'
+                  ? (lang === 'oz' ? 'Ўқилмаган билдиришномалар йўқ' : 'O‘qilmagan bildirishnomalar yo‘q')
+                  : t('modules.notifications.noNotifications')}
               </Typography>
             </Box>
           ) : (
@@ -347,7 +355,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({ onOpenRe
                           display: 'block'
                         }}
                       >
-                        {formatNotificationTime(item.createdAt)}
+                        {formatNotificationTime(item.createdAt, lang)}
                       </Typography>
                     </Box>
                   }
@@ -379,7 +387,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({ onOpenRe
             color="inherit"
             sx={{ fontSize: '0.75rem', fontWeight: 600, color: 'text.secondary' }}
           >
-            Tarixni tozalash
+            {t('modules.notifications.clear')}
           </Button>
         </Box>
       </Popover>

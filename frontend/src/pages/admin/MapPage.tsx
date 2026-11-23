@@ -29,9 +29,11 @@ import AppBreadcrumbs from '../../components/common/AppBreadcrumbs';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { RequestStatus } from '../../types';
 import { useAppSelector } from '../../store/hooks';
+import { useTranslation } from '../../i18n';
 
 export const MapPage: React.FC = () => {
   const navigate = useNavigate();
+  const { t, lang } = useTranslation();
   const { user } = useAppSelector((state) => state.auth);
   const isSuperAdmin = user?.role === 'SuperAdmin';
 
@@ -147,7 +149,7 @@ export const MapPage: React.FC = () => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      <AppBreadcrumbs items={[{ label: 'Chiqindi xaritasi' }]} />
+      <AppBreadcrumbs items={[{ label: t('nav.wasteMap') }]} />
 
       {/* Top Map Controls Card (BSK Screenshot 4 Style) */}
       <DataTableCard sx={{ p: { xs: 2, md: 2.25 } }}>
@@ -160,10 +162,10 @@ export const MapPage: React.FC = () => {
           >
             <Box>
               <Typography variant="h4" fontWeight={800}>
-                Mahallalar va Chiqindi Nuqtalari Xaritasi
+                {t('modules.map.title')}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Marker ranglari hududdagi tozalik darajasi va chiqindi holatini ifodalaydi.
+                {t('modules.map.subtitle')}
               </Typography>
             </Box>
 
@@ -171,11 +173,11 @@ export const MapPage: React.FC = () => {
         {isSuperAdmin && (
           <Box sx={{ width: 170 }}>
             <AppSelectField
-              label="Tuman"
+              label={t('modules.map.selectDistrict')}
               value={selectedDistrictId}
               onChange={(e) => setSelectedDistrictId(e.target.value ? Number(e.target.value) : '')}
               options={[
-                { value: '', label: 'Barcha tumanlar' },
+                { value: '', label: t('common.allDistricts') },
                 ...districts.map((d) => ({ value: d.id, label: d.name }))
               ]}
             />
@@ -184,26 +186,26 @@ export const MapPage: React.FC = () => {
 
               <Box sx={{ width: 155 }}>
                 <AppSelectField
-                  label="Xarita uslubi"
+                  label={t('modules.map.mapStyle')}
                   value={mapStyle}
                   onChange={(e) => setMapStyle(e.target.value as MapStyleType)}
                   options={[
-                    { value: 'osm', label: 'Standart (OSM)' },
-                    { value: 'light', label: 'Yengil (CARTO)' },
-                    { value: 'satellite', label: 'Yo‘ldosh (Sputnik)' }
+                    { value: 'osm', label: t('modules.map.standardOsm') },
+                    { value: 'light', label: lang === 'oz' ? 'Енгил (CARTO)' : 'Yengil (CARTO)' },
+                    { value: 'satellite', label: t('modules.map.satellite') }
                   ]}
                 />
               </Box>
 
               <Box sx={{ width: 165 }}>
                 <AppSelectField
-                  label="Qatlam"
+                  label={t('modules.map.layer')}
                   value={layerMode}
                   onChange={(e) => setLayerMode(e.target.value as LayerModeType)}
                   options={[
-                    { value: 'markers', label: 'Faqat markerlar' },
-                    { value: 'heat', label: 'Issiqlik (Heatmap)' },
-                    { value: 'both', label: 'Marker + Issiqlik' }
+                    { value: 'markers', label: t('modules.map.onlyMarkers') },
+                    { value: 'heat', label: t('modules.map.heatmap') },
+                    { value: 'both', label: lang === 'oz' ? 'Маркер + Иссиқлик' : 'Marker + Issiqlik' }
                   ]}
                 />
               </Box>
@@ -226,7 +228,7 @@ export const MapPage: React.FC = () => {
                   refetch();
                 }}
               >
-                Tiklash
+                {t('modules.map.reset')}
               </AppButton>
             </Stack>
           </Stack>
@@ -244,7 +246,7 @@ export const MapPage: React.FC = () => {
             {/* Legend Chips with Colored Dots */}
             <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap">
               <Chip
-                label={`Jami nuqtalar: ${legendStats.all}`}
+                label={`${t('modules.map.totalPoints')}: ${legendStats.all}`}
                 icon={<LayersOutlinedIcon fontSize="small" />}
                 variant={statusFilter === 'all' ? 'filled' : 'outlined'}
                 onClick={() => setStatusFilter('all')}
@@ -268,7 +270,7 @@ export const MapPage: React.FC = () => {
               >
                 <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: '#DC2626' }} />
                 <Typography variant="caption" fontWeight={700} color="text.primary">
-                  Sariq/Qizil: Faol muammo ({legendStats.active})
+                  {lang === 'oz' ? 'Сариқ/Қизил: Фаол муаммо' : 'Sariq/Qizil: Faol muammo'} ({legendStats.active})
                 </Typography>
               </Stack>
 
@@ -289,7 +291,7 @@ export const MapPage: React.FC = () => {
               >
                 <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: '#10B981' }} />
                 <Typography variant="caption" fontWeight={700} color="text.primary">
-                  Yashil: Tozalangan ({legendStats.completedVisible})
+                  {lang === 'oz' ? 'Яшил: Тозаланган' : 'Yashil: Tozalangan'} ({legendStats.completedVisible})
                 </Typography>
               </Stack>
             </Stack>
@@ -297,11 +299,11 @@ export const MapPage: React.FC = () => {
             {/* Date range filter */}
             <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
               <Typography variant="caption" color="text.secondary" fontWeight={700}>
-                Davr:
+                {lang === 'oz' ? 'Давр:' : 'Davr:'}
               </Typography>
               <Chip
                 size="small"
-                label="So‘nggi 24 soat (Operativ)"
+                label={t('modules.map.last24Hours')}
                 variant={dateRange === '24h' ? 'filled' : 'outlined'}
                 color={dateRange === '24h' ? 'primary' : 'default'}
                 onClick={() => setDateRange('24h')}
@@ -309,7 +311,7 @@ export const MapPage: React.FC = () => {
               />
               <Chip
                 size="small"
-                label="So‘nggi 7 kun"
+                label={t('modules.map.last7Days')}
                 variant={dateRange === '7d' ? 'filled' : 'outlined'}
                 color={dateRange === '7d' ? 'primary' : 'default'}
                 onClick={() => setDateRange('7d')}
@@ -317,7 +319,7 @@ export const MapPage: React.FC = () => {
               />
               <Chip
                 size="small"
-                label="So‘nggi 30 kun"
+                label={t('modules.map.last30Days')}
                 variant={dateRange === '30d' ? 'filled' : 'outlined'}
                 color={dateRange === '30d' ? 'primary' : 'default'}
                 onClick={() => setDateRange('30d')}
@@ -329,7 +331,7 @@ export const MapPage: React.FC = () => {
                 label={
                   dateRange === 'custom' && (customStartDate || customEndDate)
                     ? `${customStartDate || '...'} / ${customEndDate || '...'}`
-                    : 'Oraliq sana...'
+                    : t('modules.map.dateRange')
                 }
                 variant={dateRange === 'custom' ? 'filled' : 'outlined'}
                 color={dateRange === 'custom' ? 'primary' : 'default'}
@@ -342,7 +344,7 @@ export const MapPage: React.FC = () => {
               />
               <Chip
                 size="small"
-                label="Barcha vaqt"
+                label={t('modules.map.allTime')}
                 variant={dateRange === 'all' ? 'filled' : 'outlined'}
                 color={dateRange === 'all' ? 'primary' : 'default'}
                 onClick={() => setDateRange('all')}
@@ -368,7 +370,7 @@ export const MapPage: React.FC = () => {
               }}
             >
               <Typography variant="caption" sx={{ color: '#166534', fontWeight: 600 }}>
-                ⚡ <b>Operativ rejim faol:</b> Xarita doimo toza va operativ bo‘lishi uchun so‘nggi 24 soat ichida tozalangan nuqtalar ko‘rsatilmoqda. 24 soatdan oshgan <b>{legendStats.archivedHidden} ta</b> tozalangan murojaat xaritada yashirildi (baza va hisobotlarda to‘liq saqlanmoqda).
+                ⚡ <b>{lang === 'oz' ? 'Оператив режим фаол:' : 'Operativ rejim faol:'}</b> {lang === 'oz' ? 'Харита доимо тоза ва оператив бўлиши учун сўнгги 24 соат ичида тозаланган нуқталар кўрсатилмоқда.' : 'Xarita doimo toza va operativ bo‘lishi uchun so‘nggi 24 soat ichida tozalangan nuqtalar ko‘rsatilmoqda.'} 24 {lang === 'oz' ? 'соатдан ошган' : 'soatdan oshgan'} <b>{legendStats.archivedHidden} {lang === 'oz' ? 'та' : 'ta'}</b> {lang === 'oz' ? 'тозаланган мурожаат харитада яширилди (база ва ҳисоботларда тўлиқ сақланмоқда).' : 'tozalangan murojaat xaritada yashirildi (baza va hisobotlarda to‘liq saqlanmoqda).'}
               </Typography>
               <Button
                 size="small"
@@ -376,7 +378,7 @@ export const MapPage: React.FC = () => {
                 sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#059669', p: 0, minWidth: 'auto', textTransform: 'none' }}
                 onClick={() => setDateRange('all')}
               >
-                Barcha arxivni ko‘rish →
+                {t('modules.map.viewAllArchive')}
               </Button>
             </Box>
           )}

@@ -4,6 +4,7 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../../store/hooks';
+import { useTranslation } from '../../i18n';
 
 export interface BreadcrumbItem {
   label: string;
@@ -19,16 +20,16 @@ interface AppBreadcrumbsProps {
 export const AppBreadcrumbs: React.FC<AppBreadcrumbsProps> = ({ items, showHome = true }) => {
   const navigate = useNavigate();
   const { user } = useAppSelector((state) => state.auth);
+  const { t } = useTranslation();
 
   const isLeadership = user?.role === 'SuperAdmin' || user?.role === 'Manager';
   const homePath = isLeadership ? '/admin' : '/admin/requests';
 
   // Dala xodimlari (Inspector, Driver) yoki Dispetcher uchun asosiy bosh sahifa /admin/requests hisoblanadi.
-  // Ular o'zlarining asosiy sahifasida turganida, boshqaruv paneliga olib boruvchi "Bosh sahifa >" ortiqcha havolasi ko'rsatilmaydi.
   const isWorkerOnHome =
     !isLeadership &&
     items.length === 1 &&
-    (items[0].label === 'Murojaatlar' || items[0].label === 'Mening vazifalarim');
+    (items[0].label === 'Murojaatlar' || items[0].label === 'Мурожаатлар' || items[0].label === 'Mening vazifalarim' || items[0].label === 'Менинг вазифаларим');
 
   if (isWorkerOnHome) {
     return (
@@ -49,10 +50,10 @@ export const AppBreadcrumbs: React.FC<AppBreadcrumbsProps> = ({ items, showHome 
   }
 
   const homeLabel = isLeadership
-    ? 'Bosh sahifa'
+    ? t('common.home')
     : user?.role === 'Inspector' || user?.role === 'Driver'
-      ? 'Mening vazifalarim'
-      : 'Murojaatlar';
+      ? t('nav.myTasks')
+      : t('nav.requests');
 
   return (
     <Box sx={{ mb: 2 }}>

@@ -36,6 +36,7 @@ import AppSelectField from '../../components/common/AppSelectField';
 import AppButton from '../../components/common/AppButton';
 import AppBreadcrumbs from '../../components/common/AppBreadcrumbs';
 import { useAppSelector } from '../../store/hooks';
+import { useTranslation } from '../../i18n';
 import DataTableCard from '../../components/common/DataTableCard';
 import { AppTable } from '../../components/common/AppTable';
 import { TableBody, TableCell, TableHead, TableRow } from '@mui/material';
@@ -79,6 +80,7 @@ const renderInnerPieLabel = ({
 
 export const StatsPage: React.FC = () => {
   const { user } = useAppSelector((state) => state.auth);
+  const { t, lang } = useTranslation();
   const isSuperAdmin = user?.role === 'SuperAdmin';
 
   const [districtId, setDistrictId] = useState<number | ''>(() => {
@@ -145,29 +147,29 @@ export const StatsPage: React.FC = () => {
 
   return (
     <Stack spacing={2.5}>
-      <AppBreadcrumbs items={[{ label: 'Tahlil va statistika' }]} />
+      <AppBreadcrumbs items={[{ label: t('nav.stats') }]} />
 
       {/* Top FilterBar (BSK Screenshot 5 Style) */}
       <FilterBar>
         <Box sx={{ minWidth: { xs: '100%', md: 360 } }}>
           <Typography variant="h4" fontWeight={800}>
-            Tahlil va Statistika
+            {t('nav.stats')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Murojaatlar oqimi, tozalash samaradorligi va hududlar kesimidagi dinamika.
+            {lang === 'oz' ? 'Мурожаатлар оқими, тозалаш самарадорлиги ва ҳудудлар кесимидаги динамика.' : 'Murojaatlar oqimi, tozalash samaradorligi va hududlar kesimidagi dinamika.'}
           </Typography>
         </Box>
 
         <Box sx={{ width: 170 }}>
           <AppSelectField
-            label="Davr"
+            label={lang === 'oz' ? 'Давр' : 'Davr'}
             value={dateRange}
             onChange={(e) => setDateRange(e.target.value as 'week')}
             options={[
-              { value: 'all', label: 'Barcha vaqt' },
-              { value: 'today', label: 'Bugun' },
-              { value: 'week', label: 'So‘nggi 7 kun' },
-              { value: 'month', label: 'So‘nggi 30 kun' }
+              { value: 'all', label: t('modules.map.allTime') },
+              { value: 'today', label: lang === 'oz' ? 'Бугун' : 'Bugun' },
+              { value: 'week', label: t('modules.map.last7Days') },
+              { value: 'month', label: t('modules.map.last30Days') }
             ]}
           />
         </Box>
@@ -175,11 +177,11 @@ export const StatsPage: React.FC = () => {
         {isSuperAdmin && (
           <Box sx={{ width: 200 }}>
             <AppSelectField
-              label="Tuman"
+              label={t('modules.map.selectDistrict')}
               value={districtId}
               onChange={(e) => setDistrictId(e.target.value ? Number(e.target.value) : '')}
               options={[
-                { value: '', label: 'Barcha tumanlar' },
+                { value: '', label: t('common.allDistricts') },
                 ...districts.map((d) => ({ value: d.id, label: d.name }))
               ]}
             />
@@ -192,7 +194,7 @@ export const StatsPage: React.FC = () => {
           onClick={() => refetch()}
           sx={{ ml: 'auto' }}
         >
-          Yangilash
+          {t('common.refresh')}
         </AppButton>
       </FilterBar>
 

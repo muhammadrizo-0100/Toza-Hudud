@@ -30,32 +30,60 @@ import AppSelectField from '../../components/common/AppSelectField';
 import { AppTable } from '../../components/common/AppTable';
 import AppButton from '../../components/common/AppButton';
 import { RequestStatus } from '../../types';
+import { useTranslation } from '../../i18n';
 
-function formatDateTime(dateStr: string) {
+function formatDateTime(dateStr: string, lang: 'uz' | 'oz' = 'uz') {
   if (!dateStr) return { date: '-', time: '' };
   const d = new Date(dateStr);
-  const date = d.toLocaleDateString('uz-UZ', { day: '2-digit', month: '2-digit', year: 'numeric' });
-  const time = d.toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' });
+  const locale = lang === 'oz' ? 'ru-RU' : 'uz-UZ';
+  const date = d.toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const time = d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
   return { date, time };
 }
 
-function getWasteTypeBadge(type?: string | null) {
+function getWasteTypeBadge(type?: string | null, lang: 'uz' | 'oz' = 'uz') {
   switch (type) {
     case 'qurilish':
-      return { label: 'Qurilish chiqindisi', color: '#B45309', bgcolor: '#FEF3C7', border: '#FDE68A' };
+      return {
+        label: lang === 'oz' ? 'Қурилиш чиқиндиси' : 'Qurilish chiqindisi',
+        color: '#B45309',
+        bgcolor: '#FEF3C7',
+        border: '#FDE68A'
+      };
     case 'xazon':
-      return { label: 'Xazon va shoxlar', color: '#15803D', bgcolor: '#DCFCE7', border: '#BBF7D0' };
+      return {
+        label: lang === 'oz' ? 'Хазон ва шохлар' : 'Xazon va shoxlar',
+        color: '#15803D',
+        bgcolor: '#DCFCE7',
+        border: '#BBF7D0'
+      };
     case 'katta_hajmli':
-      return { label: 'Katta hajmli', color: '#6D28D9', bgcolor: '#EDE9FE', border: '#DDD6FE' };
+      return {
+        label: lang === 'oz' ? 'Катта ҳажмли' : 'Katta hajmli',
+        color: '#6D28D9',
+        bgcolor: '#EDE9FE',
+        border: '#DDD6FE'
+      };
     case 'noqonuniy':
-      return { label: 'Noqonuniy tashlandiq', color: '#B91C1C', bgcolor: '#FEE2E2', border: '#FECACA' };
+      return {
+        label: lang === 'oz' ? 'Ноқонуний ташландиқ' : 'Noqonuniy tashlandiq',
+        color: '#B91C1C',
+        bgcolor: '#FEE2E2',
+        border: '#FECACA'
+      };
     case 'maishiy':
     default:
-      return { label: 'Maishiy chiqindi', color: '#0369A1', bgcolor: '#E0F2FE', border: '#BAE6FD' };
+      return {
+        label: lang === 'oz' ? 'Маиший чиқинди' : 'Maishiy chiqindi',
+        color: '#0369A1',
+        bgcolor: '#E0F2FE',
+        border: '#BAE6FD'
+      };
   }
 }
 
 export const RequestsPage: React.FC = () => {
+  const { t, lang } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const urlRequestId = searchParams.get('requestId');
 
@@ -164,10 +192,10 @@ export const RequestsPage: React.FC = () => {
 
   const isFieldWorker = user?.role === 'Inspector' || user?.role === 'Driver';
   const pageBreadcrumbLabel = isFieldWorker
-    ? 'Mening vazifalarim'
+    ? t('nav.myTasks')
     : user?.role === 'Manager'
-      ? 'Tuman murojaatlari'
-      : 'Murojaatlar';
+      ? t('nav.districtRequests')
+      : t('nav.requests');
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, position: 'relative' }}>
@@ -176,22 +204,22 @@ export const RequestsPage: React.FC = () => {
       {/* Top Filter Bar (BSK Style) */}
       <FilterBar>
         <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.secondary', mr: 0.5 }}>
-          Filtr:
+          {lang === 'oz' ? 'Филтр:' : 'Filtr:'}
         </Typography>
 
         <Box sx={{ width: 150 }}>
           <AppSelectField
-            label="Davr"
+            label={lang === 'oz' ? 'Давр' : 'Davr'}
             value={dateRange}
             onChange={(e) => {
               setDateRange(e.target.value as 'all');
               setPage(1);
             }}
             options={[
-              { value: 'all', label: 'Barcha vaqt' },
-              { value: 'today', label: 'Bugun' },
-              { value: 'week', label: 'So‘nggi 7 kun' },
-              { value: 'month', label: 'So‘nggi 30 kun' }
+              { value: 'all', label: t('modules.map.allTime') },
+              { value: 'today', label: lang === 'oz' ? 'Бугун' : 'Bugun' },
+              { value: 'week', label: t('modules.map.last7Days') },
+              { value: 'month', label: t('modules.map.last30Days') }
             ]}
           />
         </Box>
@@ -199,7 +227,7 @@ export const RequestsPage: React.FC = () => {
         {isSuperAdmin && (
           <Box sx={{ width: 180 }}>
             <AppSelectField
-              label="Tuman"
+              label={t('modules.map.selectDistrict')}
               value={districtFilter}
               onChange={(e) => {
                 setDistrictFilter(e.target.value ? Number(e.target.value) : '');
@@ -207,7 +235,7 @@ export const RequestsPage: React.FC = () => {
                 setPage(1);
               }}
               options={[
-                { value: '', label: 'Barcha tumanlar' },
+                { value: '', label: t('common.allDistricts') },
                 ...districts.map((d) => ({ value: d.id, label: d.name }))
               ]}
             />
@@ -216,7 +244,7 @@ export const RequestsPage: React.FC = () => {
 
         <Box sx={{ width: 180 }}>
           <AppSelectField
-            label="Mahalla"
+            label={lang === 'oz' ? 'Маҳалла' : 'Mahalla'}
             value={mahallaFilter}
             searchable
             onChange={(e) => {
@@ -224,7 +252,7 @@ export const RequestsPage: React.FC = () => {
               setPage(1);
             }}
             options={[
-              { value: '', label: 'Barcha mahallalar' },
+              { value: '', label: lang === 'oz' ? 'Барча маҳаллалар' : 'Barcha mahallalar' },
               ...mahallas.map((m) => ({ value: m.id, label: m.name }))
             ]}
           />
@@ -232,37 +260,37 @@ export const RequestsPage: React.FC = () => {
 
         <Box sx={{ width: 190 }}>
           <AppSelectField
-            label="Chiqindi turi"
+            label={t('modules.requests.category')}
             value={wasteTypeFilter}
             onChange={(e) => {
               setWasteTypeFilter(String(e.target.value));
               setPage(1);
             }}
             options={[
-              { value: 'all', label: 'Barcha yo‘nalishlar' },
-              { value: 'maishiy', label: 'Maishiy chiqindilar' },
-              { value: 'qurilish', label: 'Qurilish chiqindilari' },
-              { value: 'xazon', label: 'Xazon va shoxlar' },
-              { value: 'katta_hajmli', label: 'Katta hajmli' },
-              { value: 'noqonuniy', label: 'Noqonuniy tashlandiq' }
+              { value: 'all', label: lang === 'oz' ? 'Барча йўналишлар' : 'Barcha yo‘nalishlar' },
+              { value: 'maishiy', label: t('modules.requests.householdWaste') },
+              { value: 'qurilish', label: t('modules.requests.constructionWaste') },
+              { value: 'xazon', label: t('modules.requests.foliageWaste') },
+              { value: 'katta_hajmli', label: t('modules.requests.bulkyWaste') },
+              { value: 'noqonuniy', label: lang === 'oz' ? 'Ноқонуний ташландиқ' : 'Noqonuniy tashlandiq' }
             ]}
           />
         </Box>
 
         <Box sx={{ width: 180 }}>
           <AppSelectField
-            label="Holat"
+            label={t('common.status')}
             value={statusFilter}
             onChange={(e) => {
               setStatusFilter(e.target.value as RequestStatus | 'all');
               setPage(1);
             }}
             options={[
-              { value: 'all', label: 'Barcha holatlar' },
-              { value: 'new', label: 'Yangi' },
-              { value: 'in_progress', label: 'Jarayonda' },
-              { value: 'submitted', label: 'Tasdiqlashda' },
-              { value: 'completed', label: 'Tozalandi' }
+              { value: 'all', label: t('common.allStatuses') },
+              { value: 'new', label: t('common.statuses.new') },
+              { value: 'in_progress', label: t('common.statuses.in_progress') },
+              { value: 'submitted', label: t('common.statuses.submitted') },
+              { value: 'completed', label: t('common.statuses.completed') }
             ]}
           />
         </Box>
@@ -273,7 +301,7 @@ export const RequestsPage: React.FC = () => {
           onClick={() => refetch()}
           sx={{ ml: 'auto' }}
         >
-          Yangilash
+          {t('common.refresh')}
         </AppButton>
       </FilterBar>
 
@@ -296,10 +324,10 @@ export const RequestsPage: React.FC = () => {
         )}
         <Box sx={{ px: 1, pb: 2 }}>
           <Typography variant="h4" fontWeight={800}>
-            Murojaatlar ro‘yxati
+            {t('nav.requestsList')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Kelgan arizalar, biriktirilgan xodimlar va holatlar bir jadvalda ko‘rsatiladi.
+            {lang === 'oz' ? 'Келган аризалар, бириктирилган ходимлар ва ҳолатлар бир жадвалда кўрсатилади.' : 'Kelgan arizalar, biriktirilgan xodimlar va holatlar bir jadvalda ko‘rsatiladi.'}
           </Typography>
         </Box>
 
@@ -310,7 +338,7 @@ export const RequestsPage: React.FC = () => {
         ) : requests.length === 0 ? (
           <Box sx={{ py: 8, textAlign: 'center', color: 'text.secondary' }}>
             <Typography variant="body1" fontWeight={600}>
-              Tanlangan mezonlar bo‘yicha arizalar topilmadi.
+              {t('common.noData')}
             </Typography>
           </Box>
         ) : (
@@ -319,18 +347,18 @@ export const RequestsPage: React.FC = () => {
             <TableHead>
               <TableRow>
                 <TableCell sx={{ width: 65 }}>ID</TableCell>
-                <TableCell sx={{ minWidth: 150 }}>Fuqaro va Aloqa</TableCell>
-                <TableCell sx={{ minWidth: 200 }}>Hudud va Manzil</TableCell>
-                <TableCell sx={{ width: 130 }}>Yo‘nalish</TableCell>
-                <TableCell sx={{ width: 120 }}>Sana</TableCell>
-                <TableCell sx={{ minWidth: 140 }}>Mas‘ul xodim</TableCell>
-                <TableCell sx={{ width: 120 }}>Holati</TableCell>
-                <TableCell align="right" sx={{ width: 100 }}>Harakat</TableCell>
+                <TableCell sx={{ minWidth: 150 }}>{lang === 'oz' ? 'Фуқаро ва Алоқа' : 'Fuqaro va Aloqa'}</TableCell>
+                <TableCell sx={{ minWidth: 200 }}>{lang === 'oz' ? 'Ҳудуд ва Манзил' : 'Hudud va Manzil'}</TableCell>
+                <TableCell sx={{ width: 130 }}>{lang === 'oz' ? 'Йўналиш' : 'Yo‘nalish'}</TableCell>
+                <TableCell sx={{ width: 120 }}>{t('common.date')}</TableCell>
+                <TableCell sx={{ minWidth: 140 }}>{lang === 'oz' ? 'Масъул ходим' : 'Mas‘ul xodim'}</TableCell>
+                <TableCell sx={{ width: 120 }}>{t('common.status')}</TableCell>
+                <TableCell align="right" sx={{ width: 100 }}>{t('common.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {requests.map((req) => {
-                const dt = formatDateTime(req.createdAt);
+                const dt = formatDateTime(req.createdAt, lang);
                 return (
                   <TableRow key={req.id} hover>
                     <TableCell sx={{ whiteSpace: 'nowrap' }}>
@@ -339,7 +367,7 @@ export const RequestsPage: React.FC = () => {
 
                     <TableCell>
                       <Typography variant="body2" fontWeight={700}>
-                        {req.citizenFullName || 'Noma‘lum fuqaro'}
+                        {req.citizenFullName || (lang === 'oz' ? 'Номаълум фуқаро' : 'Noma‘lum fuqaro')}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
                         {req.citizenPhone || '-'}
@@ -350,7 +378,7 @@ export const RequestsPage: React.FC = () => {
                       <Typography variant="body2" fontWeight={700}>
                         {req.district?.name ? req.district.name : ''}
                         {req.district?.name && req.mahalla?.name ? ' • ' : ''}
-                        {req.mahalla?.name || 'Mahalla ko‘rsatilmagan'}
+                        {req.mahalla?.name || (lang === 'oz' ? 'Маҳалла кўрсатилмаган' : 'Mahalla ko‘rsatilmagan')}
                       </Typography>
                       <Typography
                         variant="caption"
@@ -368,7 +396,7 @@ export const RequestsPage: React.FC = () => {
 
                     <TableCell>
                       {(() => {
-                        const badge = getWasteTypeBadge(req.wasteType);
+                        const badge = getWasteTypeBadge(req.wasteType, lang);
                         return (
                           <Typography
                             variant="caption"
@@ -418,7 +446,7 @@ export const RequestsPage: React.FC = () => {
                             display: 'inline-block'
                           }}
                         >
-                          Biriktirilmagan
+                          {lang === 'oz' ? 'Бириктирилмаган' : 'Biriktirilmagan'}
                         </Typography>
                       )}
                     </TableCell>
@@ -433,7 +461,7 @@ export const RequestsPage: React.FC = () => {
                         size="small"
                         onClick={() => handleOpenDetail(req.id)}
                       >
-                        Ko‘rish
+                        {t('common.view')}
                       </AppButton>
                     </TableCell>
                   </TableRow>

@@ -57,6 +57,7 @@ import AppPhoneField from '../../components/common/AppPhoneField';
 import { AdminUser, AdminRole } from '../../types';
 import { formatUzPhone, cleanUzPhone, validateUzPhone } from '../../utils/phone';
 import { useToast } from '../../context/ToastContext';
+import { useTranslation } from '../../i18n';
 
 /**
  * Normalizes text for search by lowercasing, replacing curly apostrophes with straight quotes,
@@ -146,6 +147,7 @@ function matchEmployee(
 
 export const StaffPage: React.FC = () => {
   const { user } = useAppSelector((state) => state.auth);
+  const { t, lang } = useTranslation();
   const isManager = user?.role === 'Manager';
   const isSuperAdmin = user?.role === 'SuperAdmin';
   const isDispatcher = user?.role === 'Dispatcher';
@@ -395,20 +397,20 @@ export const StaffPage: React.FC = () => {
   };
 
   const pageTitle = isManager
-    ? `${user?.district?.name || 'Tuman'} Tozalik Xodimlari va Brigadalari`
+    ? `${user?.district?.name || (lang === 'oz' ? 'Туман' : 'Tuman')} ${lang === 'oz' ? 'Тозалик Ходимлари ва Бригадалари' : 'Tozalik Xodimlari va Brigadalari'}`
     : isDispatcher
-    ? `${user?.district?.name || 'Tuman'} Tozalash Brigadalari`
-    : 'Viloyat Miqyosidagi Kadrlar va Mas‘ullar';
+    ? `${user?.district?.name || (lang === 'oz' ? 'Туман' : 'Tuman')} ${lang === 'oz' ? 'Тозалаш Бригадалари' : 'Tozalash Brigadalari'}`
+    : (lang === 'oz' ? 'Вилоят Миқёсидаги Кадрлар ва Масъуллар' : 'Viloyat Miqyosidagi Kadrlar va Mas‘ullar');
 
   const pageSubtitle = isManager
-    ? 'Faqat o‘z tumaningizdagi dispetcherlar hamda tozalash mashinalari haydovchilari boshqaruvi'
+    ? (lang === 'oz' ? 'Фақат ўз туманингиздаги диспетчерлар ҳамда тозалаш машиналари ҳайдовчилари бошқаруви' : 'Faqat o‘z tumaningizdagi dispetcherlar hamda tozalash mashinalari haydovchilari boshqaruvi')
     : isDispatcher
-    ? 'Chiqindi tashuvchi maxsus texnikalar va haydovchilar ro‘yxati'
-    : 'Barcha tuman tozalik boshliqlari, dispetcherlar hamda tozalash brigadalari';
+    ? (lang === 'oz' ? 'Чиқинди ташувчи махсус техникалар ва ҳайдовчилар рўйхати' : 'Chiqindi tashuvchi maxsus texnikalar va haydovchilar ro‘yxati')
+    : (lang === 'oz' ? 'Барча туман тозалик бошлиқлари, диспетчерлар ҳамда тозалаш бригадалари' : 'Barcha tuman tozalik boshliqlari, dispetcherlar hamda tozalash brigadalari');
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-      <AppBreadcrumbs items={[{ label: 'Xodimlar va brigadalar' }]} />
+      <AppBreadcrumbs items={[{ label: t('nav.staffAndManagement') }]} />
 
       {/* Header */}
       <Stack direction="row" alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={1.5}>
@@ -427,7 +429,9 @@ export const StaffPage: React.FC = () => {
             startIcon={<AddIcon />}
             onClick={handleOpenAddAdmin}
           >
-            {isSuperAdmin ? 'Yangi Rahbar / Dispetcher Qo‘shish' : 'Yangi Dispetcher Qo‘shish'}
+            {isSuperAdmin
+              ? (lang === 'oz' ? 'Янги Раҳбар / Диспетчер Қўшиш' : 'Yangi Rahbar / Dispetcher Qo‘shish')
+              : (lang === 'oz' ? 'Янги Диспетчер Қўшиш' : 'Yangi Dispetcher Qo‘shish')}
           </AppButton>
         ) : (
           <AppButton
@@ -440,7 +444,7 @@ export const StaffPage: React.FC = () => {
               setWorkerDialogOpen(true);
             }}
           >
-            Yangi Nazoratchi / Haydovchi Qo‘shish
+            {lang === 'oz' ? 'Янги Назоратчи / Ҳайдовчи Қўшиш' : 'Yangi Nazoratchi / Haydovchi Qo‘shish'}
           </AppButton>
         )}
       </Stack>
@@ -473,13 +477,17 @@ export const StaffPage: React.FC = () => {
             <Tab
               icon={<SupervisorAccountOutlinedIcon sx={{ fontSize: 18 }} />}
               iconPosition="start"
-              label={isManager ? `Tuman Dispetcherlari (${admins.length})` : `Tuman Boshliqlari va Dispetcherlar (${admins.length})`}
+              label={
+                isManager
+                  ? `${lang === 'oz' ? 'Туман Диспетчерлари' : 'Tuman Dispetcherlari'} (${admins.length})`
+                  : `${lang === 'oz' ? 'Туман Бошлиқлари ва Диспетчерлар' : 'Tuman Boshliqlari va Dispetcherlar'} (${admins.length})`
+              }
             />
           )}
           <Tab
             icon={<LocalShippingOutlinedIcon sx={{ fontSize: 18 }} />}
             iconPosition="start"
-            label={`Hudud Nazoratchilari va Haydovchilar (${workers.length})`}
+            label={`${lang === 'oz' ? 'Ҳудуд Назоратчилари ва Ҳайдовчилар' : 'Hudud Nazoratchilari va Haydovchilar'} (${workers.length})`}
           />
         </Tabs>
       </Box>

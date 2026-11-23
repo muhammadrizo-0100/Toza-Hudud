@@ -19,6 +19,7 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import DataTableCard from '../../../components/common/DataTableCard';
 import { AppTable } from '../../../components/common/AppTable';
 import { District } from '../../../types';
+import { useTranslation } from '../../../i18n';
 
 interface DistrictsListTableProps {
   districts: District[];
@@ -36,6 +37,7 @@ export const DistrictsListTable: React.FC<DistrictsListTableProps> = ({
   onDeleteDistrict
 }) => {
   const navigate = useNavigate();
+  const { t, lang } = useTranslation();
 
   return (
     <DataTableCard sx={{ p: 0, borderRadius: '14px', border: '1px solid #E2E8F0', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
@@ -45,20 +47,26 @@ export const DistrictsListTable: React.FC<DistrictsListTableProps> = ({
             <LocationCityOutlinedIcon sx={{ fontSize: 18 }} />
           </Box>
           <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#0F172A', fontSize: '0.95rem' }}>
-            Tumanlar ({districts.length})
+            {t('modules.districts.districtsTitle')} ({districts.length})
           </Typography>
         </Stack>
         <Typography variant="caption" sx={{ color: '#94A3B8', fontWeight: 500 }}>
-          Tanlash uchun bosing
+          {t('modules.districts.clickToSelect')}
         </Typography>
       </Box>
 
       <AppTable minWidth="100%">
         <TableHead>
           <TableRow sx={{ bgcolor: '#F8FAFC' }}>
-            <TableCell sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.78rem', py: 1.25 }}>Tuman nomi</TableCell>
-            <TableCell width={130} align="center" sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.78rem', py: 1.25 }}>Chegara</TableCell>
-            <TableCell width={80} align="right" sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.78rem', py: 1.25 }}>Amallar</TableCell>
+            <TableCell sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.78rem', py: 1.25 }}>
+              {lang === 'oz' ? 'Туман номи' : 'Tuman nomi'}
+            </TableCell>
+            <TableCell width={130} align="center" sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.78rem', py: 1.25 }}>
+              {lang === 'oz' ? 'Чегара' : 'Chegara'}
+            </TableCell>
+            <TableCell width={80} align="right" sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.78rem', py: 1.25 }}>
+              {t('common.actions')}
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -97,7 +105,7 @@ export const DistrictsListTable: React.FC<DistrictsListTableProps> = ({
                   <TableCell align="center" sx={{ py: 1.5 }}>
                     <Chip
                       size="small"
-                      label={hasBoundary ? 'Poligon bor' : 'Markaz nuqta'}
+                      label={hasBoundary ? t('modules.districts.hasPolygon') : (lang === 'oz' ? 'Марказ нуқта' : 'Markaz nuqta')}
                       sx={{
                         fontSize: '0.72rem',
                         height: 22,
@@ -110,7 +118,7 @@ export const DistrictsListTable: React.FC<DistrictsListTableProps> = ({
                   </TableCell>
                   <TableCell align="right" sx={{ py: 1.5 }}>
                     <Stack direction="row" spacing={0.5} justifyContent="flex-end" alignItems="center">
-                      <Tooltip title="Xaritada ko‘rish">
+                      <Tooltip title={lang === 'oz' ? 'Харитада кўриш' : 'Xaritada ko‘rish'}>
                         <IconButton
                           size="small"
                           sx={{ color: '#64748B', '&:hover': { color: 'primary.main', bgcolor: '#F0FDF4' } }}
@@ -119,7 +127,7 @@ export const DistrictsListTable: React.FC<DistrictsListTableProps> = ({
                           <MapOutlinedIcon sx={{ fontSize: 17 }} />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title="O‘chirish">
+                      <Tooltip title={t('common.delete')}>
                         <IconButton
                           size="small"
                           sx={{ color: '#64748B', '&:hover': { color: '#DC2626', bgcolor: '#FEF2F2' } }}

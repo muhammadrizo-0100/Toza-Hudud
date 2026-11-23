@@ -1,0 +1,33 @@
+import { NavTranslations } from '../../types';
+
+export const navOz: NavTranslations = {
+  brandTitle: 'Тоза Ҳудуд',
+  brandSubtitle: 'Санитар тозалаш тизими',
+  superAdminTitle: 'Вилоят Бошқарув Маркази',
+  managerTitle: 'Туман Тозалик Бошқармаси',
+  dispatcherTitle: 'Туман Диспетчерлик Хизмати',
+  dashboard: 'Вилоят бошқарув маркази',
+  allRequests: 'Барча мурожаатлар',
+  wasteMap: 'Вилоят чиқинди харитаси',
+  stats: 'Таҳлил ва статистика',
+  districtsAndNeighborhoods: 'Туман ва маҳаллалар',
+  staffAndManagement: 'Туман раҳбарлари ва ходимлар',
+  myAccount: 'Менинг ҳисобим',
+  myTasks: 'Менинг вазифаларим',
+  requests: 'Мурожаатлар',
+  district: 'Туман',
+  region: 'Вилоят',
+  managerManagement: 'бошқаруви',
+  districtRequests: 'Туман мурожаатлари',
+  districtMap: 'Туман харитаси',
+  districtStats: 'Туман статистикаси',
+  districtStaff: 'Туман ходимлари ва бригадалари',
+  myRounds: 'Менинг рейсларим',
+  routeMap: 'Маршрут харитаси',
+  areaMap: 'Ҳудуд харитаси',
+  requestsList: 'Мурожаатлар рўйхати',
+  driversAndBrigades: 'Ҳайдовчилар ва бригадалар',
+  logout: 'Тизимдан чиқиш',
+  logoutConfirmTitle: 'Тизимдан чиқишни тасдиқлайсизми?',
+  logoutConfirmDesc: 'Ҳақиқатан ҳам ўз ҳисобингиздан чиқмоқчимисиз?'
+};
