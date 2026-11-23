@@ -249,15 +249,30 @@ export const WasteMapCanvas: React.FC<WasteMapCanvasProps> = ({
         const palette = DISTRICT_PALETTE[idx % DISTRICT_PALETTE.length];
         const poly = L.polygon(polyCoords, {
           color: palette.border,
-          weight: 2.5,
+          weight: 2,
           fillColor: palette.fill,
           fillOpacity: 0.08
         });
 
-        poly.bindTooltip(`<b>${d.name}</b>`, {
-          permanent: true,
-          direction: 'center',
-          className: 'district-map-label'
+        poly.bindTooltip(
+          `<div style="display:flex;align-items:center;gap:6px;font-weight:700;font-size:12px;color:#0F172A;">
+             <span style="width:8px;height:8px;border-radius:50%;background:${palette.border};flex-shrink:0;"></span>
+             ${d.name}
+           </div>`,
+          {
+            permanent: false,
+            sticky: true,
+            direction: 'top',
+            className: 'district-map-hover-card'
+          }
+        );
+
+        poly.on('mouseover', () => {
+          poly.setStyle({ weight: 3.5, fillOpacity: 0.22 });
+        });
+
+        poly.on('mouseout', () => {
+          poly.setStyle({ weight: 2, fillOpacity: 0.08 });
         });
 
         poly.on('click', () => {

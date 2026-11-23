@@ -1,11 +1,11 @@
 export type LatLngTuple = [number, number];
 
 export const UZBEKISTAN_BOUNDS: [LatLngTuple, LatLngTuple] = [
-  [37.15, 55.90], // Janubiy-G'arbiy (Termiz / Qoraqalpog'iston)
-  [45.65, 73.20]  // Shimoliy-Sharqiy (Farg'ona vodiysi / Orol)
+  [36.0, 54.5], // Janubiy-G'arbiy (Surxondaryo / Qoraqalpog'iston chegarasi bilan)
+  [46.5, 74.5]  // Shimoliy-Sharqiy (Farg'ona vodiysi / Orol shimoli)
 ];
 
-export const UZBEKISTAN_MIN_ZOOM = 7;
+export const UZBEKISTAN_MIN_ZOOM = 6;
 
 export const DAVLATOBOD_CENTER: LatLngTuple = [41.0108, 71.5775];
 

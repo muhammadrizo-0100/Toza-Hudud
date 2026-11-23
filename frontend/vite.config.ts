@@ -21,20 +21,25 @@ export default defineConfig({
       '/socket.io': {
         target: 'http://127.0.0.1:4001',
         ws: true,
+        changeOrigin: true,
         configure: (proxy) => {
+          const isBenign = (err: any) => {
+            const str = String(err?.code || '') + ' ' + String(err?.message || '');
+            return ['ECONNABORTED', 'ECONNRESET', 'EPIPE', 'ETIMEDOUT'].some((code) => str.includes(code));
+          };
           proxy.on('error', (err: any) => {
-            // Ignore benign client disconnects / tab closes / page reloads
-            if (['ECONNABORTED', 'ECONNRESET', 'EPIPE', 'ETIMEDOUT'].includes(err?.code)) {
-              return;
-            }
+            if (isBenign(err)) return;
             console.warn('[vite] ws proxy notice:', err?.message || err);
           });
           proxy.on('proxyReqWs', (_proxyReq, _req, socket: any) => {
             socket.on('error', (err: any) => {
-              if (['ECONNABORTED', 'ECONNRESET', 'EPIPE', 'ETIMEDOUT'].includes(err?.code)) {
-                return;
-              }
+              if (isBenign(err)) return;
               console.warn('[vite] ws socket notice:', err?.message || err);
+            });
+          });
+          proxy.on('open', (proxySocket: any) => {
+            proxySocket.on('error', (err: any) => {
+              if (isBenign(err)) return;
             });
           });
         }

@@ -52,6 +52,19 @@ export const theme = createTheme({
           WebkitBoxShadow: '0 0 0 1000px #FFFFFF inset !important',
           WebkitTextFillColor: '#1E293B !important',
           transition: 'background-color 5000s ease-in-out 0s'
+        },
+        '.leaflet-tooltip.district-map-hover-card': {
+          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(8px)',
+          border: '1px solid #E2E8F0',
+          borderRadius: '10px',
+          boxShadow: '0 8px 20px rgba(15, 23, 42, 0.12)',
+          padding: '6px 12px',
+          color: '#0F172A',
+          pointerEvents: 'none'
+        },
+        '.leaflet-tooltip.district-map-hover-card::before': {
+          borderTopColor: '#E2E8F0'
         }
       }
     },
