@@ -157,8 +157,7 @@ export const AppSelectField: React.FC<AppSelectFieldProps> = ({
           '&.Mui-focused fieldset': {
             borderColor: '#059669',
             borderWidth: '1.5px'
-          },
-          ...props.sx
+          }
         }}
         {...props}
       >

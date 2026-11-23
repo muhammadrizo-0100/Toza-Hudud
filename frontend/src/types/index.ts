@@ -69,6 +69,7 @@ export interface AppNotificationItem {
   message: string;
   status: string;
   districtId?: number | null;
+  recipientAdminId?: number | null;
   isRead: boolean;
   createdAt: string;
 }
